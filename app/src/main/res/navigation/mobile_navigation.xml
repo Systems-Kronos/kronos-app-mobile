@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/HomeFragment">
+
+    <fragment
+        android:id="@+id/CalendarioFragment"
+        android:name="com.example.kronosprojeto.ui.Calendario.CalendarioFragment"
+        android:label="CalendarioFragment"
+        tools:layout="@layout/fragment_calendario" />
+
+    <fragment
+        android:id="@+id/HomeFragment"
+        android:name="com.example.kronosprojeto.ui.Home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/ChatFragment"
+        android:name="com.example.kronosprojeto.ui.Chat.ChatFragment"
+        android:label="ChatFragment"
+        tools:layout="@layout/fragment_chat" />
+    <fragment
+        android:id="@+id/PerfilFragment"
+        android:name="com.example.kronosprojeto.ui.Perfil.perfil"
+        android:label="perfil"
+        tools:layout="@layout/fragment_perfil" />
+</navigation>
