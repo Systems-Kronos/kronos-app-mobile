@@ -1,6 +1,10 @@
 package com.example.kronosprojeto.ui.Login;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +16,7 @@ import com.example.kronosprojeto.R;
 
 public class LoginActivity extends AppCompatActivity {
 
+    TextView phoneRecoveryEntrypoint;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,5 +27,15 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        phoneRecoveryEntrypoint = findViewById(R.id.passwordRecoveryText);
+        phoneRecoveryEntrypoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
+                startActivity(intent);
+            }
+        }
+
+        );
     }
 }
