@@ -115,7 +115,7 @@
         app:layout_constraintTop_toBottomOf="@id/passwordInput" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/appCompatButton"
+        android:id="@+id/loginButton"
         android:layout_width="147dp"
         android:layout_height="39dp"
         android:layout_marginTop="48dp"
