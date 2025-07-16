@@ -33,19 +33,11 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Cria a lista de tarefas (você pode depois carregar do banco, etc.)
         List<Tarefa> tarefas = new ArrayList<>();
         tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
         tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
         tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi"));
 
-        // Aqui está o trecho que você perguntou:
         RecyclerView recyclerView = binding.recyclerview;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new TerefaAdapter(getContext(), tarefas));

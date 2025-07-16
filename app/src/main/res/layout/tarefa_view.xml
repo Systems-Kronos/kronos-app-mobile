@@ -1,8 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="140dp"
     android:layout_margin="12dp"
+    android:layout_marginStart="20dp"
     android:background="@drawable/borda_tarefa">
 
     <View
@@ -13,8 +14,8 @@
         android:background="@drawable/bordaverde_arredondada" />
 
     <LinearLayout
-        android:layout_width="375dp"
-        android:layout_height="wrap_content"
+        android:layout_width="353dp"
+        android:layout_height="158dp"
         android:layout_marginStart="-5dp"
         android:layout_toEndOf="@id/barra_decorativa"
         android:orientation="vertical"
@@ -49,26 +50,31 @@
             android:textStyle="bold"
             tools:text="0/5" />
 
-        <TextView
-            android:id="@+id/setor"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/Yelow"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="Setor:" />
+            android:layout_marginTop="10dp">
 
-        <TextView
-            android:id="@+id/maisInformacoes"
-            android:layout_width="137dp"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/setor"
-            android:textColor="@color/Yelow"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="Mais informações" />
+            <TextView
+                android:id="@+id/setor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Yelow"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Setor:" />
 
+            <TextView
+                android:id="@+id/maisInformacoes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/setor"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/Yelow"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Mais informações" />
+        </RelativeLayout>
 
     </LinearLayout>
 
