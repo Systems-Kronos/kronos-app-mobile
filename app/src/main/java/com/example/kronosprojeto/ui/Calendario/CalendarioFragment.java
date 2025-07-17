@@ -10,18 +10,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.kronosprojeto.databinding.FragmentCalendarioBinding;
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
 
 public class CalendarioFragment extends Fragment {
 
-    private FragmentHomeBinding binding;
+    private FragmentCalendarioBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         CalendarioViewModel calendarioViewModel =
                 new ViewModelProvider(this).get(CalendarioViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentCalendarioBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         return root;

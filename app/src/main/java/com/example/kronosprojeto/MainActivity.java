@@ -1,6 +1,7 @@
 package com.example.kronosprojeto;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.kronosprojeto.ui.Home.Tarefa;
 import com.example.kronosprojeto.ui.Home.TerefaAdapter;
@@ -20,7 +21,7 @@ import com.example.kronosprojeto.databinding.ActivityMainBinding;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import androidx.appcompat.widget.Toolbar;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -33,8 +34,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        View customView = getLayoutInflater().inflate(R.layout.toolbar_custom, null);
+        toolbar.addView(customView);
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.HomeFragment, R.id.CalendarioFragment, R.id.PerfilFragment, R.id.ChatFragment)
                 .build();
