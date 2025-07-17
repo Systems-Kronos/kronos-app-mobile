@@ -2,29 +2,22 @@ package com.example.kronosprojeto;
 
 import android.os.Bundle;
 import android.view.View;
-
-import com.example.kronosprojeto.ui.Home.Tarefa;
-import com.example.kronosprojeto.ui.Home.TerefaAdapter;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.databinding.ActivityMainBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import androidx.appcompat.widget.Toolbar;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,23 +26,40 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        View customView = getLayoutInflater().inflate(R.layout.toolbar_custom, null);
+        View customView = getLayoutInflater().inflate(R.layout.toolbar_custom, toolbar, false);
         toolbar.addView(customView);
 
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.HomeFragment, R.id.CalendarioFragment, R.id.PerfilFragment, R.id.ChatFragment)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+                R.id.HomeFragment,
+                R.id.CalendarioFragment,
+                R.id.PerfilFragment,
+                R.id.ChatFragment,
+                R.id.NotificationsFragment
+        ).build();
+
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
 
+        BottomNavigationView navView = binding.navView;
+        NavigationUI.setupWithNavController(navView, navController);
 
+        ImageView notificationIcon = customView.findViewById(R.id.notification_logo);
+        notificationIcon.setOnClickListener(v ->
+                navController.navigate(R.id.NotificationsFragment, null,
+                        new androidx.navigation.NavOptions.Builder()
+                                .setLaunchSingleTop(true)
+                                .setPopUpTo(R.id.mobile_navigation, false) // Não limpa o grafo inteiro
+                                .build())
+        );
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        return navController.navigateUp() || super.onSupportNavigateUp();
+    }
 }

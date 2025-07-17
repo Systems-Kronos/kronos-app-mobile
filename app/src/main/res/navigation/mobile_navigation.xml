@@ -27,4 +27,10 @@
         android:name="com.example.kronosprojeto.ui.Perfil.perfil"
         android:label="perfil"
         tools:layout="@layout/fragment_perfil" />
+
+    <fragment
+        android:id="@+id/NotificationsFragment"
+        android:name="com.example.kronosprojeto.ui.Notifications.NotificationsFragment"
+        android:label="Notificacoes"
+        tools:layout="@layout/fragment_notifications" />
 </navigation>
