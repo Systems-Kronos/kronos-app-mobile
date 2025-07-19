@@ -24,4 +24,18 @@ public class TarefaViewHolder extends RecyclerView.ViewHolder {
 
 
     }
+
+    public TextView getTituloView() {
+        return tituloView;
+    }
+    public TextView getDiaView() {
+        return diaView;
+    }
+    public TextView getPrioridadeView() {
+        return prioridadeView;
+    }
+    public TextView getSetorView() {
+        return setorView;
+    }
+
 }

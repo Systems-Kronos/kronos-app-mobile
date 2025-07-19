@@ -1,12 +1,12 @@
-package com.example.kronosprojeto.ui.Home;
+package com.example.kronosprojeto.ui.Model;
 
 import java.util.Date;
 
 public class Tarefa {
-    String titulo;
-    Date dia;
-    int prioridade;
-    String setor;
+    protected String titulo;
+    protected Date dia;
+    protected int prioridade;
+    protected String setor;
 
     String tag;
 

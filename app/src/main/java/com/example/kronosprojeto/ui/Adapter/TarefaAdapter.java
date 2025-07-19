@@ -1,6 +1,5 @@
-package com.example.kronosprojeto.ui.Home;
+package com.example.kronosprojeto.ui.Adapter;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -9,18 +8,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.R;
-
-import org.jetbrains.annotations.NotNull;
+import com.example.kronosprojeto.ui.Home.TarefaViewHolder;
+import com.example.kronosprojeto.ui.Model.Tarefa;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class TerefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
+public class TarefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
     Context context;
     List<Tarefa> tarefas;
 
-    public TerefaAdapter(Context context, List<Tarefa> tarefas) {
+    public TarefaAdapter(Context context, List<Tarefa> tarefas) {
         this.context = context;
         this.tarefas = tarefas;
     }
@@ -38,10 +37,10 @@ public class TerefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
         SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String dataFormatada = data.format(tarefas.get(position).getDia());
 
-        holder.tituloView.setText(tarefas.get(position).getTitulo());
-        holder.diaView.setText(dataFormatada);
-        holder.setorView.setText(tarefas.get(position).getSetor());
-        holder.prioridadeView.setText(String.valueOf(tarefas.get(position).getPrioridade()));
+        holder.getTituloView().setText(tarefas.get(position).getTitulo());
+        holder.getDiaView().setText(dataFormatada);
+        holder.getSetorView().setText(tarefas.get(position).getSetor());
+        holder.getPrioridadeView().setText(String.valueOf(tarefas.get(position).getPrioridade()));
 
     }
 

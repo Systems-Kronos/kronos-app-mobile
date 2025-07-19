@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -13,9 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
-import com.example.kronosprojeto.ui.Home.HomeViewModel;
-import com.example.kronosprojeto.ui.Home.Tarefa;
-import com.example.kronosprojeto.ui.Home.TerefaAdapter;
+import com.example.kronosprojeto.ui.Adapter.TarefaAdapter;
+import com.example.kronosprojeto.ui.Model.Tarefa;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +38,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView recyclerView = binding.recyclerview;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TerefaAdapter(getContext(), tarefas));
+        recyclerView.setAdapter(new TarefaAdapter(getContext(), tarefas));
 
 
         return root;
