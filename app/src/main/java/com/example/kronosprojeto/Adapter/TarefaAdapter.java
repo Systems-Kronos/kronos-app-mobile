@@ -1,4 +1,4 @@
-package com.example.kronosprojeto.ui.Adapter;
+package com.example.kronosprojeto.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.ui.Home.TarefaViewHolder;
-import com.example.kronosprojeto.ui.Model.Tarefa;
+import com.example.kronosprojeto.Model.Tarefa;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -35,11 +35,11 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull @org.jetbrains.annotations.NotNull TarefaViewHolder holder, int position){
         SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        String dataFormatada = data.format(tarefas.get(position).getDia());
-
+        String dataFormatada = "Data: " + data.format(tarefas.get(position).getDia());
+        // Pegar a ! e colocar no layout deppis mudar a cor por aqui com o id
         holder.getTituloView().setText(tarefas.get(position).getTitulo());
         holder.getDiaView().setText(dataFormatada);
-        holder.getSetorView().setText(tarefas.get(position).getSetor());
+        holder.getSetorView().setText("Setor: "+tarefas.get(position).getSetor());
         holder.getPrioridadeView().setText(String.valueOf(tarefas.get(position).getPrioridade()));
 
     }

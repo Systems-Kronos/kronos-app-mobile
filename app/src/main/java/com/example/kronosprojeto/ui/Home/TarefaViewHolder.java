@@ -22,7 +22,6 @@ public class TarefaViewHolder extends RecyclerView.ViewHolder {
         setorView = itemView.findViewById(R.id.setor);
 
 
-
     }
 
     public TextView getTituloView() {

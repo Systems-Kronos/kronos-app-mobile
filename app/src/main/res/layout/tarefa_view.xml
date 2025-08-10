@@ -14,21 +14,49 @@
         android:background="@drawable/bordaverde_arredondada" />
 
     <LinearLayout
-        android:layout_width="353dp"
-        android:layout_height="158dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginStart="-5dp"
         android:layout_toEndOf="@id/barra_decorativa"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/titulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:text="Titulo" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+               android:id="@+id/titulo"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:textColor="@color/black"
+               android:textSize="18sp"
+               android:textStyle="bold"
+               tools:text="Titulo" />
+
+            <FrameLayout
+                android:id="@+id/tag"
+                android:layout_width="110dp"
+                android:layout_height="25dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="110dp"
+                android:background="@drawable/borda_tag_roxa">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Tag"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"/>
+
+
+
+            </FrameLayout>
+
+
+
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/dia"
@@ -50,7 +78,8 @@
             android:textStyle="bold"
             tools:text="0/5" />
 
-        <RelativeLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp">
@@ -63,19 +92,21 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="Setor:" />
-
             <TextView
-                android:id="@+id/maisInformacoes"
+                android:id="@+id/Informacoes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/setor"
-                android:layout_alignParentEnd="true"
                 android:textColor="@color/Yelow"
-                android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="Mais informações" />
-        </RelativeLayout>
+                android:layout_marginStart="110dp"
+                tools:text="Mais informações"
 
+                />
+        </LinearLayout>
     </LinearLayout>
 
+
+
+
 </RelativeLayout>
+
