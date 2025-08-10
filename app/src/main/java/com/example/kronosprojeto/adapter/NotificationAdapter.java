@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.model.Notification;
 import com.example.kronosprojeto.ui.Home.TarefaViewHolder;
-import com.example.kronosprojeto.ui.Model.Tarefa;
 
 import java.util.List;
 

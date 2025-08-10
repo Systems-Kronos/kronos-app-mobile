@@ -20,6 +20,7 @@ public class TarefaViewHolder extends RecyclerView.ViewHolder {
         diaView = itemView.findViewById(R.id.dia);
         prioridadeView = itemView.findViewById(R.id.prioridade);
         setorView = itemView.findViewById(R.id.setor);
+
     }
 
     public TextView getTituloView() {

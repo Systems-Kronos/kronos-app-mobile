@@ -12,10 +12,10 @@ import com.example.kronosprojeto.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link perfil#newInstance} factory method to
+ * Use the {@link Perfil#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class perfil extends Fragment {
+public class Perfil extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class perfil extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public perfil() {
+    public Perfil() {
         // Required empty public constructor
     }
 
@@ -36,11 +36,11 @@ public class perfil extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment perfil.
+     * @return A new instance of fragment Perfil.
      */
     // TODO: Rename and change types and number of parameters
-    public static perfil newInstance(String param1, String param2) {
-        perfil fragment = new perfil();
+    public static Perfil newInstance(String param1, String param2) {
+        Perfil fragment = new Perfil();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

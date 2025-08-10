@@ -1,88 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".ui.Home.HomeFragment">
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="95dp"
+        android:padding="16dp">
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="170dp"
+            android:background="@drawable/borda_retangulo_roxo"
+            android:layout_gravity="center" />
 
             <TextView
-                android:id="@+id/textView3"
-                android:layout_width="167dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="336dp"
-                android:layout_marginEnd="353dp"
+                android:id="@+id/textoDentroDoFrame"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="90dp"
                 android:fontFamily="@font/anekodia"
-                android:text="Tarefas pendentes:"
-                android:textColor="#070707"
-                android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.06"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:text="Progresso de suas tarefas diárias"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
 
-            <EditText
-                android:id="@+id/editTextTextMultiLine"
-                android:layout_width="190dp"
-                android:layout_height="23dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginTop="8dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:inputType="textMultiLine"
-                app:layout_constraintEnd_toStartOf="@+id/textView4"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="27dp"
-                android:layout_height="21dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="372dp"
-                android:layout_marginEnd="1dp"
-                android:text="hoje"
-                app:layout_constraintEnd_toStartOf="@+id/editTextTextMultiLine2"
-                app:layout_constraintStart_toEndOf="@+id/editTextTextMultiLine"
-                app:layout_constraintTop_toTopOf="parent" />
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="75dp"
+            />
 
-            <EditText
-                android:id="@+id/editTextTextMultiLine2"
-                android:layout_width="186dp"
-                android:layout_height="21dp"
-                android:layout_marginStart="9dp"
-                android:layout_marginTop="372dp"
-                android:layout_marginEnd="3dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:inputType="textMultiLine"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView4"
-                app:layout_constraintTop_toTopOf="parent" />
+    </FrameLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview"
-                android:layout_width="361dp"
-                android:layout_height="227dp"
-                android:layout_marginTop="23dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView4"
-                app:layout_constraintVertical_bias="0.154" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="#F7EAFF">
 
-    </ScrollView>
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="167dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="336dp"
+            android:layout_marginEnd="353dp"
+            android:fontFamily="@font/anekodia"
+            android:text="Tarefas pendentes:"
+            android:textColor="#070707"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.06"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+
+        <EditText
+            android:id="@+id/lnTodayTask"
+            android:layout_width="183dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="4dp"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:gravity="start|top"
+            android:inputType="none|textMultiLine"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+
+        <TextView
+            android:id="@+id/txtToday"
+            android:layout_width="27dp"
+            android:layout_height="21dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="368dp"
+            android:layout_marginEnd="5dp"
+            android:text="hoje"
+            app:layout_constraintEnd_toStartOf="@+id/lnTodayTask2"
+            app:layout_constraintStart_toEndOf="@+id/lnTodayTask"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/lnTodayTask2"
+            android:layout_width="185dp"
+            android:layout_height="27dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:cursorVisible="false"
+            android:ems="10"
+            android:focusable="false"
+            android:gravity="start|top"
+            android:inputType="none|textMultiLine"
+            app:layout_constraintBottom_toTopOf="@+id/tomorrowstasks"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtToday"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tomorrowstasks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtToday" />
+
+
+        <Button
+            android:id="@+id/btnTarefaDiaria"
+            android:layout_width="168dp"
+            android:layout_height="58dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:backgroundTint="#BE8F35"
+            android:text="Tarefas semanais"
+            android:textAllCaps="false"
+            android:textColor="#0F0F0F"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnTarefaSemanal"
+            android:layout_width="168dp"
+            android:layout_height="58dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#F7EAFF"
+            android:text="Tarefas semanais"
+            android:textAllCaps="false"
+            android:textColor="#0F0F0F"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/btnTarefaDiaria"
+            app:layout_constraintHorizontal_bias="0.47"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+   </RelativeLayout>
+</androidx.core.widget.NestedScrollView>

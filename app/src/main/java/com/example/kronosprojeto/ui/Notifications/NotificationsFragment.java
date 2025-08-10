@@ -10,13 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.adapter.NotificationAdapter;
-import com.example.kronosprojeto.databinding.FragmentHomeBinding;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
 import com.example.kronosprojeto.model.Notification;
-import com.example.kronosprojeto.ui.Adapter.TarefaAdapter;
-import com.example.kronosprojeto.ui.Model.Tarefa;
+
 
 import java.util.ArrayList;
 import java.util.List;
