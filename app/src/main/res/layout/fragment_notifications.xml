@@ -6,18 +6,36 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.recyclerview.widget.RecyclerView
 
-        android:id="@+id/recyclerviewNotifications"
-        android:layout_width="296dp"
-        android:layout_height="652dp"
+    <ScrollView
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
 
-        android:layout_marginTop="60dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UnknownIdInLayout"
-        tools:listitem="@layout/notification_view" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:alignItems="center"
+            app:justifyContent="center"
+            >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerviewNotifications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="4dp"
+                tools:ignore="UnknownIdInLayout"
+                tools:listitem="@layout/notification_view" />
+
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
