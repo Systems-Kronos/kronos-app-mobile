@@ -1,4 +1,4 @@
-package com.example.kronosprojeto.Adapter;
+package com.example.kronosprojeto.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.ui.Home.TarefaViewHolder;
-import com.example.kronosprojeto.Model.Tarefa;
+import com.example.kronosprojeto.model.Tarefa;
 
 import java.text.SimpleDateFormat;
 import java.util.List;

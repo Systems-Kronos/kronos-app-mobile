@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
-import com.example.kronosprojeto.Adapter.TarefaAdapter;
-import com.example.kronosprojeto.Model.Tarefa;
+import com.example.kronosprojeto.adapter.TarefaAdapter;
+import com.example.kronosprojeto.model.Tarefa;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;

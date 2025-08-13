@@ -21,7 +21,6 @@ public class TarefaViewHolder extends RecyclerView.ViewHolder {
         prioridadeView = itemView.findViewById(R.id.prioridade);
         setorView = itemView.findViewById(R.id.setor);
 
-
     }
 
     public TextView getTituloView() {
