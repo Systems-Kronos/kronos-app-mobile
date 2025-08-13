@@ -24,9 +24,9 @@
         tools:layout="@layout/fragment_chat" />
     <fragment
         android:id="@+id/PerfilFragment"
-        android:name="com.example.kronosprojeto.ui.Perfil.perfil"
+        android:name="com.example.kronosprojeto.ui.Profile.ProfileFragment"
         android:label="perfil"
-        tools:layout="@layout/fragment_perfil" />
+        tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/NotificationsFragment"

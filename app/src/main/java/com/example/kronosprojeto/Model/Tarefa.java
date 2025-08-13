@@ -1,4 +1,4 @@
-package com.example.kronosprojeto.ui.Model;
+package com.example.kronosprojeto.model;
 
 import java.util.Date;
 
