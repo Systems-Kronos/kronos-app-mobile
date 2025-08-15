@@ -51,5 +51,11 @@ dependencies {
     implementation ("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.github.prolificinteractive:material-calendarview:2.0.1"){
+        exclude(group = "com.android.support", module = "support-compat")
+    }
+    implementation ("com.jakewharton.threetenabp:threetenabp:1.4.4")
+
+
 
 }
