@@ -15,7 +15,11 @@
         android:id="@+id/HomeFragment"
         android:name="com.example.kronosprojeto.ui.Home.HomeFragment"
         android:label="HomeFragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_HomeFragment_to_details"
+            app:destination="@id/details" />
+    </fragment>
 
     <fragment
         android:id="@+id/ChatFragment"
@@ -33,4 +37,9 @@
         android:name="com.example.kronosprojeto.ui.Notifications.NotificationsFragment"
         android:label="Notificacoes"
         tools:layout="@layout/fragment_notifications" />
+    <fragment
+        android:id="@+id/details"
+        android:name="com.example.kronosprojeto.ui.Details"
+        android:label="fragment_details"
+        tools:layout="@layout/fragment_details" />
 </navigation>

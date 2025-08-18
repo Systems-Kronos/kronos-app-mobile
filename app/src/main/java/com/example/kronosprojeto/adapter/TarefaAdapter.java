@@ -5,6 +5,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.R;
@@ -42,6 +45,14 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
         holder.getSetorView().setText("Setor: "+tarefas.get(position).getSetor());
         holder.getPrioridadeView().setText(String.valueOf(tarefas.get(position).getPrioridade()));
 
+        holder.getTxtInformation().setOnClickListener(v -> {
+            if (context instanceof FragmentActivity) {
+                NavController navController = Navigation.findNavController(
+                        ((FragmentActivity) context), R.id.nav_host_fragment_activity_main
+                );
+                navController.navigate(R.id.action_HomeFragment_to_details);
+            }
+        });
     }
 
     @Override
