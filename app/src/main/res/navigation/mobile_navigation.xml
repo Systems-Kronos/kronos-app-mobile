@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/CalendarioFragment"
-        android:name="com.example.kronosprojeto.ui.Calendario.CalendarioFragment"
+        android:name="com.example.kronosprojeto.ui.Calendar.CalendarFragment"
         android:label="CalendarioFragment"
-        tools:layout="@layout/fragment_calendario" />
+        tools:layout="@layout/fragment_calendar" />
 
     <fragment
         android:id="@+id/HomeFragment"
