@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class TarefaViewHolder extends RecyclerView.ViewHolder {
 
-    TextView tituloView, diaView, prioridadeView, setorView;
+    TextView tituloView, diaView, prioridadeView, setorView, maisDetalhesView, tagView;
 
     public TarefaViewHolder(@NonNull View tarefa_view){
         super(tarefa_view);
@@ -20,6 +20,9 @@ public class TarefaViewHolder extends RecyclerView.ViewHolder {
         diaView = itemView.findViewById(R.id.dia);
         prioridadeView = itemView.findViewById(R.id.prioridade);
         setorView = itemView.findViewById(R.id.setor);
+        maisDetalhesView = itemView.findViewById(R.id.Informacoes);
+        tagView = itemView.findViewById(R.id.tag);
+
 
     }
 
@@ -36,4 +39,11 @@ public class TarefaViewHolder extends RecyclerView.ViewHolder {
         return setorView;
     }
 
+    public TextView getMaisDetalhesView() {
+        return maisDetalhesView;
+    }
+
+    public TextView getTagView() {
+        return tagView;
+    }
 }

@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="140dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="12dp"
     android:layout_marginStart="20dp"
     android:background="@drawable/borda_tarefa">
@@ -12,36 +13,47 @@
         android:layout_height="160dp"
         android:layout_alignParentStart="true"
         android:background="@drawable/bordaverde_arredondada" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <com.google.android.flexbox.FlexboxLayout
+        android:paddingLeft="35dp"
+        android:paddingTop="25dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="-5dp"
-        android:layout_toEndOf="@id/barra_decorativa"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_width="match_parent"
+        android:paddingRight="20dp"
+        app:flexDirection="column"
+        >
 
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:justifyContent="space_between"
+            >
             <TextView
-               android:id="@+id/titulo"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:textColor="@color/black"
-               android:textSize="18sp"
-               android:textStyle="bold"
-               tools:text="Titulo" />
-
-            <FrameLayout
-                android:id="@+id/tag"
+                android:id="@+id/titulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Titulo" />
+            <TextView
+                android:id="@+id/titulso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Titulo" />
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/tag_box"
                 android:layout_width="110dp"
                 android:layout_height="25dp"
                 android:layout_alignParentStart="true"
-                android:layout_marginStart="110dp"
-                android:background="@drawable/borda_tag_roxa">
-
+                android:background="@drawable/borda_tag_roxa"
+                app:justifyContent="center"
+                app:alignItems="center"
+                >
                 <TextView
+                    android:id="@+id/tag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="Tag"
@@ -51,13 +63,9 @@
 
 
 
-            </FrameLayout>
+            </com.google.android.flexbox.FlexboxLayout>
 
-
-
-
-        </LinearLayout>
-
+        </com.google.android.flexbox.FlexboxLayout>
         <TextView
             android:id="@+id/dia"
             android:layout_width="wrap_content"
@@ -67,7 +75,6 @@
             android:textSize="16sp"
             android:textStyle="bold"
             tools:text="Dia: A partir das 00:00h" />
-
         <TextView
             android:id="@+id/prioridade"
             android:layout_width="wrap_content"
@@ -77,12 +84,12 @@
             android:textSize="16sp"
             android:textStyle="bold"
             tools:text="0/5" />
-
-
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            app:justifyContent="space_between">
+
+
 
             <TextView
                 android:id="@+id/setor"
@@ -98,12 +105,15 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/Yelow"
                 android:textStyle="bold"
-                android:layout_marginStart="110dp"
                 tools:text="Mais informações"
 
                 />
-        </LinearLayout>
-    </LinearLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+
 
 
 
