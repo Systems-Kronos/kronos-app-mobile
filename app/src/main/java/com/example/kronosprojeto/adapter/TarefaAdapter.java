@@ -39,13 +39,12 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
     public void onBindViewHolder(@NonNull @org.jetbrains.annotations.NotNull TarefaViewHolder holder, int position){
         SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String dataFormatada = "Data: " + data.format(tarefas.get(position).getDia());
-        // Pegar a ! e colocar no layout deppis mudar a cor por aqui com o id
         holder.getTituloView().setText(tarefas.get(position).getTitulo());
         holder.getDiaView().setText(dataFormatada);
         holder.getSetorView().setText("Setor: "+tarefas.get(position).getSetor());
         holder.getPrioridadeView().setText(String.valueOf(tarefas.get(position).getPrioridade()));
-
-        holder.getTxtInformation().setOnClickListener(v -> {
+        
+        holder.getMaisDetalhesView().setOnClickListener(v -> {
             if (context instanceof FragmentActivity) {
                 NavController navController = Navigation.findNavController(
                         ((FragmentActivity) context), R.id.nav_host_fragment_activity_main
@@ -53,6 +52,8 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
                 navController.navigate(R.id.action_HomeFragment_to_details);
             }
         });
+        holder.getTagView().setText("Tag"); // precisa ter no model
+        holder.getMaisDetalhesView().setText("Mais informações");
     }
 
     @Override
