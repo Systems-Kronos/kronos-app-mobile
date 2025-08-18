@@ -226,7 +226,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnTarefaSemanal"
-                tools:listitem="@layout/tarefa_view_refatorada" />
+                tools:listitem="@layout/tarefa_view" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

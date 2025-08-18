@@ -29,7 +29,7 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaViewHolder> {
     @org.jetbrains.annotations.NotNull
     @Override
     public TarefaViewHolder onCreateViewHolder(@NonNull @org.jetbrains.annotations.NotNull ViewGroup parent, int viewType){
-        return new TarefaViewHolder(LayoutInflater.from(context).inflate(R.layout.tarefa_view_refatorada, parent, false));
+        return new TarefaViewHolder(LayoutInflater.from(context).inflate(R.layout.tarefa_view, parent, false));
     }
 
     @Override
