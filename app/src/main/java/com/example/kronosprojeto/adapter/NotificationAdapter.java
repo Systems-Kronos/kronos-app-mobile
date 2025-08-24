@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.model.Notification;
-import com.example.kronosprojeto.ui.Home.TarefaViewHolder;
 
 import java.util.List;
 

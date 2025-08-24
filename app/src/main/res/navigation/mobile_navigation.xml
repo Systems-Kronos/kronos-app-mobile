@@ -39,7 +39,16 @@
         tools:layout="@layout/fragment_notifications" />
     <fragment
         android:id="@+id/details"
-        android:name="com.example.kronosprojeto.ui.Details"
+        android:name="com.example.kronosprojeto.ui.Details.Details"
         android:label="fragment_details"
-        tools:layout="@layout/fragment_details" />
+        tools:layout="@layout/fragment_details" >
+        <action
+            android:id="@+id/action_details_to_assignmentHistoryFragment"
+            app:destination="@id/assignmentHistoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/assignmentHistoryFragment"
+        android:name="com.example.kronosprojeto.ui.AssignmentHistory.AssignmentHistoryFragment"
+        android:label="fragment_assignment_history"
+        tools:layout="@layout/fragment_assignment_history" />
 </navigation>

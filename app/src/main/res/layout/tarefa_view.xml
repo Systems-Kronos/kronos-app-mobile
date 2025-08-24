@@ -35,14 +35,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="Titulo" />
-            <TextView
-                android:id="@+id/titulso"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:text="Titulo" />
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/tag_box"
                 android:layout_width="110dp"
