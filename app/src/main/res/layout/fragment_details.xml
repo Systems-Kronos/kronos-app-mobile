@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Exemplo de descrição" />
+                android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, :" />
 
             <TextView
                 android:id="@+id/txtTitleSection"
@@ -196,6 +196,55 @@
             app:backgroundTint="#E6B648"
             app:cornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/flexDescricaoRelator" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAtributte"
+            android:layout_width="0dp"
+            android:layout_height="49dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            android:text="Atribuir"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            app:backgroundTint="#E6B648"
+            app:cornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/flexDescricaoRelator" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUpdate2"
+            android:layout_width="wrap_content"
+            android:layout_height="49dp"
+            android:layout_marginTop="48dp"
+            android:text="Atualizar"
+            android:textColor="#0D0000"
+            android:textStyle="bold"
+            app:backgroundTint="#E6B648"
+            app:cornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.945"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/flexDescricaoRelator" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUnassign"
+            android:layout_width="wrap_content"
+            android:layout_height="49dp"
+            android:layout_marginTop="48dp"
+            android:text="Desatribuir"
+            android:textColor="#FFFEFE"
+            android:textStyle="bold"
+            app:backgroundTint="#DE1B1B"
+            app:cornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.431"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/flexDescricaoRelator" />
 

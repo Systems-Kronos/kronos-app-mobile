@@ -39,7 +39,7 @@ public class Details extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        MaterialButton btnUpdate = view.findViewById(R.id.btnUpdate);
+        MaterialButton btnUpdate = view.findViewById(R.id.btnUpdate2);
 
         btnUpdate.setOnClickListener(v -> {
             Log.d(TAG, "Botão Update clicado");
@@ -73,6 +73,36 @@ public class Details extends Fragment {
 
             bottomSheetDialog.show();
             Log.d(TAG, "BottomSheetDialog exibido.");
+        });
+
+        MaterialButton btnUnassign = view.findViewById(R.id.btnUnassign);
+
+        btnUnassign.setOnClickListener(v -> {
+            Log.d(TAG, "Botão Unassign clicado");
+
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.TransparentBottomSheetDialog);
+            View sheetView = getLayoutInflater().inflate(R.layout.botton_sheet_input_unassign, null);
+
+            MaterialButton btnConfirm = sheetView.findViewById(R.id.btnUnassign);
+            if (btnConfirm != null) {
+                btnConfirm.setOnClickListener(view1 -> {
+                    Log.d(TAG, "Botão desatribuir clicado");
+                    bottomSheetDialog.dismiss();
+                });
+            }
+
+            bottomSheetDialog.setContentView(sheetView);
+
+            View container = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (container != null) {
+                container.setBackgroundResource(android.R.color.transparent);
+                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(container);
+                behavior.setSkipCollapsed(true);
+                behavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+
+            bottomSheetDialog.show();
         });
 
         View btnReport = view.findViewById(R.id.imgReport);
