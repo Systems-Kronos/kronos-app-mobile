@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.CalendarioFragment,
                 R.id.PerfilFragment,
                 R.id.ChatFragment,
-                R.id.NotificationsFragment
+                R.id.NotificationsFragment,
+                R.id.assignmentHistoryFragment
         ).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

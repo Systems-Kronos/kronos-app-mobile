@@ -1,0 +1,114 @@
+package com.example.kronosprojeto.adapter;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.model.Tarefa;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Locale;
+
+public class TarefaAdapter extends RecyclerView.Adapter<TarefaAdapter.TarefaViewHolder> {
+    Context context;
+    List<Tarefa> tarefas;
+
+    public TarefaAdapter(Context context, List<Tarefa> tarefas) {
+        this.context = context;
+        this.tarefas = tarefas;
+    }
+
+    @NonNull
+    @org.jetbrains.annotations.NotNull
+    @Override
+    public TarefaViewHolder onCreateViewHolder(@NonNull @org.jetbrains.annotations.NotNull ViewGroup parent, int viewType){
+        return new TarefaViewHolder(LayoutInflater.from(context).inflate(R.layout.tarefa_view, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull @org.jetbrains.annotations.NotNull TarefaViewHolder holder, int position){
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat dateTerm = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        String dateFormat = "Data: " + date.format(tarefas.get(position).getDay());
+        String dateTermFormat = "Data Término:" + dateTerm.format(tarefas.get(position).getDateTerm());
+        holder.getTitleView().setText(tarefas.get(position).getTitle());
+        holder.getDayView().setText(dateFormat);
+        holder.getDayTermView().setText(dateTermFormat);
+        holder.getSectorView().setText("Setor: "+tarefas.get(position).getSector());
+        holder.getPriorityView().setText(String.valueOf(tarefas.get(position).getPriority()));
+        
+        holder.getDetailsView().setOnClickListener(v -> {
+            if (context instanceof FragmentActivity) {
+                NavController navController = Navigation.findNavController(
+                        ((FragmentActivity) context), R.id.nav_host_fragment_activity_main
+                );
+                navController.navigate(R.id.action_HomeFragment_to_details);
+            }
+        });
+        holder.getTagView().setText("Tag"); // precisa ter no model
+        holder.getDetailsView().setText("Mais informações");
+    }
+
+
+    public class TarefaViewHolder extends RecyclerView.ViewHolder {
+
+        TextView titleView, dayView, priorityView, sectorView, detailsView, tagView, dayTermView;
+
+        public TarefaViewHolder(@NonNull View tarefa_view){
+            super(tarefa_view);
+            titleView = itemView.findViewById(R.id.txtTitle);
+            dayView = itemView.findViewById(R.id.txtDay);
+            dayTermView = itemView.findViewById(R.id.dateTerm);
+            priorityView = itemView.findViewById(R.id.priority);
+            sectorView = itemView.findViewById(R.id.txtSector);
+            detailsView = itemView.findViewById(R.id.txtInformation);
+            tagView = itemView.findViewById(R.id.txtTag);
+
+        }
+
+        public TextView getDayTermView() {
+            return dayTermView;
+        }
+
+        public TextView getTitleView() {
+            return titleView;
+        }
+        public TextView getDayView() {
+            return dayView;
+        }
+        public TextView getPriorityView() {
+            return priorityView;
+        }
+        public TextView getSectorView() {
+            return sectorView;
+        }
+
+        public TextView getDetailsView() {
+            return detailsView;
+        }
+
+        public TextView getTagView() {
+            return tagView;
+        }
+    }
+
+
+    @Override
+    public int getItemCount(){
+        return tarefas.size();
+    }
+
+
+}
+
