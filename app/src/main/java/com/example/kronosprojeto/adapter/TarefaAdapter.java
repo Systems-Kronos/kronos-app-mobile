@@ -37,14 +37,18 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaAdapter.TarefaView
 
     @Override
     public void onBindViewHolder(@NonNull @org.jetbrains.annotations.NotNull TarefaViewHolder holder, int position){
-        SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        String dataFormatada = "Data: " + data.format(tarefas.get(position).getDia());
-        holder.getTituloView().setText(tarefas.get(position).getTitulo());
-        holder.getDiaView().setText(dataFormatada);
-        holder.getSetorView().setText("Setor: "+tarefas.get(position).getSetor());
-        holder.getPrioridadeView().setText(String.valueOf(tarefas.get(position).getPrioridade()));
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat dateTerm = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        String dateFormat = "Data: " + date.format(tarefas.get(position).getDay());
+        String dateTermFormat = "Data Término:" + dateTerm.format(tarefas.get(position).getDateTerm());
+        holder.getTitleView().setText(tarefas.get(position).getTitle());
+        holder.getDayView().setText(dateFormat);
+        holder.getDayTermView().setText(dateTermFormat);
+        holder.getSectorView().setText("Setor: "+tarefas.get(position).getSector());
+        holder.getPriorityView().setText(String.valueOf(tarefas.get(position).getPriority()));
         
-        holder.getMaisDetalhesView().setOnClickListener(v -> {
+        holder.getDetailsView().setOnClickListener(v -> {
             if (context instanceof FragmentActivity) {
                 NavController navController = Navigation.findNavController(
                         ((FragmentActivity) context), R.id.nav_host_fragment_activity_main
@@ -53,42 +57,45 @@ public class TarefaAdapter extends RecyclerView.Adapter<TarefaAdapter.TarefaView
             }
         });
         holder.getTagView().setText("Tag"); // precisa ter no model
-        holder.getMaisDetalhesView().setText("Mais informações");
+        holder.getDetailsView().setText("Mais informações");
     }
 
 
     public class TarefaViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tituloView, diaView, prioridadeView, setorView, maisDetalhesView, tagView;
+        TextView titleView, dayView, priorityView, sectorView, detailsView, tagView, dayTermView;
 
         public TarefaViewHolder(@NonNull View tarefa_view){
             super(tarefa_view);
-            tituloView = itemView.findViewById(R.id.titulo);
-            diaView = itemView.findViewById(R.id.dia);
-            prioridadeView = itemView.findViewById(R.id.prioridade);
-            setorView = itemView.findViewById(R.id.setor);
-            maisDetalhesView = itemView.findViewById(R.id.txtInformation);
-            tagView = itemView.findViewById(R.id.tag);
+            titleView = itemView.findViewById(R.id.txtTitle);
+            dayView = itemView.findViewById(R.id.txtDay);
+            dayTermView = itemView.findViewById(R.id.dateTerm);
+            priorityView = itemView.findViewById(R.id.priority);
+            sectorView = itemView.findViewById(R.id.txtSector);
+            detailsView = itemView.findViewById(R.id.txtInformation);
+            tagView = itemView.findViewById(R.id.txtTag);
 
         }
 
-
-
-        public TextView getTituloView() {
-            return tituloView;
-        }
-        public TextView getDiaView() {
-            return diaView;
-        }
-        public TextView getPrioridadeView() {
-            return prioridadeView;
-        }
-        public TextView getSetorView() {
-            return setorView;
+        public TextView getDayTermView() {
+            return dayTermView;
         }
 
-        public TextView getMaisDetalhesView() {
-            return maisDetalhesView;
+        public TextView getTitleView() {
+            return titleView;
+        }
+        public TextView getDayView() {
+            return dayView;
+        }
+        public TextView getPriorityView() {
+            return priorityView;
+        }
+        public TextView getSectorView() {
+            return sectorView;
+        }
+
+        public TextView getDetailsView() {
+            return detailsView;
         }
 
         public TextView getTagView() {

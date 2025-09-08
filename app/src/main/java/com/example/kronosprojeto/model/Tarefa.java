@@ -3,58 +3,65 @@ package com.example.kronosprojeto.model;
 import java.util.Date;
 
 public class Tarefa {
-    protected String titulo;
-    protected Date dia;
-    protected int prioridade;
-    protected String setor;
+    protected String title;
+    protected Date day;
+    protected int priority;
+    protected String sector;
+
+    protected Date dateTerm;
 
     String tag;
 
-    public Tarefa(String titulo, Date dia, int prioridade, String setor, String tag) {
-        this.titulo = titulo;
-        this.dia = dia;
-        this.prioridade = prioridade;
-        this.setor = setor;
+    public Tarefa(String title, Date day, int priority, String sector, String tag, Date dateTerm) {
+        this.title = title;
+        this.day = day;
+        this.priority = priority;
+        this.sector = sector;
         this.tag = tag;
+        this.dateTerm = dateTerm;
     }
 
-    public int getPrioridade() {
-        return prioridade;
+    public int getPriority() {
+        return priority;
     }
 
-    public Date getDia() {
-        return dia;
+    public Date getDay() {
+        return day;
     }
 
     public String getTag() {
         return tag;
     }
 
-    public String getSetor() {
-        return setor;
+    public String getSector() {
+        return sector;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDia(Date dia) {
-        this.dia = dia;
+    public void setDateTerm(Date day) {
+        this.dateTerm = day;
     }
 
-    public void setPrioridade(int prioridade) {
-        this.prioridade = prioridade;
+    public void setPrioridade(int priority) {
+        this.priority = priority;
     }
 
-    public void setSetor(String setor) {
-        this.setor = setor;
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
+
+    public Date getDateTerm(){
+        return dateTerm;
     }
 
     public void setTag(String tag) {
         this.tag = tag;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String titulo) {
+        this.title = titulo;
     }
 }
