@@ -13,17 +13,17 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.R;
-import com.example.kronosprojeto.model.Tarefa;
+import com.example.kronosprojeto.model.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class TarefaAdapter extends RecyclerView.Adapter<TarefaAdapter.TarefaViewHolder> {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHolder> {
     Context context;
-    List<Tarefa> tarefas;
+    List<Task> tarefas;
 
-    public TarefaAdapter(Context context, List<Tarefa> tarefas) {
+    public TaskAdapter(Context context, List<Task> tarefas) {
         this.context = context;
         this.tarefas = tarefas;
     }

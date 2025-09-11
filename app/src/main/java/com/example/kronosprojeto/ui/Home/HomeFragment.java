@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
-import com.example.kronosprojeto.adapter.TarefaAdapter;
-import com.example.kronosprojeto.model.Tarefa;
+import com.example.kronosprojeto.adapter.TaskAdapter;
+import com.example.kronosprojeto.model.Task;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -38,17 +38,17 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        List<Tarefa> tarefas = new ArrayList<>();
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Frigorífico", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        List<Task> tarefas = new ArrayList<>();
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Matadouro", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Frigorífico", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
 
         RecyclerView recyclerView = binding.tomorrowstasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TarefaAdapter(getContext(), tarefas));
+        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
 
         Log.d("DEBUG_APP", "Iniciando a MainActivity...");
 
