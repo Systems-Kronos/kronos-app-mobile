@@ -86,6 +86,11 @@ public class LoginActivity extends AppCompatActivity {
                             .edit()
                             .putString("jwt", token.getToken())
                             .apply();
+                    getSharedPreferences("app", MODE_PRIVATE)
+                            .edit()
+                            .putString("cpf", cpf)
+                            .apply();
+
 
                     Toast.makeText(LoginActivity.this, "Login OK", Toast.LENGTH_SHORT).show();
 
