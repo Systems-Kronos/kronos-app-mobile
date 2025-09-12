@@ -1,23 +1,36 @@
 package com.example.kronosprojeto;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.ActivityMainBinding;
+import com.example.kronosprojeto.dto.UserResponseDto;
+import com.example.kronosprojeto.service.UserService;
+import com.example.kronosprojeto.ui.Login.LoginActivity;
+import com.example.kronosprojeto.viewmodel.UserViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +69,34 @@ public class MainActivity extends AppCompatActivity {
                                 .setPopUpTo(R.id.mobile_navigation, false) // Não limpa o grafo inteiro
                                 .build())
         );
+
+
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
+        SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
+        String token = prefs.getString("jwt", null);
+        String cpf = prefs.getString("cpf", null);
+
+        if (token != null && cpf != null) {
+            UserService userService = RetrofitClientSQL.createService(UserService.class);
+            Call<UserResponseDto> call = userService.getUserByCPF("Bearer " + token, cpf);
+
+            call.enqueue(new Callback<UserResponseDto>() {
+
+                public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        userViewModel.setUser(response.body());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserResponseDto> call, Throwable t) {
+                }
+            });
+        }
+
+
+
     }
 
     @Override
