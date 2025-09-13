@@ -180,7 +180,7 @@ public class ProfileFragment extends Fragment {
                 nameTextView.setText(user.getNome());
                 emailView.setText(user.getEmail());
                 sectionView.setText(user.getSetor().getNome());
-                if (user.getFoto().isEmpty()){
+                if (user.getFoto() == null){
                     Glide.with(this)
                             .load(R.drawable.profile_mock)
                             .circleCrop()
