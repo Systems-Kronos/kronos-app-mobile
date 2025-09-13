@@ -5,13 +5,20 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +30,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.adapter.TarefaAdapter;
 
@@ -59,6 +68,7 @@ public class ProfileFragment extends Fragment {
     private ImageView pencilImage;
     private CloudinaryService cloudinaryService;
     private UserService usuarioService;
+    private View banner;
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
@@ -88,7 +98,7 @@ public class ProfileFragment extends Fragment {
         emailView = binding.emailText;
         sectionView = binding.setorText;
         pencilImage = binding.pencilIcon;
-
+        banner = binding.viewBanner;
         cloudinaryService = RetrofitClientCloudinary.createService(CloudinaryService.class);
 
 
@@ -105,10 +115,21 @@ public class ProfileFragment extends Fragment {
                                 .into(profileImg);
 
                         try {
-                            InputStream inputStream = getContext().getContentResolver().openInputStream(imageUri);
+                            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
                             byte[] bytes = new byte[inputStream.available()];
                             inputStream.read(bytes);
                             inputStream.close();
+
+                            InputStream inputStreamBitmap = requireContext().getContentResolver().openInputStream(imageUri);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStreamBitmap);
+                            inputStreamBitmap.close();
+
+                            if (bitmap != null) {
+                                Palette.from(bitmap).generate(palette -> {
+                                    int corPredominante = palette.getDominantColor(Color.GRAY);
+                                    banner.setBackgroundColor(corPredominante);
+                                });
+                            }
 
                             RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), bytes);
                             MultipartBody.Part body = MultipartBody.Part.createFormData(
@@ -180,16 +201,36 @@ public class ProfileFragment extends Fragment {
                 nameTextView.setText(user.getNome());
                 emailView.setText(user.getEmail());
                 sectionView.setText(user.getSetor().getNome());
+
                 if (user.getFoto() == null){
                     Glide.with(this)
                             .load(R.drawable.profile_mock)
                             .circleCrop()
                             .into(profileImg);
+
+
                 }else {
                     Glide.with(this)
                             .load(userViewModel.getUser().getValue().getFoto())
                             .circleCrop()
                             .into(profileImg);
+
+                    Glide.with(this)
+                            .asBitmap()
+                            .load(userViewModel.getUser().getValue().getFoto())
+                            .into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource,
+                                                            @Nullable Transition<? super Bitmap> transition) {
+                                    Palette.from(resource).generate(palette -> {
+                                        int corPredominante = palette.getDominantColor(Color.GRAY);
+                                        banner.setBackgroundColor(corPredominante);
+                                    });
+                                }
+
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {}
+                            });
                 }
             }
         });
