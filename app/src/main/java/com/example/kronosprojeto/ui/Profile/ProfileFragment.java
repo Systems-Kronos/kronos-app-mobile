@@ -20,6 +20,7 @@ import com.example.kronosprojeto.model.Task;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
@@ -30,6 +31,8 @@ public class ProfileFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
     }
 
     @Override
