@@ -2,7 +2,7 @@ package com.example.kronosprojeto.model;
 
 import java.util.Date;
 
-public class Tarefa {
+public class Task {
     protected String title;
     protected Date day;
     protected int priority;
@@ -12,7 +12,7 @@ public class Tarefa {
 
     String tag;
 
-    public Tarefa(String title, Date day, int priority, String sector, String tag, Date dateTerm) {
+    public Task(String title, Date day, int priority, String sector, String tag, Date dateTerm) {
         this.title = title;
         this.day = day;
         this.priority = priority;
@@ -29,10 +29,6 @@ public class Tarefa {
         return day;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
     public String getSector() {
         return sector;
     }
@@ -41,27 +37,8 @@ public class Tarefa {
         return title;
     }
 
-    public void setDateTerm(Date day) {
-        this.dateTerm = day;
-    }
-
-    public void setPrioridade(int priority) {
-        this.priority = priority;
-    }
-
-    public void setSector(String sector) {
-        this.sector = sector;
-    }
-
     public Date getDateTerm(){
         return dateTerm;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public void setTitle(String titulo) {
-        this.title = titulo;
-    }
 }

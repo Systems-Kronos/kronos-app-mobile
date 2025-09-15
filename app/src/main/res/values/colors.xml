@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="Yelow">#E6B648</color>
     <color name="GreenKronos">#70E648</color>
+    <color name="GreyMessage">#D9D9D9</color>
+    <color name="YellowMessage">#FFDB8A</color>
 </resources>
