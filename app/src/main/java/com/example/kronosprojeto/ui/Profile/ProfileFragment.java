@@ -239,6 +239,13 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        List<Task> tarefas = new ArrayList<>();
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Matadouro", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Frigorífico", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
 
 
         RecyclerView recyclerView = binding.userTasks;
