@@ -33,16 +33,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.kronosprojeto.R;
-import com.example.kronosprojeto.adapter.TarefaAdapter;
 
 import com.example.kronosprojeto.config.RetrofitClientCloudinary;
+import com.example.kronosprojeto.adapter.TaskAdapter;
+import com.example.kronosprojeto.databinding.FragmentProfileBinding;
+import com.example.kronosprojeto.model.Task;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentProfileBinding;
 import com.example.kronosprojeto.dto.UploadResultDto;
 import com.example.kronosprojeto.dto.UserResponseDto;
-import com.example.kronosprojeto.model.Tarefa;
+
 import com.example.kronosprojeto.service.AuthService;
 import com.example.kronosprojeto.service.CloudinaryService;
+
 import com.example.kronosprojeto.service.UserService;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 
@@ -194,6 +197,7 @@ public class ProfileFragment extends Fragment {
                 });
 
         pencilImage.setOnClickListener(v -> abrirGaleria());
+
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
@@ -235,17 +239,11 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        List<Tarefa> tarefas = new ArrayList<>();
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Matadouro", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Frigorífico", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Tarefa("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
+
 
         RecyclerView recyclerView = binding.userTasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TarefaAdapter(getContext(), tarefas));
+        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
 
         return root;
     }
