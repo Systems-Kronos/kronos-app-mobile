@@ -3,6 +3,7 @@ package com.example.kronosprojeto.ui.Login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,11 +16,23 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
+import com.example.kronosprojeto.dto.LoginRequestDto;
+import com.example.kronosprojeto.model.Token;
+import com.example.kronosprojeto.service.AuthService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
     TextView phoneRecoveryEntrypoint;
     AppCompatButton loginButton;
+    EditText cpfInput;
+    EditText passwordInput;
+    private AuthService authService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,11 +53,58 @@ public class LoginActivity extends AppCompatActivity {
         }
         );
         loginButton = findViewById(R.id.loginButton);
+
+        cpfInput = findViewById(R.id.cpfInput);
+        passwordInput = findViewById(R.id.passwordInput);
+
+        authService = RetrofitClientSQL.createService(AuthService.class);
+
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
+                login();
+            }
+        });
+    }
+
+    private void login() {
+        String cpf = cpfInput.getText().toString();
+        String password = passwordInput.getText().toString();
+
+        LoginRequestDto loginRequest = new LoginRequestDto(cpf, password);
+
+        Call<Token> call = authService.login(loginRequest);
+
+        call.enqueue(new Callback<Token>() {
+            @Override
+            public void onResponse(Call<Token> call, Response<Token> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Token token = response.body();
+
+                    getSharedPreferences("app", MODE_PRIVATE)
+                            .edit()
+                            .putString("jwt", token.getToken())
+                            .apply();
+                    getSharedPreferences("app", MODE_PRIVATE)
+                            .edit()
+                            .putString("cpf", cpf)
+                            .apply();
+
+
+                    Toast.makeText(LoginActivity.this, "Login OK", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Credenciais inválidas", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Token> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
