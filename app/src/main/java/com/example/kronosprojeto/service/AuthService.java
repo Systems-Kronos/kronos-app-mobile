@@ -9,4 +9,5 @@ public interface AuthService {
 
     @POST("/api/usuario/login")
     Call<Token> login(@Body LoginRequestDto loginRequest);
+    
 }

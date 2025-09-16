@@ -1,27 +1,42 @@
 package com.example.kronosprojeto.ui.Calendar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.kronosprojeto.MainActivity;
+import com.example.kronosprojeto.config.RetrofitCalenderNoSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
 import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
+import com.example.kronosprojeto.dto.LoginRequestDto;
+import com.example.kronosprojeto.model.Token;
+import com.example.kronosprojeto.service.CalenderService;
+import com.example.kronosprojeto.ui.Login.LoginActivity;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+
 import org.threeten.bp.DayOfWeek;
+import org.threeten.bp.LocalDate;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CalendarFragment extends Fragment {
 
@@ -42,6 +57,7 @@ public class CalendarFragment extends Fragment {
         // Cria uma única instância do decorator de seleção preta
         BlackBackgroundDecorator blackBackgroundDecorator = new BlackBackgroundDecorator(getContext());
 
+        // Aqui que escolhemos o dia que vai ficar marcado
         // Datas para bordas
         List<CalendarDay> bordaLaranja = Arrays.asList(
                 CalendarDay.from(2025, 8, 15),
@@ -76,6 +92,51 @@ public class CalendarFragment extends Fragment {
 
         return root;
     }
+
+    private void calender() {
+        CalenderService calendarService = RetrofitCalenderNoSQL.createService(CalenderService.class);
+
+        calendarService.buscarPorUsuario(10).enqueue(new Callback<List<com.example.kronosprojeto.model.Calendar>>() {
+            @Override
+            public void onResponse(Call<List<com.example.kronosprojeto.model.Calendar>> call,
+                                   Response<List<com.example.kronosprojeto.model.Calendar>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<com.example.kronosprojeto.model.Calendar> eventos = response.body();
+
+                    List<CalendarDay> verdes = new ArrayList<>();
+                    List<CalendarDay> laranjas = new ArrayList<>();
+
+                    for (int i = 0; i < eventos.size(); i++) {
+                        com.example.kronosprojeto.model.Calendar event = eventos.get(i);
+
+                        LocalDate date = LocalDate.parse(event.getDay().substring(0, 10));
+
+                        CalendarDay dia = CalendarDay.from(
+                                date.getYear(),
+                                date.getMonthValue(),
+                                date.getDayOfMonth()
+                        );
+
+                        if (Boolean.TRUE.equals(event.getPresenca())) {
+                            verdes.add(dia);
+                        } else {
+                            laranjas.add(dia);
+                        }
+                    }
+
+                    binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes));
+                    binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<com.example.kronosprojeto.model.Calendar>> call, Throwable t) {
+                t.printStackTrace();
+                Toast.makeText(getContext(), "Erro ao buscar eventos: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     @Override
     public void onDestroyView() {

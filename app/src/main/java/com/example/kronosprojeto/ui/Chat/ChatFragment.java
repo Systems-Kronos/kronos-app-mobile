@@ -12,6 +12,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kronosprojeto.databinding.FragmentChatBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChatFragment extends Fragment {
 
     private FragmentChatBinding binding;
@@ -23,6 +26,14 @@ public class ChatFragment extends Fragment {
 
         binding = FragmentChatBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        List<String> mensagens = new ArrayList<>();
+        mensagens.add("Oi chat, tudo bom?");
+        mensagens.add("Tudo sim, o que deseja?");
+        mensagens.add("Como eu bato ponto?");
+        mensagens.add("Aqui não bate ponto 😡");
+        mensagens.add("Ta bom");
+
 
         return root;
     }
