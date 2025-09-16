@@ -30,7 +30,11 @@
         android:id="@+id/PerfilFragment"
         android:name="com.example.kronosprojeto.ui.Profile.ProfileFragment"
         android:label="perfil"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_PerfilFragment_to_details"
+            app:destination="@id/details" />
+    </fragment>
 
     <fragment
         android:id="@+id/NotificationsFragment"
