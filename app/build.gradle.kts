@@ -57,6 +57,7 @@ dependencies {
         exclude(group = "com.android.support", module = "support-compat")
     }
     implementation ("com.jakewharton.threetenabp:threetenabp:1.4.4")
+    implementation("androidx.palette:palette:1.0.0")
 
 
 

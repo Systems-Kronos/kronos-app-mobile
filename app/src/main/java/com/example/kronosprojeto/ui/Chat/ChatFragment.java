@@ -35,7 +35,6 @@ public class ChatFragment extends Fragment {
         mensagens.add("Ta bom");
 
 
-
         return root;
     }
 
