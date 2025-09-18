@@ -1,6 +1,5 @@
 package com.example.kronosprojeto.ui.Calendar;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,19 +8,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
-import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.config.RetrofitCalenderNoSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
 import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
-import com.example.kronosprojeto.dto.LoginRequestDto;
-import com.example.kronosprojeto.model.Token;
 import com.example.kronosprojeto.service.CalenderService;
-import com.example.kronosprojeto.ui.Login.LoginActivity;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
@@ -29,7 +22,6 @@ import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;

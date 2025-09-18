@@ -76,13 +76,12 @@
                         android:layout_width="120dp"
                         android:layout_height="35dp"
                         android:background="#ffff"
-                        android:text="Estarei presente"
+                        android:text="Reportar um problema"
                         android:textAllCaps="false"
 
                         android:textColor="#25173A"
-                        android:textStyle="bold"
                         android:textSize="13dp"
-                         />
+                        android:textStyle="bold" />
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/absenceSelect"
                         android:layout_width="120dp"

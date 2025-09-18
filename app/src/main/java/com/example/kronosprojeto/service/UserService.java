@@ -10,7 +10,6 @@ import retrofit2.http.Path;
 
 
 public interface UserService {
-
     @GET("/api/usuario/selecionarCpf/{cpf}")
     Call<UserResponseDto> getUserByCPF(@Header("Authorization") String token, @Path("cpf") String cpf);
 
