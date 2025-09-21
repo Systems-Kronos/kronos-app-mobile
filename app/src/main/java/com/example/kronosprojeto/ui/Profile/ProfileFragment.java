@@ -250,7 +250,7 @@ public class ProfileFragment extends Fragment {
 
         RecyclerView recyclerView = binding.userTasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
+        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas, "profile"));
 
         return root;
     }
