@@ -34,8 +34,6 @@ public class ChatFragment extends Fragment {
         mensagens.add("Aqui não bate ponto 😡");
         mensagens.add("Ta bom");
 
-
-
         return root;
     }
 

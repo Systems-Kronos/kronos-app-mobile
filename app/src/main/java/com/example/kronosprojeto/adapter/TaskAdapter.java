@@ -23,9 +23,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
     Context context;
     List<Task> tarefas;
 
-    public TaskAdapter(Context context, List<Task> tarefas) {
+    String comeFrom;
+
+    public TaskAdapter(Context context, List<Task> tarefas, String comeFrom) {
         this.context = context;
         this.tarefas = tarefas;
+        this.comeFrom = comeFrom;
     }
 
     @NonNull
@@ -53,7 +56,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
                 NavController navController = Navigation.findNavController(
                         ((FragmentActivity) context), R.id.nav_host_fragment_activity_main
                 );
-                navController.navigate(R.id.action_HomeFragment_to_details);
+
+                if(comeFrom.equals("home")){
+                    navController.navigate(R.id.action_HomeFragment_to_details);
+                }else{
+                    navController.navigate(R.id.action_PerfilFragment_to_details);
+
+                }
             }
         });
         holder.getTagView().setText("Tag"); // precisa ter no model

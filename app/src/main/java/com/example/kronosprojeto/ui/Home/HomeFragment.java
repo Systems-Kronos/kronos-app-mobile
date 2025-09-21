@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView recyclerView = binding.tomorrowstasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
+        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas, "home"));
 
         Log.d("DEBUG_APP", "Iniciando a MainActivity...");
 

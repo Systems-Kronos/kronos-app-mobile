@@ -38,7 +38,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -61,7 +60,8 @@ public class ProfileFragment extends Fragment {
 
         RecyclerView recyclerView = binding.userTasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
+        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas, "profile"));
+
 
         return root;
     }
