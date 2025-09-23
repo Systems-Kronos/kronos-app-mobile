@@ -91,6 +91,7 @@ public class CalendarFragment extends Fragment {
             widget.invalidateDecorators();
         });
 
+        searchUserID();
 
         return root;
     }
@@ -141,7 +142,7 @@ public class CalendarFragment extends Fragment {
 
 
 
-    private void searchUserID(){
+    private void searchUserID() {
 
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
@@ -150,25 +151,26 @@ public class CalendarFragment extends Fragment {
         String token = prefs.getString("token", null);
 
         UserService userService = RetrofitClientSQL.createService(UserService.class);
-
-        userService.getUserByCPF(token, cpf).enqueue(new Callback<List<UserResponseDto>>() {
+        userService.getUserByCPF(token, cpf).enqueue(new Callback<UserResponseDto>() {
             @Override
-            public void onResponse(Call<List<UserResponseDto>> call,
-                                   Response<List<UserResponseDto>> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    UserResponseDto usuario = response.body().get(0);
+            public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserResponseDto usuario = response.body();
                     long userId = usuario.getId();
+
                     calender(userId);
+                } else {
+                    Toast.makeText(getContext(), "Usuário não encontrado", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<UserResponseDto>> call, Throwable t) {
+            public void onFailure(Call<UserResponseDto> call, Throwable t) {
                 Toast.makeText(getContext(), "Erro ao buscar usuário: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
+
 
 
     @Override
