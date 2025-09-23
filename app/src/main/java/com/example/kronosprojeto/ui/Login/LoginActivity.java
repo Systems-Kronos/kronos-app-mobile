@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         phoneRecoveryEntrypoint = findViewById(R.id.passwordRecoveryText);
         phoneRecoveryEntrypoint.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
+
         );
         loginButton = findViewById(R.id.loginButton);
 

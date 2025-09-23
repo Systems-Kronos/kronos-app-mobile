@@ -1,6 +1,7 @@
 package com.example.kronosprojeto.ui.Calendar;
 
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +11,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.example.kronosprojeto.MainActivity;
-import com.example.kronosprojeto.config.RetrofitCalenderNoSQL;
+import com.example.kronosprojeto.config.RetrofitCalendarNoSQL;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
 import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
-import com.example.kronosprojeto.dto.LoginRequestDto;
-import com.example.kronosprojeto.model.Token;
-import com.example.kronosprojeto.service.CalenderService;
-import com.example.kronosprojeto.ui.Login.LoginActivity;
+import com.example.kronosprojeto.dto.UserResponseDto;
+import com.example.kronosprojeto.service.*;
+import com.example.kronosprojeto.viewmodel.UserViewModel;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
@@ -29,7 +28,7 @@ import com.prolificinteractive.materialcalendarview.format.WeekDayFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+import com.example.kronosprojeto.viewmodel.UserViewModel;
 
 import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;
@@ -37,8 +36,10 @@ import org.threeten.bp.LocalDate;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.example.kronosprojeto.service.CalendarService;
 
 public class CalendarFragment extends Fragment {
+    private UserViewModel userViewModel;
 
     private FragmentCalendarBinding binding;
     private static final String[] DIAS_ABREV = {"D", "S", "T", "Q", "Q", "S", "S"};
@@ -90,13 +91,14 @@ public class CalendarFragment extends Fragment {
             widget.invalidateDecorators();
         });
 
+
         return root;
     }
 
-    private void calender() {
-        CalenderService calendarService = RetrofitCalenderNoSQL.createService(CalenderService.class);
+    private void calender(long userId) {
+        CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
 
-        calendarService.buscarPorUsuario(10).enqueue(new Callback<List<com.example.kronosprojeto.model.Calendar>>() {
+        calendarService.searchUser(userId).enqueue(new Callback<List<com.example.kronosprojeto.model.Calendar>>() {
             @Override
             public void onResponse(Call<List<com.example.kronosprojeto.model.Calendar>> call,
                                    Response<List<com.example.kronosprojeto.model.Calendar>> response) {
@@ -132,9 +134,40 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(Call<List<com.example.kronosprojeto.model.Calendar>> call, Throwable t) {
                 t.printStackTrace();
-                Toast.makeText(getContext(), "Erro ao buscar eventos: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Erro tal tal: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+
+    private void searchUserID(){
+
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
+        SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
+        String cpf = prefs.getString("cpf", null);
+        String token = prefs.getString("token", null);
+
+        UserService userService = RetrofitClientSQL.createService(UserService.class);
+
+        userService.getUserByCPF(token, cpf).enqueue(new Callback<List<UserResponseDto>>() {
+            @Override
+            public void onResponse(Call<List<UserResponseDto>> call,
+                                   Response<List<UserResponseDto>> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                    UserResponseDto usuario = response.body().get(0);
+                    long userId = usuario.getId();
+                    calender(userId);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserResponseDto>> call, Throwable t) {
+                Toast.makeText(getContext(), "Erro ao buscar usuário: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 
