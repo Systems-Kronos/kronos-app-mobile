@@ -3,7 +3,6 @@ package com.example.kronosprojeto.ui.Profile;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -40,11 +39,9 @@ import com.example.kronosprojeto.adapter.TaskAdapter;
 import com.example.kronosprojeto.databinding.FragmentProfileBinding;
 import com.example.kronosprojeto.model.Task;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
-import com.example.kronosprojeto.databinding.FragmentProfileBinding;
 import com.example.kronosprojeto.dto.UploadResultDto;
 import com.example.kronosprojeto.dto.UserResponseDto;
 
-import com.example.kronosprojeto.service.AuthService;
 import com.example.kronosprojeto.service.CloudinaryService;
 
 import com.example.kronosprojeto.service.TaskService;
@@ -54,7 +51,6 @@ import com.example.kronosprojeto.viewmodel.UserViewModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -289,7 +285,7 @@ public class ProfileFragment extends Fragment {
                                 + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
                                 + ", Status: " + tarefa.getStatus());
                     }
-                    adapter.updateList(tarefas); // Atualiza RecyclerView
+                    adapter.updateList(tarefas);
                 } else {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
                 }
