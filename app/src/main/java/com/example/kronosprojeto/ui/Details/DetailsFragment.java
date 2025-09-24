@@ -1,11 +1,14 @@
 package com.example.kronosprojeto.ui.Details;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,18 +17,30 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.RetrofitClientCloudinary;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
+import com.example.kronosprojeto.dto.TaskDetailsDto;
+import com.example.kronosprojeto.model.Task;
+import com.example.kronosprojeto.service.CloudinaryService;
+import com.example.kronosprojeto.service.TaskService;
+import com.example.kronosprojeto.service.UserService;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 
-public class Details extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class DetailsFragment extends Fragment {
 
     private static final String TAG = "DetailsFragment";
+    private TaskService taskService;
 
-    public Details() {}
+    public DetailsFragment() {}
 
-    public static Details newInstance() {
-        return new Details();
+    public static DetailsFragment newInstance() {
+        return new DetailsFragment();
     }
 
     @Override
@@ -38,6 +53,23 @@ public class Details extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        long idTarefa = -1; // valor padrão caso não venha nada
+        if (getArguments() != null) {
+            idTarefa = getArguments().getLong("idTarefa", -1); // mesmo nome que o adapter
+            Log.d("DetailsFragment", "Id da tarefa recebido: " + idTarefa);
+        }
+        taskService = RetrofitClientSQL.createService(TaskService.class);
+
+        TextView txtTituloTarefa = view.findViewById(R.id.txtTituloTarefa);
+        TextView txtDescription = view.findViewById(R.id.txtDescription);
+        TextView txtInicialDate = view.findViewById(R.id.txtInicialDate);
+        TextView txtSituation = view.findViewById(R.id.txtSituation);
+        TextView txtSection = view.findViewById(R.id.txtSection);
+        TextView txtRapporteur = view.findViewById(R.id.txtRapporteur);
+        TextView txtAdditionalContacts = view.findViewById(R.id.txtAdditionalContacts);
+
 
         MaterialButton btnUpdate = view.findViewById(R.id.btnUpdate);
 
@@ -109,10 +141,54 @@ public class Details extends Fragment {
             bottomSheetDialog.show();
         });
 
+
+
+
         ImageView imgHistorico = view.findViewById(R.id.imgHistorico);
         imgHistorico.setOnClickListener(s -> {
-            NavController navController = NavHostFragment.findNavController(Details.this);
+            NavController navController = NavHostFragment.findNavController(DetailsFragment.this);
             navController.navigate(R.id.action_details_to_assignmentHistoryFragment);
         });
-    }
+        SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
+        String token = prefs.getString("jwt", null);
+
+
+
+        if (idTarefa != -1 && token != null) {
+            Call<TaskDetailsDto> call = taskService.getTaskById(idTarefa, "Bearer " + token);
+            call.enqueue(new Callback<TaskDetailsDto>() {
+                @Override
+                public void onResponse(Call<TaskDetailsDto> call, Response<TaskDetailsDto> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        TaskDetailsDto task = response.body();
+                        Log.d(TAG, "Tarefa recebida: " + task.getNome());
+                        TaskDetailsDto tarefa = response.body();
+                        txtTituloTarefa.setText(tarefa.getNome());
+                        txtDescription.setText(tarefa.getDescricao() != null ? tarefa.getDescricao() : "-");
+                        txtInicialDate.setText(tarefa.getDataAtribuicao() != null ? tarefa.getDataAtribuicao() : "-");
+                        txtSituation.setText(tarefa.getStatus() != null ? tarefa.getStatus() : "-");
+                        txtRapporteur.setText(tarefa.getUsuarioRelator().getNome() != null ? tarefa.getUsuarioRelator().getNome()  : "-");
+                        txtAdditionalContacts.setText(tarefa.getUsuarioRelator().getEmail() != null ? tarefa.getUsuarioRelator().getEmail()  : "-");
+                        txtSection.setText(tarefa.getUsuarioRelator().getSetor().getNome() != null ? tarefa.getUsuarioRelator().getSetor().getNome()  : "-");
+
+
+
+
+                    } else {
+                        Log.e(TAG, "Erro na resposta: " + response.code());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<TaskDetailsDto> call, Throwable t) {
+                    Log.e(TAG, "Falha ao buscar tarefa", t);
+                }
+            });
+        } else {
+            Log.e(TAG, "idTarefa inválido ou token nulo");
+            Log.e(TAG, "idTarefa inválido ou token nulo: " + idTarefa + ", " + token);
+
+
+
+        }    }
 }

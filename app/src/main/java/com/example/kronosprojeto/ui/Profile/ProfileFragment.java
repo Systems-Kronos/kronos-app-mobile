@@ -262,12 +262,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
-        // Logando parâmetros da requisição
-        Log.d("DEBUG_TASKS", "Chamando getTasksByUserID com:");
-        Log.d("DEBUG_TASKS", "Token: " + token);
-        Log.d("DEBUG_TASKS", "usuarioId: " + usuarioId);
-        Log.d("DEBUG_TASKS", "tipoTarefa: " + tipoTarefa);
-        Log.d("DEBUG_TASKS", "status: " + status);
 
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
         Call<List<Task>> call = service.getTasksByUserID(usuarioId,"Bearer "+ token, tipoTarefa, status);

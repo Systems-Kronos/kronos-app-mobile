@@ -1,6 +1,7 @@
 package com.example.kronosprojeto.service;
 
 
+import com.example.kronosprojeto.dto.TaskDetailsDto;
 import com.example.kronosprojeto.model.Calendar;
 import com.example.kronosprojeto.model.Task;
 
@@ -20,4 +21,10 @@ public interface TaskService {
                                       @Header("Authorization") String token,
                                       @Query("tipoTarefa") String tipoTarefa,
                                       @Query("status") String status);
+
+    @GET("/api/tarefa/selecionar/{idTarefa}")
+    Call<TaskDetailsDto> getTaskById(@Path("idTarefa")long idTarefa,
+                                     @Header("Authorization") String token
+    );
+
 }

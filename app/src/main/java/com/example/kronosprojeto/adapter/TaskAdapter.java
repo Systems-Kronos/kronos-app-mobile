@@ -1,6 +1,7 @@
 package com.example.kronosprojeto.adapter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,11 +65,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
                 NavController navController = Navigation.findNavController(
                         ((FragmentActivity) context), R.id.nav_host_fragment_activity_main
                 );
+                Bundle bundle = new Bundle();
+                bundle.putLong("idTarefa", tarefas.get(position).getId());
 
                 if(comeFrom.equals("home")){
-                    navController.navigate(R.id.action_HomeFragment_to_details);
+                    navController.navigate(R.id.action_HomeFragment_to_details,bundle);
                 }else{
-                    navController.navigate(R.id.action_PerfilFragment_to_details);
+                    navController.navigate(R.id.action_PerfilFragment_to_details,bundle);
 
                 }
             }

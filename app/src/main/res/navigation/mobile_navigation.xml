@@ -43,7 +43,7 @@
         tools:layout="@layout/fragment_notifications" />
     <fragment
         android:id="@+id/details"
-        android:name="com.example.kronosprojeto.ui.Details.Details"
+        android:name="com.example.kronosprojeto.ui.Details.DetailsFragment"
         android:label="fragment_details"
         tools:layout="@layout/fragment_details" >
         <action
