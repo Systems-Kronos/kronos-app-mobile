@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -69,17 +70,17 @@ public class CalendarFragment extends Fragment {
             widget.invalidateDecorators();
         });
 
-        // Aqui eu preencho os dados necessários para instanciar o Calendário
+        // Aqui eu preencho os dados necessários para instanciar o Calendário quando tentam marcar a falta
+        // CAso 1 que seria a questão da falta mesmo
 
-        Calendar calendar = new Calendar();
-        calendar.setDay(editTextDay.getText().toString());
-        calendar.setPresence(checkBoxPresence.isChecked());
-        calendar.setObservation(editTextObs.getText().toString());
 
-        searchUserID();
+        Button btnAbsence = calendarView.findViewById(R.id.absenceSelect);
+        btnAbsence.setOnClickListener(v -> {
 
-        return root;
+        });
+        return  root;
     }
+
 
     private void calender(long userId) {
         CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
@@ -115,6 +116,8 @@ public class CalendarFragment extends Fragment {
                     binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes));
                     binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas));
                 }
+
+
             }
 
             @Override
@@ -131,19 +134,18 @@ public class CalendarFragment extends Fragment {
         calendarService.updateReport(id, calendar).enqueue(new Callback<Calendar>() {
             @Override
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
-                // Recebi da requisição o calendário (json) e o id desse calendário, aqui armazenei esse json calendario
 
                 if (response.isSuccessful() && response.body() != null) {
-                    Calendar updated = response.body();
+                    Calendar calenderUpdated = response.body();
 
-                    LocalDate date = LocalDate.parse(updated.getDay().substring(0, 10));
+                    LocalDate date = LocalDate.parse(calenderUpdated.getDay().substring(0, 10));
                     CalendarDay dia = CalendarDay.from(
                             date.getYear(),
                             date.getMonthValue(),
                             date.getDayOfMonth()
                     );
 
-                    if (Boolean.TRUE.equals(updated.getPresence())) {
+                    if (calenderUpdated.getPresence()) {
                         binding.calendarView.addDecorator(
                                 new GreenBorderDecorator(getContext(), List.of(dia))
                         );
