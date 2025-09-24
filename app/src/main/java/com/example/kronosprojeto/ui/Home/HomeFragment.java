@@ -55,7 +55,7 @@ public class HomeFragment extends Fragment {
         recyclerView = binding.tomorrowstasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TaskAdapter(getContext(), new ArrayList<>()); // lista vazia inicial
+        adapter = new TaskAdapter(getContext(), new ArrayList<>(), "home"); // lista vazia inicial
         recyclerView.setAdapter(adapter);
         Log.d("DEBUG_APP", "Iniciando a MainActivity...");
 

@@ -244,7 +244,7 @@ public class ProfileFragment extends Fragment {
 
         recyclerView = binding.userTasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TaskAdapter(getContext(), tarefas);
+        adapter = new TaskAdapter(getContext(), tarefas,"profile");
 
         recyclerView.setAdapter(adapter);
 

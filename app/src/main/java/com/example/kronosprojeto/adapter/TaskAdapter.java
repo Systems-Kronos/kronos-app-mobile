@@ -23,7 +23,6 @@ import java.util.Locale;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHolder> {
     Context context;
     List<Task> tarefas;
-
     String comeFrom;
 
     public TaskAdapter(Context context, List<Task> tarefas, String comeFrom) {
