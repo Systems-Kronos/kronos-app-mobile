@@ -19,6 +19,7 @@ import com.example.kronosprojeto.databinding.ActivityMainBinding;
 import com.example.kronosprojeto.dto.UserResponseDto;
 import com.example.kronosprojeto.service.UserService;
 import com.example.kronosprojeto.ui.Login.LoginActivity;
+import com.example.kronosprojeto.utils.NotificationHelper;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -99,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
 
 
     }

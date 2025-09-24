@@ -3,7 +3,7 @@ package com.example.kronosprojeto.model;
 public class Notification {
 
     private String cMensagem;
-    private String dDataCriacao;
+    private String dCriacao;
 
 
     public String getTitulo() {
@@ -11,7 +11,7 @@ public class Notification {
     }
 
     public String getDescrição() {
-        return dDataCriacao;
+        return dCriacao;
     }
 
 
@@ -21,7 +21,7 @@ public class Notification {
     }
 
     public Notification(String titulo, String descrição) {
-        this.dDataCriacao = titulo;
+        this.dCriacao = titulo;
         this.cMensagem = descrição;
     }
 }

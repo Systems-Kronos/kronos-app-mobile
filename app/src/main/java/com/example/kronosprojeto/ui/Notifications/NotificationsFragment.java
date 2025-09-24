@@ -17,6 +17,8 @@ import com.example.kronosprojeto.config.RetrofitCalenderNoSQL;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
 import com.example.kronosprojeto.model.Notification;
 import com.example.kronosprojeto.service.NotificationService;
+import com.example.kronosprojeto.utils.NotificationHelper;
+import com.example.kronosprojeto.utils.NotificationProcessor;
 
 
 import java.util.ArrayList;
@@ -51,7 +53,8 @@ public class NotificationsFragment extends Fragment {
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
 
-        // Faz a chamada à API
+        NotificationHelper.createNotificationChannel(requireContext());
+
         Call<List<Notification>> call = notificationService.getNotificationsByUserID(usuarioId);
         call.enqueue(new retrofit2.Callback<List<Notification>>() {
             @Override
@@ -60,6 +63,8 @@ public class NotificationsFragment extends Fragment {
                     List<Notification> notifications = response.body();
                     NotificationAdapter adapter = new NotificationAdapter(getContext(), notifications);
                     recyclerView.setAdapter(adapter);
+                    NotificationProcessor.processarNotificacoes(getContext(), notifications);
+
                 }
             }
 
