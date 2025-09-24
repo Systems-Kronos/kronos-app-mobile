@@ -3,11 +3,11 @@ package com.example.kronosprojeto.config;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitCalenderNoSQL {
+public class RetrofitCalendarNoSQL {
     private static final String BASE_URL = "https://spring-api-nosql.onrender.com";
     private static Retrofit retrofit;
 
-    private RetrofitCalenderNoSQL() {
+    private RetrofitCalendarNoSQL() {
     }
 
     private static Retrofit getRetrofitInstance() {
