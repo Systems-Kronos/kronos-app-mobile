@@ -1,5 +1,7 @@
 package com.example.kronosprojeto.ui.Home;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,21 +16,32 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
 import com.example.kronosprojeto.adapter.TaskAdapter;
 import com.example.kronosprojeto.model.Task;
+import com.example.kronosprojeto.service.TaskService;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
+
+    RecyclerView recyclerView;
+    TaskAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -37,19 +50,13 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         List<Task> tarefas = new ArrayList<>();
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Matadouro", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Frigorífico", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
 
-        RecyclerView recyclerView = binding.tomorrowstasks;
+        recyclerView = binding.tomorrowstasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
 
+        adapter = new TaskAdapter(getContext(), new ArrayList<>()); // lista vazia inicial
+        recyclerView.setAdapter(adapter);
         Log.d("DEBUG_APP", "Iniciando a MainActivity...");
 
         PieChart pieChart = binding.pieChart;
@@ -83,6 +90,16 @@ public class HomeFragment extends Fragment {
         pieChart.setCenterTextColor(Color.parseColor("#370963"));
         pieChart.setDrawCenterText(true);
         pieChart.setHoleColor(Color.parseColor("#FFE9B5"));
+        SharedPreferences prefs = getActivity().getSharedPreferences("app", Context.MODE_PRIVATE);
+
+
+
+
+
+        String token = prefs.getString("jwt", null);
+        String usuarioIdStr = prefs.getString("id", "0");
+        Long usuarioId = Long.parseLong(usuarioIdStr);
+        carregarTarefasUsuario(token,usuarioId, "1", "1");
 
         return root;
     }
@@ -92,4 +109,46 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+    private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
+        // Logando parâmetros da requisição
+        Log.d("DEBUG_TASKS", "Chamando getTasksByUserID com:");
+        Log.d("DEBUG_TASKS", "Token: " + token);
+        Log.d("DEBUG_TASKS", "usuarioId: " + usuarioId);
+        Log.d("DEBUG_TASKS", "tipoTarefa: " + tipoTarefa);
+        Log.d("DEBUG_TASKS", "status: " + status);
+
+        TaskService service = RetrofitClientSQL.createService(TaskService.class);
+        Call<List<Task>> call = service.getTasksByUserID(usuarioId,"Bearer "+ token, tipoTarefa, status);
+
+        call.enqueue(new Callback<List<Task>>() {
+            @Override
+            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Task> tarefas = response.body();
+                    Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
+                    for (Task tarefa : tarefas) {
+                        Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
+                                + ", Gravidade: " + tarefa.getGravidade()
+                                + ", Origem: " + tarefa.getOrigemTarefa()
+                                + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
+                                + ", Status: " + tarefa.getStatus());
+                    }
+                    adapter.updateList(tarefas); // Atualiza RecyclerView
+                } else {
+                    Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Task>> call, Throwable t) {
+                Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
+            }
+
+        });
+
+
+
+
+    }
+
 }

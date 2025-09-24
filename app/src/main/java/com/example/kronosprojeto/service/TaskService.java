@@ -12,8 +12,12 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface TaskService {
     @GET("/api/tarefa/selecionarFunction/{idUsuario}")
-    Call<List<Task>> getTasksByUserID(@Path("idUsuario") Integer idUsuario, @Header("Authorization") String token);
+    Call<List<Task>> getTasksByUserID(@Path("idUsuario")long idUsuario,
+                                      @Header("Authorization") String token,
+                                      @Query("tipoTarefa") String tipoTarefa,
+                                      @Query("status") String status);
 }

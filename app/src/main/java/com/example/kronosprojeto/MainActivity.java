@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         userViewModel.setUser(response.body());
-                        getSharedPreferences("app", MODE_PRIVATE)
+                        prefs
                                 .edit()
-                                .putString("id", Long.toString( response.body().getId()))
+                                .putString("id", String.valueOf( response.body().getId()))
                                 .apply();
                     }
                 }

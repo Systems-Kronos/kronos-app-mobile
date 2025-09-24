@@ -16,6 +16,7 @@ import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.model.Task;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,16 +38,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
 
     @Override
     public void onBindViewHolder(@NonNull @org.jetbrains.annotations.NotNull TarefaViewHolder holder, int position){
-        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        SimpleDateFormat dateTerm = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-        String dateFormat = "Data: " + date.format(tarefas.get(position).getDay());
-        String dateTermFormat = "Data Término:" + dateTerm.format(tarefas.get(position).getDateTerm());
-        holder.getTitleView().setText(tarefas.get(position).getTitle());
-        holder.getDayView().setText(dateFormat);
-        holder.getDayTermView().setText(dateTermFormat);
-        holder.getSectorView().setText("Setor: "+tarefas.get(position).getSector());
-        holder.getPriorityView().setText(String.valueOf(tarefas.get(position).getPriority()));
+
+        String atribuicao = tarefas.get(position).getDataAtribuicao();
+        if (atribuicao != null && !atribuicao.isEmpty()) {
+            holder.getDayView().setText("Data: " + atribuicao);
+        } else {
+            holder.getDayView().setText("Data: -");
+        }
+
+
+        holder.getTitleView().setText(tarefas.get(position).getNome());
+        holder.getSectorView().setText(" ");
+        int tempo = tarefas.get(position).getTempoEstimado();
+        holder.getDayTermView().setText("Tempo estimado: " + tempo + " Horas");
+
+        int gut = tarefas.get(position).getGravidade()  * tarefas.get(position).getGravidade() *  tarefas.get(position).getUrgencia() * tarefas.get(position).getTendencia();
+        double gutEscala = (gut / 125.0) * 5;
+        holder.getPriorityView().setText(String.valueOf(gutEscala));
         
         holder.getDetailsView().setOnClickListener(v -> {
             if (context instanceof FragmentActivity) {
@@ -56,7 +65,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
                 navController.navigate(R.id.action_HomeFragment_to_details);
             }
         });
-        holder.getTagView().setText("Tag"); // precisa ter no model
+        holder.getTagView().setText(tarefas.get(position).getOrigemTarefa()); // precisa ter no model
         holder.getDetailsView().setText("Mais informações");
     }
 
@@ -107,6 +116,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
     @Override
     public int getItemCount(){
         return tarefas.size();
+    }
+    public void updateList(List<Task> novasTarefas) {
+        this.tarefas.clear();
+        this.tarefas.addAll(novasTarefas);
+        notifyDataSetChanged();
     }
 
 

@@ -3,6 +3,7 @@ package com.example.kronosprojeto.ui.Profile;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -46,6 +47,7 @@ import com.example.kronosprojeto.dto.UserResponseDto;
 import com.example.kronosprojeto.service.AuthService;
 import com.example.kronosprojeto.service.CloudinaryService;
 
+import com.example.kronosprojeto.service.TaskService;
 import com.example.kronosprojeto.service.UserService;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 
@@ -72,7 +74,8 @@ public class ProfileFragment extends Fragment {
     private CloudinaryService cloudinaryService;
     private UserService usuarioService;
     private View banner;
-
+    RecyclerView recyclerView;
+    TaskAdapter adapter;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
 
@@ -240,18 +243,19 @@ public class ProfileFragment extends Fragment {
         });
 
         List<Task> tarefas = new ArrayList<>();
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Matadouro", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Frigorífico", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
-        tarefas.add(new Task("Matar boi", new Date(), 3, "Administração", "boi", new Date()));
 
 
-        RecyclerView recyclerView = binding.userTasks;
+
+        recyclerView = binding.userTasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new TaskAdapter(getContext(), tarefas));
+        adapter = new TaskAdapter(getContext(), tarefas);
 
+        recyclerView.setAdapter(adapter);
+
+
+        String usuarioIdStr = prefs.getString("id", "0");
+        Long usuarioId = Long.parseLong(usuarioIdStr);
+        carregarTarefasUsuario(token,usuarioId, "1", "1");
         return root;
     }
 
@@ -259,5 +263,42 @@ public class ProfileFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         imagePickerLauncher.launch(intent);
+    }
+
+    private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
+        // Logando parâmetros da requisição
+        Log.d("DEBUG_TASKS", "Chamando getTasksByUserID com:");
+        Log.d("DEBUG_TASKS", "Token: " + token);
+        Log.d("DEBUG_TASKS", "usuarioId: " + usuarioId);
+        Log.d("DEBUG_TASKS", "tipoTarefa: " + tipoTarefa);
+        Log.d("DEBUG_TASKS", "status: " + status);
+
+        TaskService service = RetrofitClientSQL.createService(TaskService.class);
+        Call<List<Task>> call = service.getTasksByUserID(usuarioId,"Bearer "+ token, tipoTarefa, status);
+
+        call.enqueue(new Callback<List<Task>>() {
+            @Override
+            public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Task> tarefas = response.body();
+                    Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
+                    for (Task tarefa : tarefas) {
+                        Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
+                                + ", Gravidade: " + tarefa.getGravidade()
+                                + ", Origem: " + tarefa.getOrigemTarefa()
+                                + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
+                                + ", Status: " + tarefa.getStatus());
+                    }
+                    adapter.updateList(tarefas); // Atualiza RecyclerView
+                } else {
+                    Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Task>> call, Throwable t) {
+                Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
+            }
+        });
     }
 }
