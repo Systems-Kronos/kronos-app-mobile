@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.kronosprojeto.adapter.NotificationAdapter;
-import com.example.kronosprojeto.config.RetrofitCalenderNoSQL;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
 
 import com.example.kronosprojeto.viewmodel.NotificationViewModel;

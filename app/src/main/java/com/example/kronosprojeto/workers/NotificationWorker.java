@@ -12,7 +12,6 @@ import com.example.kronosprojeto.config.RetrofitCalendarNoSQL;
 import com.example.kronosprojeto.model.Notification;
 import com.example.kronosprojeto.service.NotificationService;
 import com.example.kronosprojeto.utils.NotificationProcessor;
-import com.example.kronosprojeto.utils.NotificationUtils;
 
 import java.io.IOException;
 import java.util.List;
