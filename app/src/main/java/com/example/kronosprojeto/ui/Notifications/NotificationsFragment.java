@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,68 +17,43 @@ import android.view.ViewGroup;
 import com.example.kronosprojeto.adapter.NotificationAdapter;
 import com.example.kronosprojeto.config.RetrofitCalenderNoSQL;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
-import com.example.kronosprojeto.model.Notification;
-import com.example.kronosprojeto.service.NotificationService;
-import com.example.kronosprojeto.utils.NotificationHelper;
-import com.example.kronosprojeto.utils.NotificationProcessor;
+
+import com.example.kronosprojeto.viewmodel.NotificationViewModel;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
-
 public class NotificationsFragment extends Fragment {
 
     private FragmentNotificationsBinding binding;
-    private NotificationService notificationService;
-    public NotificationsFragment() {
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
+    private NotificationAdapter adapter;
+    private NotificationViewModel notificationViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentNotificationsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        notificationService = RetrofitCalenderNoSQL.createService(NotificationService.class);
 
         RecyclerView recyclerView = binding.recyclerviewNotifications;
-        SharedPreferences prefs = getActivity().getSharedPreferences("app", Context.MODE_PRIVATE);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        String usuarioIdStr = prefs.getString("id", "0");
-        Long usuarioId = Long.parseLong(usuarioIdStr);
+        adapter = new NotificationAdapter(getContext(), new ArrayList<>());
+        recyclerView.setAdapter(adapter);
 
-        NotificationHelper.createNotificationChannel(requireContext());
+        // pega o mesmo viewmodel da Activity
+        notificationViewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
 
-        Call<List<Notification>> call = notificationService.getNotificationsByUserID(usuarioId);
-        call.enqueue(new retrofit2.Callback<List<Notification>>() {
-            @Override
-            public void onResponse(Call<List<Notification>> call, retrofit2.Response<List<Notification>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Notification> notifications = response.body();
-                    NotificationAdapter adapter = new NotificationAdapter(getContext(), notifications);
-                    recyclerView.setAdapter(adapter);
-                    NotificationProcessor.processarNotificacoes(getContext(), notifications);
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Notification>> call, Throwable t) {
-                t.printStackTrace();
-            }
+        // observa mudanças
+        notificationViewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
+            adapter.updateList(notifications);
         });
 
         return root;
     }
 
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;

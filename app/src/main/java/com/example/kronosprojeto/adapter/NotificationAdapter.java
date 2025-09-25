@@ -56,4 +56,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             return message;
         }
     }
+    public void updateList(List<Notification> novas) {
+        this.notifications.clear();
+        this.notifications.addAll(novas);
+        notifyDataSetChanged();
+    }
+
 }
