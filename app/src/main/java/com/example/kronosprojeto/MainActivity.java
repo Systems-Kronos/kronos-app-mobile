@@ -3,6 +3,7 @@ package com.example.kronosprojeto;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -13,14 +14,27 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
+import com.example.kronosprojeto.config.RetrofitCalendarNoSQL;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.ActivityMainBinding;
 import com.example.kronosprojeto.dto.UserResponseDto;
+import com.example.kronosprojeto.model.Notification;
+import com.example.kronosprojeto.service.NotificationService;
 import com.example.kronosprojeto.service.UserService;
 import com.example.kronosprojeto.ui.Login.LoginActivity;
+import com.example.kronosprojeto.utils.NotificationHelper;
+import com.example.kronosprojeto.utils.NotificationProcessor;
+import com.example.kronosprojeto.viewmodel.NotificationViewModel;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
+import com.example.kronosprojeto.workers.NotificationWorker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private NavController navController;
     private UserViewModel userViewModel;
+    private NotificationViewModel notificationViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
         SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
@@ -91,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                                 .edit()
                                 .putString("id", String.valueOf( response.body().getId()))
                                 .apply();
+                        carregarNotificacoes(response.body().getId());
                     }
                 }
 
@@ -101,9 +118,45 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
     }
 
+    private void carregarNotificacoes(long idUsuario) {
+        NotificationService notificationService = RetrofitCalendarNoSQL.createService(NotificationService.class);
+        Call<List<Notification>> callNotificacoes = notificationService.getNotificationsByUserID(idUsuario);
+
+        callNotificacoes.enqueue(new Callback<List<Notification>>() {
+            @Override
+            public void onResponse(Call<List<Notification>> call, Response<List<Notification>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.e("s", "ID: "+idUsuario);
+                    notificationViewModel.setNotifications(response.body());
+                    List<Notification> lista = response.body();
+                    if (!lista.isEmpty()){
+                        for (Notification notification : lista){
+                            Log.e("dd",notification.getTitulo());
+                        }
+                    }
+
+                    notificationViewModel.setNotifications(lista);
+
+                    NotificationProcessor.processarNotificacoes(MainActivity.this, lista);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Notification>> call, Throwable t) {}
+        });
+        NotificationHelper.createNotificationChannel(this);
+        PeriodicWorkRequest notificationWorkRequest =
+                new PeriodicWorkRequest.Builder(NotificationWorker.class, 1, TimeUnit.MINUTES)
+                        .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "notificacoes_worker",
+                ExistingPeriodicWorkPolicy.UPDATE,
+                notificationWorkRequest
+        );
+    }
     @Override
     public boolean onSupportNavigateUp() {
         return navController.navigateUp() || super.onSupportNavigateUp();
