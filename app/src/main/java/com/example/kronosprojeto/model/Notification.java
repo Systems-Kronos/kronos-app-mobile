@@ -2,30 +2,26 @@ package com.example.kronosprojeto.model;
 
 public class Notification {
 
-    private String titulo;
-    private String descrição;
+    private String cMensagem;
+    private String dCriacao;
+
 
     public String getTitulo() {
-        return titulo;
+        return cMensagem;
     }
 
     public String getDescrição() {
-        return descrição;
+        return dCriacao;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
 
-    public void setDescrição(String descrição) {
-        this.descrição = descrição;
-    }
+
 
     public Notification() {
     }
 
     public Notification(String titulo, String descrição) {
-        this.titulo = titulo;
-        this.descrição = descrição;
+        this.dCriacao = titulo;
+        this.cMensagem = descrição;
     }
 }
