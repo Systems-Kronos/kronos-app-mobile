@@ -72,6 +72,9 @@ public class ProfileFragment extends Fragment {
     private View banner;
     RecyclerView recyclerView;
     TaskAdapter adapter;
+    TextView concluidasTxt;
+    TextView realocadasTxt;
+    TextView atribuidasTxt;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
 
@@ -248,6 +251,9 @@ public class ProfileFragment extends Fragment {
 
         recyclerView.setAdapter(adapter);
 
+        concluidasTxt = binding.concluidasTxt;
+        realocadasTxt = binding.realocadasTxt;
+        atribuidasTxt = binding.atribuidasTxt;
 
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
@@ -271,6 +277,14 @@ public class ProfileFragment extends Fragment {
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Task> tarefas = response.body();
+
+
+                    // 🔹 Contadores
+                    int concluidas = 0;
+                    int realocadas = 0;
+                    int atribuidas = 0;
+
+
                     Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
                     for (Task tarefa : tarefas) {
                         Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
@@ -278,6 +292,24 @@ public class ProfileFragment extends Fragment {
                                 + ", Origem: " + tarefa.getOrigemTarefa()
                                 + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
                                 + ", Status: " + tarefa.getStatus());
+                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus())) {
+                            concluidas++;
+                        }
+
+                        // pela Origem
+                        if ("Realocada".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
+                            realocadas++;
+                        }
+
+                        if ("Atribuída".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
+                            atribuidas++;
+                        }
+
+                        concluidasTxt.setText(String.valueOf(concluidas));
+                        realocadasTxt.setText(String.valueOf(realocadas));
+                        atribuidasTxt.setText(String.valueOf(atribuidas));
+
+
                     }
                     adapter.updateList(tarefas);
                 } else {

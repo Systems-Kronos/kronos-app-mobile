@@ -1,7 +1,5 @@
 package com.example.kronosprojeto.ui.Notifications;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +18,7 @@ import com.example.kronosprojeto.viewmodel.NotificationViewModel;
 
 
 import java.util.ArrayList;
-import java.util.List;
 
-import retrofit2.Call;
 public class NotificationsFragment extends Fragment {
 
     private FragmentNotificationsBinding binding;
@@ -41,10 +36,8 @@ public class NotificationsFragment extends Fragment {
         adapter = new NotificationAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        // pega o mesmo viewmodel da Activity
         notificationViewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
 
-        // observa mudanças
         notificationViewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
             adapter.updateList(notifications);
         });
