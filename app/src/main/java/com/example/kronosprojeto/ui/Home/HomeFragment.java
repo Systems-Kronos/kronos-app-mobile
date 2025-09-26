@@ -9,12 +9,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.Visibility;
 
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
@@ -27,6 +30,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
+import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,7 +46,8 @@ public class HomeFragment extends Fragment {
 
     RecyclerView recyclerView;
     TaskAdapter adapter;
-
+    PieChart pieChart;
+    ArrayList<PieEntry> entries;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -53,17 +58,20 @@ public class HomeFragment extends Fragment {
         List<Task> tarefas = new ArrayList<>();
 
         recyclerView = binding.tomorrowstasks;
+        Button buttonAll = binding.btnTarefaTodas;
+        Button buttonRealocadas = binding.btnTarefaRealocadas;
+
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new TaskAdapter(getContext(), new ArrayList<>(), "home"); // lista vazia inicial
         recyclerView.setAdapter(adapter);
         Log.d("DEBUG_APP", "Iniciando a MainActivity...");
 
-        PieChart pieChart = binding.pieChart;
+        pieChart = binding.pieChart;
 
-        ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(70f, ""));
-        entries.add(new PieEntry(30f, ""));
+        entries = new ArrayList<>();
+
 
 
         PieDataSet dataSet = new PieDataSet(entries, "");
@@ -99,7 +107,20 @@ public class HomeFragment extends Fragment {
         String token = prefs.getString("jwt", null);
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
+
         carregarTarefasUsuario(token,usuarioId, "1", "1");
+
+        buttonAll.setOnClickListener(v-> {
+            carregarTarefasUsuario(token,usuarioId, "1", "1");
+            buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
+            buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
+
+        });
+        buttonRealocadas.setOnClickListener(v->{
+            carregarTarefasUsuario(token,usuarioId, "2", "1");
+            buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
+            buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
+        });
 
         return root;
     }
@@ -110,7 +131,6 @@ public class HomeFragment extends Fragment {
         binding = null;
     }
     private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
-        // Logando parâmetros da requisição
         Log.d("DEBUG_TASKS", "Chamando getTasksByUserID com:");
         Log.d("DEBUG_TASKS", "Token: " + token);
         Log.d("DEBUG_TASKS", "usuarioId: " + usuarioId);
@@ -118,13 +138,17 @@ public class HomeFragment extends Fragment {
         Log.d("DEBUG_TASKS", "status: " + status);
 
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
-        Call<List<Task>> call = service.getTasksByUserID(usuarioId,"Bearer "+ token, tipoTarefa, status);
+        Call<List<Task>> call = service.getTasksByUserID(usuarioId, "Bearer " + token, tipoTarefa, status);
 
         call.enqueue(new Callback<List<Task>>() {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Task> tarefas = response.body();
+
+                    int total = tarefas.size();
+                    int concluidas = 0;
+
                     Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
                     for (Task tarefa : tarefas) {
                         Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
@@ -132,8 +156,37 @@ public class HomeFragment extends Fragment {
                                 + ", Origem: " + tarefa.getOrigemTarefa()
                                 + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
                                 + ", Status: " + tarefa.getStatus());
+
+                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus())) {
+                            concluidas++;
+                        }
                     }
-                    adapter.updateList(tarefas); // Atualiza RecyclerView
+
+                    int porcentagemConcluidas = 0;
+                    if (total > 0) {
+                        porcentagemConcluidas = (int) ((concluidas * 100.0f) / total);
+                    }
+
+                    // 🔹 Atualiza texto central
+                    pieChart.setCenterText(porcentagemConcluidas + "%");
+
+                    // 🔹 Zera as entradas antigas
+                    entries.clear();
+
+                    // 🔹 Adiciona as novas
+                    entries.add(new PieEntry(porcentagemConcluidas, ""));
+                    entries.add(new PieEntry(100 - porcentagemConcluidas, ""));
+
+                    // 🔹 Cria um novo DataSet e aplica no gráfico
+                    PieDataSet dataSet = new PieDataSet(entries, "");
+                    dataSet.setColors(Color.parseColor("#E6B648"), Color.parseColor("#FFFFFF"));
+                    dataSet.setDrawValues(false);
+
+                    PieData data = new PieData(dataSet);
+                    pieChart.setData(data);
+                    pieChart.invalidate(); // redesenha
+
+                    adapter.updateList(tarefas);
                 } else {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
                 }
@@ -143,12 +196,7 @@ public class HomeFragment extends Fragment {
             public void onFailure(Call<List<Task>> call, Throwable t) {
                 Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
             }
-
         });
-
-
-
-
     }
 
 }
