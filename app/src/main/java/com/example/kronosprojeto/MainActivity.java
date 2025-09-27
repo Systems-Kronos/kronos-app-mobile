@@ -26,6 +26,7 @@ import com.example.kronosprojeto.model.Notification;
 import com.example.kronosprojeto.service.NotificationService;
 import com.example.kronosprojeto.service.UserService;
 import com.example.kronosprojeto.ui.Login.LoginActivity;
+import com.example.kronosprojeto.ui.SplashScreen.SplashScreen;
 import com.example.kronosprojeto.utils.NotificationHelper;
 import com.example.kronosprojeto.utils.NotificationProcessor;
 import com.example.kronosprojeto.viewmodel.NotificationViewModel;
@@ -108,11 +109,17 @@ public class MainActivity extends AppCompatActivity {
                                 .putString("id", String.valueOf( response.body().getId()))
                                 .apply();
                         carregarNotificacoes(response.body().getId());
+                    }else{
+                        if (response.code() == 403){
+                            Intent intent = new Intent(MainActivity.this, SplashScreen.class);
+
+                        }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<UserResponseDto> call, Throwable t) {
+
                 }
             });
         }

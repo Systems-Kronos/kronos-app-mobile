@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -75,6 +76,9 @@ public class ProfileFragment extends Fragment {
     TextView concluidasTxt;
     TextView realocadasTxt;
     TextView atribuidasTxt;
+    FrameLayout loadingOverlay;
+
+
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
 
@@ -106,6 +110,7 @@ public class ProfileFragment extends Fragment {
         banner = binding.viewBanner;
         cloudinaryService = RetrofitClientCloudinary.createService(CloudinaryService.class);
 
+        loadingOverlay= binding.loadingOverlay;
 
 
         imagePickerLauncher = registerForActivityResult(
@@ -207,6 +212,7 @@ public class ProfileFragment extends Fragment {
                 nameTextView.setText(user.getNome());
                 emailView.setText(user.getEmail());
                 sectionView.setText(user.getSetor().getNome());
+                loadingOverlay.setVisibility(View.VISIBLE);
 
                 if (user.getFoto() == null){
                     Glide.with(this)
@@ -232,6 +238,8 @@ public class ProfileFragment extends Fragment {
                                         int corPredominante = palette.getDominantColor(Color.GRAY);
                                         banner.setBackgroundColor(corPredominante);
                                     });
+                                    loadingOverlay.setVisibility(View.GONE);
+
                                 }
 
                                 @Override

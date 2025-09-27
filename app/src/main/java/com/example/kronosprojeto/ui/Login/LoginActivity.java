@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     EditText cpfInput;
     EditText passwordInput;
     private AuthService authService;
+    FrameLayout loadingOverlay;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        loadingOverlay= findViewById(R.id.loadingOverlay);
 
         phoneRecoveryEntrypoint = findViewById(R.id.passwordRecoveryText);
         phoneRecoveryEntrypoint.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +76,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login() {
+        loadingOverlay.setVisibility(View.VISIBLE);
+
         String cpf = cpfInput.getText().toString();
         String password = passwordInput.getText().toString();
 
@@ -97,9 +104,12 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Login OK", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    loadingOverlay.setVisibility(View.GONE);
+
                     startActivity(intent);
                     finish();
                 } else {
+                    loadingOverlay.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Credenciais inválidas", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -107,6 +117,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                loadingOverlay.setVisibility(View.GONE);
+
             }
         });
     }

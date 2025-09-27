@@ -7,11 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -36,6 +38,8 @@ public class DetailsFragment extends Fragment {
 
     private static final String TAG = "DetailsFragment";
     private TaskService taskService;
+    FrameLayout loadingOverlay;
+    ConstraintLayout constraintLayout;
 
     public DetailsFragment() {}
 
@@ -69,7 +73,11 @@ public class DetailsFragment extends Fragment {
         TextView txtSection = view.findViewById(R.id.txtSection);
         TextView txtRapporteur = view.findViewById(R.id.txtRapporteur);
         TextView txtAdditionalContacts = view.findViewById(R.id.txtAdditionalContacts);
+        loadingOverlay= view.findViewById(R.id.loadingOverlay);
+        constraintLayout = view.findViewById(R.id.constraint_layout);
 
+        constraintLayout.setVisibility(View.GONE);
+        loadingOverlay.setVisibility(View.VISIBLE);
 
         MaterialButton btnUpdate = view.findViewById(R.id.btnUpdate);
 
@@ -170,7 +178,9 @@ public class DetailsFragment extends Fragment {
                         txtRapporteur.setText(tarefa.getUsuarioRelator().getNome() != null ? tarefa.getUsuarioRelator().getNome()  : "-");
                         txtAdditionalContacts.setText(tarefa.getUsuarioRelator().getEmail() != null ? tarefa.getUsuarioRelator().getEmail()  : "-");
                         txtSection.setText(tarefa.getUsuarioRelator().getSetor().getNome() != null ? tarefa.getUsuarioRelator().getSetor().getNome()  : "-");
+                        constraintLayout.setVisibility(View.VISIBLE);
 
+                        loadingOverlay.setVisibility(View.GONE);
 
 
 
