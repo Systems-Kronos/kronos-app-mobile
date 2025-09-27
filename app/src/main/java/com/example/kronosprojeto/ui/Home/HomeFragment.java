@@ -10,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,6 +50,8 @@ public class HomeFragment extends Fragment {
     TaskAdapter adapter;
     PieChart pieChart;
     ArrayList<PieEntry> entries;
+    FrameLayout loadingOverlay;
+    NestedScrollView nestedScrollView;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -56,6 +60,9 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         List<Task> tarefas = new ArrayList<>();
+        loadingOverlay= binding.loadingOverlay;
+        nestedScrollView = binding.contentScroll;
+
 
         recyclerView = binding.tomorrowstasks;
         Button buttonAll = binding.btnTarefaTodas;
@@ -139,12 +146,17 @@ public class HomeFragment extends Fragment {
 
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
         Call<List<Task>> call = service.getTasksByUserID(usuarioId, "Bearer " + token, tipoTarefa, status);
+        nestedScrollView.setVisibility(View.GONE);
+        loadingOverlay.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<List<Task>>() {
+
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Task> tarefas = response.body();
+                    loadingOverlay.setVisibility(View.GONE);
+                    nestedScrollView.setVisibility(View.VISIBLE);
 
                     int total = tarefas.size();
                     int concluidas = 0;
