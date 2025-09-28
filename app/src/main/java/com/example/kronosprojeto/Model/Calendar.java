@@ -1,17 +1,34 @@
 package com.example.kronosprojeto.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Calendar {
 
         private String id;
-        private Long user;
-        private String day; // vem como String no JSON
-        private Boolean presence;
-        private String observation;
-        private String crm;
-        private String cid;
-        private Boolean accepted;
-        private String attest;
 
+        @SerializedName("usuario")
+        private Long user;
+
+        @SerializedName("dia")
+        private String day;
+
+        @SerializedName("presenca")
+        private Boolean presence;
+
+        @SerializedName("observacao")
+        private String observation;
+
+        @SerializedName("crm")
+        private String crm;
+
+        @SerializedName("cid")
+        private String cid;
+
+        @SerializedName("aceito")
+        private Boolean accepted;
+
+        @SerializedName("atestado")
+        private String medicalCertificate;
         public Calendar() {
         }
         public Calendar(String id, Long user, String day, Boolean presence, String observation,
@@ -24,7 +41,7 @@ public class Calendar {
                 this.crm = crm;
                 this.cid = cid;
                 this.accepted = accepted;
-                this.attest = attest;
+                this.medicalCertificate = attest;
         }
 
 
@@ -93,10 +110,10 @@ public class Calendar {
         }
 
         public String getAttest() {
-                return attest;
+                return medicalCertificate;
         }
 
         public void setAttest(String attest) {
-                this.attest = attest;
+                this.medicalCertificate = attest;
         }
 }
