@@ -29,6 +29,7 @@ import com.example.kronosprojeto.ui.Login.LoginActivity;
 import com.example.kronosprojeto.ui.SplashScreen.SplashScreen;
 import com.example.kronosprojeto.utils.NotificationHelper;
 import com.example.kronosprojeto.utils.NotificationProcessor;
+import com.example.kronosprojeto.utils.ToastHelper;
 import com.example.kronosprojeto.viewmodel.NotificationViewModel;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 import com.example.kronosprojeto.workers.NotificationWorker;
@@ -70,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.PerfilFragment,
                 R.id.ChatFragment,
                 R.id.NotificationsFragment,
-                R.id.assignmentHistoryFragment
+                R.id.assignmentHistoryFragment,
+                R.id.details
         ).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     }else{
                         if (response.code() == 403){
                             Intent intent = new Intent(MainActivity.this, SplashScreen.class);
+                            startActivity(intent);
 
                         }
                     }
@@ -119,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<UserResponseDto> call, Throwable t) {
+                    ToastHelper.showFeedbackToast(getApplicationContext(),"error","ERRO:","Não foi possível carregar as tarefas");
 
                 }
             });
@@ -151,7 +155,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Notification>> call, Throwable t) {}
+            public void onFailure(Call<List<Notification>> call, Throwable t) {
+                ToastHelper.showFeedbackToast(getApplicationContext(),"error","ERRO:","Não foi carregar as notificações");
+
+            }
         });
         NotificationHelper.createNotificationChannel(this);
         PeriodicWorkRequest notificationWorkRequest =
