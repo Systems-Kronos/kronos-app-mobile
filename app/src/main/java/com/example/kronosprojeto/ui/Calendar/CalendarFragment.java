@@ -3,6 +3,7 @@ package com.example.kronosprojeto.ui.Calendar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,7 +127,7 @@ public class CalendarFragment extends Fragment {
         }
 
         LocalDate localDate = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
-        String localDateStr = localDate.toString(); // Formato: YYYY-MM-DD
+        String localDateStr = localDate.toString();
 
         Calendar existCalendar = null;
         for (Calendar c : calenderByUser) {
@@ -175,51 +176,72 @@ public class CalendarFragment extends Fragment {
         calendarService.searchUser(userId).enqueue(new Callback<List<Calendar>>() {
             @Override
             public void onResponse(Call<List<Calendar>> call, Response<List<Calendar>> response) {
+                Log.d("CALENDAR_DEBUG", "HTTP Code: " + response.code());
+
                 if (response.isSuccessful() && response.body() != null) {
                     calenderByUser = response.body();
+                    Log.d("CALENDAR_DEBUG", "Recebeu " + calenderByUser.size() + " itens");
 
                     List<CalendarDay> verdes = new ArrayList<>();
                     List<CalendarDay> laranjas = new ArrayList<>();
 
-                    LocalDate today = LocalDate.now();
-
                     for (Calendar event : calenderByUser) {
-                        String dateStr = event.getDay() != null && event.getDay().length() >= 10 ? event.getDay().substring(0, 10) : null;
-                        if (dateStr == null) continue;
+                        Log.d("CALENDAR_DEBUG", "Item recebido: day=" + event.getDay() +
+                                " presence=" + event.getPresence() +
+                                " obs=" + event.getObservation());
 
-                        LocalDate date = LocalDate.parse(dateStr);
-                        CalendarDay dia = CalendarDay.from(date);
+                        String dateStr = event.getDay() != null && event.getDay().length() >= 10
+                                ? event.getDay().substring(0, 10)
+                                : null;
 
-                        Boolean presence = event.getPresence();
-
-                        if (Boolean.TRUE.equals(presence)) {
-                            verdes.add(dia);
+                        if (dateStr == null) {
+                            Log.w("CALENDAR_DEBUG", "Ignorando item com data inválida: " + event.getDay());
+                            continue;
                         }
-                         else {
-                            laranjas.add(dia);
+
+                        try {
+                            LocalDate date = LocalDate.parse(dateStr);
+                            CalendarDay dia = CalendarDay.from(date);
+
+                            Boolean presence = event.getPresence();
+
+                            if (Boolean.TRUE.equals(presence)) {
+                                verdes.add(dia);
+                                Log.d("CALENDAR_DEBUG", "Adicionado ao VERDE: " + date);
+                            } else {
+                                laranjas.add(dia);
+                                Log.d("CALENDAR_DEBUG", "Adicionado ao LARANJA: " + date);
+                            }
+                        } catch (Exception e) {
+                            Log.e("CALENDAR_DEBUG", "Erro ao converter data: " + dateStr, e);
                         }
                     }
 
-                    binding.calendarView.removeDecorators();
+                    Log.d("CALENDAR_DEBUG", "Total verdes=" + verdes.size() + " | laranjas=" + laranjas.size());
 
-                    binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes));
-                    binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas));
+                    binding.calendarView.removeDecorators(); //Aqui (limpa as bordas anteriores)
+
+                    binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes)); //Aqui (aplica borda verde)
+                    binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas)); //Aqui (aplica borda laranja)
 
                     if (blackBackgroundDecorator != null) {
-                        binding.calendarView.addDecorator(blackBackgroundDecorator);
+                        binding.calendarView.addDecorator(blackBackgroundDecorator); //Aqui (aplica fundo preto no dia selecionado)
                     }
 
-                    binding.calendarView.invalidateDecorators();
+                    binding.calendarView.invalidateDecorators(); //Aqui (força redesenho das bordas)
+                } else {
+                    Log.e("CALENDAR_DEBUG", "Erro HTTP: " + response.errorBody());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Calendar>> call, Throwable t) {
-                t.printStackTrace();
+                Log.e("CALENDAR_DEBUG", "Falha na chamada da API", t);
                 Toast.makeText(getContext(), "Erro ao buscar calendários: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void createCalender(Calendar calendar) {
         CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
@@ -228,6 +250,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("teste2", "Entrou aqui");
                     Calendar created = response.body();
                     calenderByUser.add(created);
                     selectCalendar = created;

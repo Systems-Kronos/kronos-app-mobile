@@ -14,7 +14,7 @@
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="348dp"
+            android:layout_height="360dp"
             android:layout_marginBottom="20dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,6 @@
             <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 app:flexDirection="column"
                 app:justifyContent="space_between">
 
@@ -71,7 +70,7 @@
                         android:id="@+id/presenceSelect"
                         android:layout_width="120dp"
                         android:layout_height="35dp"
-                        android:background="#ffff"
+                        android:background="@drawable/border_normal"
                         android:text="Estarei presente"
                         android:textAllCaps="false"
                         android:textColor="#25173A"
@@ -82,12 +81,13 @@
                         android:id="@+id/absenceSelect"
                         android:layout_width="120dp"
                         android:layout_height="35dp"
-                        android:background="#ffff"
+                        android:background="@drawable/border_normal"
                         android:text="Estarei ausente"
                         android:textAllCaps="false"
                         android:textColor="#25173A"
                         android:textSize="13sp"
                         android:textStyle="bold" />
+
 
                 </com.google.android.flexbox.FlexboxLayout>
 
