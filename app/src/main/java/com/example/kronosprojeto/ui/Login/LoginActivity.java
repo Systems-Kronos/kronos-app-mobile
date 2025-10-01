@@ -5,6 +5,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,9 +45,50 @@ public class LoginActivity extends AppCompatActivity {
     private AuthService authService;
     FrameLayout loadingOverlay;
 
+    private boolean isUpdating = false;
+    private final String mask = "###.###.###-##";
+
+    private String unmask(String s) {
+        return s.replaceAll("[^0-9]", "");
+    }
+
+    private void setupCpfMask(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isUpdating) {
+                    isUpdating = false;
+                    return;
+                }
+
+                String raw = unmask(s.toString());
+                StringBuilder masked = new StringBuilder();
+
+                int i = 0;
+                for (char m : mask.toCharArray()) {
+                    if (m != '#') {
+                        if (raw.length() > i) masked.append(m);
+                        else break;
+                    } else {
+                        if (raw.length() > i) masked.append(raw.charAt(i++));
+                        else break;
+                    }
+                }
+
+                isUpdating = true;
+                int selection = masked.length();
+                editText.setText(masked.toString());
+                editText.setSelection(selection <= editText.getText().length() ? selection : editText.getText().length());
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
@@ -80,6 +123,7 @@ public class LoginActivity extends AppCompatActivity {
                 login();
             }
         });
+        setupCpfMask(cpfInput);
     }
 
     private void login() {
