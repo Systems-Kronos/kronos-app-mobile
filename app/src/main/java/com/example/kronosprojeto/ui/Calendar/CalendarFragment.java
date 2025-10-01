@@ -97,7 +97,7 @@ public class CalendarFragment extends Fragment {
         SharedPreferences prefs = getContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         idUsuario = prefs.getString("id", null);
 
-        calender(idUsuario);
+        calenderByUser(idUsuario);
 
         btnAbscense = root.findViewById(R.id.absenceSelect);
         btnPresenceSelect = root.findViewById(R.id.presenceSelect);
@@ -110,6 +110,19 @@ public class CalendarFragment extends Fragment {
         });
 
         btnPresenceSelect.setOnClickListener(v -> {
+            if (selectDay == null) {
+                Toast.makeText(getContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            LocalDate hoje = LocalDate.now();
+            LocalDate diaSelecionado = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+
+            if (!diaSelecionado.isEqual(hoje)) {
+                Toast.makeText(getContext(), "Só é permitido marcar presença no dia de hoje.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             selectCalendarDay("presente", root);
             btnPresenceSelect.setBackgroundResource(R.drawable.border_yellow);
             btnAbscense.setBackgroundResource(R.drawable.border_normal);
@@ -168,7 +181,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private void calender(String userId) {
+    private void calenderByUser(String userId) {
         if (userId == null) return;
 
         CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
@@ -176,28 +189,20 @@ public class CalendarFragment extends Fragment {
         calendarService.searchUser(userId).enqueue(new Callback<List<Calendar>>() {
             @Override
             public void onResponse(Call<List<Calendar>> call, Response<List<Calendar>> response) {
-                Log.d("CALENDAR_DEBUG", "HTTP Code: " + response.code());
-
                 if (response.isSuccessful() && response.body() != null) {
                     calenderByUser = response.body();
-                    Log.d("CALENDAR_DEBUG", "Recebeu " + calenderByUser.size() + " itens");
 
                     List<CalendarDay> verdes = new ArrayList<>();
                     List<CalendarDay> laranjas = new ArrayList<>();
 
-                    for (Calendar event : calenderByUser) {
-                        Log.d("CALENDAR_DEBUG", "Item recebido: day=" + event.getDay() +
-                                " presence=" + event.getPresence() +
-                                " obs=" + event.getObservation());
+                    LocalDate hoje = LocalDate.now();
 
+                    for (Calendar event : calenderByUser) {
                         String dateStr = event.getDay() != null && event.getDay().length() >= 10
                                 ? event.getDay().substring(0, 10)
                                 : null;
 
-                        if (dateStr == null) {
-                            Log.w("CALENDAR_DEBUG", "Ignorando item com data inválida: " + event.getDay());
-                            continue;
-                        }
+                        if (dateStr == null) continue;
 
                         try {
                             LocalDate date = LocalDate.parse(dateStr);
@@ -205,30 +210,28 @@ public class CalendarFragment extends Fragment {
 
                             Boolean presence = event.getPresence();
 
-                            if (Boolean.TRUE.equals(presence)) {
-                                verdes.add(dia);
-                                Log.d("CALENDAR_DEBUG", "Adicionado ao VERDE: " + date);
-                            } else {
+                            if (Boolean.FALSE.equals(presence)) {
                                 laranjas.add(dia);
-                                Log.d("CALENDAR_DEBUG", "Adicionado ao LARANJA: " + date);
+                            } else if (Boolean.TRUE.equals(presence)) {
+                                verdes.add(dia);
+                            } else if (date.isBefore(hoje)){
+                                verdes.add(dia);
                             }
+
                         } catch (Exception e) {
                             Log.e("CALENDAR_DEBUG", "Erro ao converter data: " + dateStr, e);
                         }
                     }
 
-                    Log.d("CALENDAR_DEBUG", "Total verdes=" + verdes.size() + " | laranjas=" + laranjas.size());
-
-                    binding.calendarView.removeDecorators(); //Aqui (limpa as bordas anteriores)
-
-                    binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes)); //Aqui (aplica borda verde)
-                    binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas)); //Aqui (aplica borda laranja)
+                    binding.calendarView.removeDecorators();
+                    binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes));
+                    binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas));
 
                     if (blackBackgroundDecorator != null) {
-                        binding.calendarView.addDecorator(blackBackgroundDecorator); //Aqui (aplica fundo preto no dia selecionado)
+                        binding.calendarView.addDecorator(blackBackgroundDecorator);
                     }
 
-                    binding.calendarView.invalidateDecorators(); //Aqui (força redesenho das bordas)
+                    binding.calendarView.invalidateDecorators();
                 } else {
                     Log.e("CALENDAR_DEBUG", "Erro HTTP: " + response.errorBody());
                 }
@@ -256,7 +259,7 @@ public class CalendarFragment extends Fragment {
                     selectCalendar = created;
                     Toast.makeText(getContext(), "Dia salvo com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    calender(idUsuario);
+                    calenderByUser(idUsuario);
                 }
             }
 
@@ -276,7 +279,7 @@ public class CalendarFragment extends Fragment {
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(getContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
-                    calender(idUsuario);
+                    calenderByUser(idUsuario);
                 }
             }
 
