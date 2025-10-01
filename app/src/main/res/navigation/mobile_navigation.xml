@@ -49,6 +49,9 @@
         <action
             android:id="@+id/action_details_to_assignmentHistoryFragment"
             app:destination="@id/assignmentHistoryFragment" />
+        <action
+            android:id="@+id/action_details_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
     </fragment>
     <fragment
         android:id="@+id/assignmentHistoryFragment"

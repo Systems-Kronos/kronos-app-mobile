@@ -3,6 +3,7 @@ package com.example.kronosprojeto.ui.Profile;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -47,6 +48,7 @@ import com.example.kronosprojeto.service.CloudinaryService;
 
 import com.example.kronosprojeto.service.TaskService;
 import com.example.kronosprojeto.service.UserService;
+import com.example.kronosprojeto.utils.ToastHelper;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class ProfileFragment extends Fragment {
     TextView realocadasTxt;
     TextView atribuidasTxt;
     FrameLayout loadingOverlay;
-
+    Activity activity;
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
@@ -101,6 +103,7 @@ public class ProfileFragment extends Fragment {
         SharedPreferences prefs = getContext().getSharedPreferences("app", MODE_PRIVATE);
 
         String token = prefs.getString("jwt", null);
+        activity = getActivity();
 
         ImageView profileImg = binding.profileImg;
         nameTextView = binding.usernameText;
@@ -171,27 +174,42 @@ public class ProfileFragment extends Fragment {
                                         callUpdate.enqueue(new Callback<String>() {
                                             @Override
                                             public void onResponse(Call<String> call, Response<String> response) {
+
+
                                                 if (response.isSuccessful()) {
+                                                    ToastHelper.showFeedbackToast(activity,"sucesso","SUCESSO:","Informações salvas!");
+
                                                     Log.d("UpdateUsuario", "Usuário atualizado com sucesso!");
+
+
                                                 } else {
                                                     Log.e("UpdateUsuario", "Erro: " + response.code());
+                                                    ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
+
+
                                                 }
                                             }
 
                                             @Override
                                             public void onFailure(Call<String> call, Throwable t) {
                                                 Log.e("UpdateUsuario", "Falha: " + t.getMessage());
+                                                ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
+
                                             }
                                         });
 
                                     } else {
                                         Log.e("Cloudinary", "Erro no upload: " + response.errorBody());
+                                        ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
+
                                     }
                                 }
 
                                 @Override
                                 public void onFailure(Call<UploadResultDto> call, Throwable t) {
                                     Log.e("Cloudinary", "Falhou: " + t.getMessage());
+                                    ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
+
                                 }
                             });
 
@@ -219,6 +237,9 @@ public class ProfileFragment extends Fragment {
                             .load(R.drawable.profile_mock)
                             .circleCrop()
                             .into(profileImg);
+
+                    loadingOverlay.setVisibility(View.GONE);
+
 
 
                 }else {
@@ -286,12 +307,9 @@ public class ProfileFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Task> tarefas = response.body();
 
-
-                    // 🔹 Contadores
                     int concluidas = 0;
                     int realocadas = 0;
                     int atribuidas = 0;
-
 
                     Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
                     for (Task tarefa : tarefas) {
@@ -304,7 +322,6 @@ public class ProfileFragment extends Fragment {
                             concluidas++;
                         }
 
-                        // pela Origem
                         if ("Realocada".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
                             realocadas++;
                         }
@@ -328,6 +345,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(Call<List<Task>> call, Throwable t) {
                 Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
+                ToastHelper.showFeedbackToast(activity,"error","ERRO:","Não foi possível carregar as tarefas");
+
             }
         });
     }
