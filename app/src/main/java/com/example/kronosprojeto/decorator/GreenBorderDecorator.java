@@ -29,10 +29,8 @@ public class GreenBorderDecorator implements DayViewDecorator {
     public void decorate(DayViewFacade view) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.OVAL);
-        drawable.setStroke(4, Color.GREEN); // borda verde
-        drawable.setColor(Color.TRANSPARENT); // fundo transparente
-
-        // CORREÇÃO: Usa setSelectionDrawable para evitar conflito com o background
+        drawable.setStroke(2, Color.GREEN);
+        drawable.setColor(Color.TRANSPARENT);
         view.setSelectionDrawable(drawable);
     }
 }

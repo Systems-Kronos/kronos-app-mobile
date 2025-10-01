@@ -14,7 +14,7 @@ import retrofit2.http.Path;
 
 public interface CalendarService {
 
-    @GET("selecionar/usuario/{idUsuario}")
+    @GET("api/calendario/selecionar/usuario/{idUsuario}")
     Call<List<Calendar>> searchUser(@Path("idUsuario") String idUsuario);
 
     @GET("api/calendario/selecionar")

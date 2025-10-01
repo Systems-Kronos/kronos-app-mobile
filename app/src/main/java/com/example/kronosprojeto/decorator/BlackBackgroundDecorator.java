@@ -28,7 +28,8 @@ public class BlackBackgroundDecorator implements DayViewDecorator {
     public void decorate(DayViewFacade view) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.OVAL);
-        drawable.setColor(Color.BLACK); // fundo preto
+        drawable.setColor(Color.rgb(234, 218, 245)
+        ); // fundo lilás
         view.setBackgroundDrawable(drawable);
     }
 }

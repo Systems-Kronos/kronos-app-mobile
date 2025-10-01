@@ -3,6 +3,7 @@ package com.example.kronosprojeto.ui.Calendar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,7 +97,7 @@ public class CalendarFragment extends Fragment {
         SharedPreferences prefs = getContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         idUsuario = prefs.getString("id", null);
 
-        calender(idUsuario);
+        calenderByUser(idUsuario);
 
         btnAbscense = root.findViewById(R.id.absenceSelect);
         btnPresenceSelect = root.findViewById(R.id.presenceSelect);
@@ -109,6 +110,19 @@ public class CalendarFragment extends Fragment {
         });
 
         btnPresenceSelect.setOnClickListener(v -> {
+            if (selectDay == null) {
+                Toast.makeText(getContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            LocalDate hoje = LocalDate.now();
+            LocalDate diaSelecionado = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+
+            if (!diaSelecionado.isEqual(hoje)) {
+                Toast.makeText(getContext(), "Só é permitido marcar presença no dia de hoje.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             selectCalendarDay("presente", root);
             btnPresenceSelect.setBackgroundResource(R.drawable.border_yellow);
             btnAbscense.setBackgroundResource(R.drawable.border_normal);
@@ -126,7 +140,7 @@ public class CalendarFragment extends Fragment {
         }
 
         LocalDate localDate = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
-        String localDateStr = localDate.toString(); // Formato: YYYY-MM-DD
+        String localDateStr = localDate.toString();
 
         Calendar existCalendar = null;
         for (Calendar c : calenderByUser) {
@@ -167,7 +181,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-    private void calender(String userId) {
+    private void calenderByUser(String userId) {
         if (userId == null) return;
 
         CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
@@ -181,27 +195,35 @@ public class CalendarFragment extends Fragment {
                     List<CalendarDay> verdes = new ArrayList<>();
                     List<CalendarDay> laranjas = new ArrayList<>();
 
-                    LocalDate today = LocalDate.now();
+                    LocalDate hoje = LocalDate.now();
 
                     for (Calendar event : calenderByUser) {
-                        String dateStr = event.getDay() != null && event.getDay().length() >= 10 ? event.getDay().substring(0, 10) : null;
+                        String dateStr = event.getDay() != null && event.getDay().length() >= 10
+                                ? event.getDay().substring(0, 10)
+                                : null;
+
                         if (dateStr == null) continue;
 
-                        LocalDate date = LocalDate.parse(dateStr);
-                        CalendarDay dia = CalendarDay.from(date);
+                        try {
+                            LocalDate date = LocalDate.parse(dateStr);
+                            CalendarDay dia = CalendarDay.from(date);
 
-                        Boolean presence = event.getPresence();
+                            Boolean presence = event.getPresence();
 
-                        if (Boolean.TRUE.equals(presence)) {
-                            verdes.add(dia);
-                        }
-                         else {
-                            laranjas.add(dia);
+                            if (Boolean.FALSE.equals(presence)) {
+                                laranjas.add(dia);
+                            } else if (Boolean.TRUE.equals(presence)) {
+                                verdes.add(dia);
+                            } else if (date.isBefore(hoje)){
+                                verdes.add(dia);
+                            }
+
+                        } catch (Exception e) {
+                            Log.e("CALENDAR_DEBUG", "Erro ao converter data: " + dateStr, e);
                         }
                     }
 
                     binding.calendarView.removeDecorators();
-
                     binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes));
                     binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas));
 
@@ -210,16 +232,19 @@ public class CalendarFragment extends Fragment {
                     }
 
                     binding.calendarView.invalidateDecorators();
+                } else {
+                    Log.e("CALENDAR_DEBUG", "Erro HTTP: " + response.errorBody());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Calendar>> call, Throwable t) {
-                t.printStackTrace();
+                Log.e("CALENDAR_DEBUG", "Falha na chamada da API", t);
                 Toast.makeText(getContext(), "Erro ao buscar calendários: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void createCalender(Calendar calendar) {
         CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
@@ -228,12 +253,13 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("teste2", "Entrou aqui");
                     Calendar created = response.body();
                     calenderByUser.add(created);
                     selectCalendar = created;
                     Toast.makeText(getContext(), "Dia salvo com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    calender(idUsuario);
+                    calenderByUser(idUsuario);
                 }
             }
 
@@ -253,7 +279,7 @@ public class CalendarFragment extends Fragment {
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(getContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
-                    calender(idUsuario);
+                    calenderByUser(idUsuario);
                 }
             }
 
