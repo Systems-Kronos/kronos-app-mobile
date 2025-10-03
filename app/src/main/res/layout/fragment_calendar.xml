@@ -30,7 +30,7 @@
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="26dp"
             android:background="@drawable/calendar_section_shape"
             android:padding="40dp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -15,9 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.kronosprojeto.R;
-import com.example.kronosprojeto.config.RetrofitCalendarNoSQL;
+import com.example.kronosprojeto.config.RetrofitClientNoSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
+import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
 import com.example.kronosprojeto.model.Calendar;
@@ -44,9 +45,7 @@ public class CalendarFragment extends Fragment {
     private Calendar selectCalendar;
     private String actionSelect;
     private String idUsuario;
-
     private BlackBackgroundDecorator blackBackgroundDecorator;
-
     private Button btnAbscense, btnPresenceSelect;
 
     private static final String[] DIAS_ABREV = {"D", "S", "T", "Q", "Q", "S", "S"};
@@ -83,6 +82,11 @@ public class CalendarFragment extends Fragment {
             LocalDate localDate = LocalDate.of(date.getYear(), date.getMonth(), date.getDay());
             String localDateStr = localDate.toString();
 
+            if (isWeekend(localDate)) {
+                if (isAdded()) Toast.makeText(requireContext(), "Final de semana não pode ser selecionado", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             for (Calendar c : calenderByUser) {
                 String saveDate = c.getDay() != null && c.getDay().length() >= 10 ? c.getDay().substring(0, 10) : "";
                 if (saveDate.equals(localDateStr)) {
@@ -104,22 +108,46 @@ public class CalendarFragment extends Fragment {
         Button btnSend = root.findViewById(R.id.sendAbsenceButton);
 
         btnAbscense.setOnClickListener(v -> {
+            if (selectDay == null) {
+                if (isAdded()) Toast.makeText(requireContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+
+            if (isWeekend(selectedDay)) {
+                if (isAdded()) Toast.makeText(requireContext(), "Não é possível marcar falta no final de semana", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            LocalDate today = LocalDate.now();
+
+            if (selectedDay.isBefore(today)) {
+                if (isAdded()) Toast.makeText(requireContext(), "Só é permitido marcar uma falta hoje ou programada para o futuro", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             selectCalendarDay("falta", root);
             btnAbscense.setBackgroundResource(R.drawable.border_yellow);
             btnPresenceSelect.setBackgroundResource(R.drawable.border_normal);
         });
 
+
         btnPresenceSelect.setOnClickListener(v -> {
             if (selectDay == null) {
-                Toast.makeText(getContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
+                if (isAdded()) Toast.makeText(requireContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            LocalDate hoje = LocalDate.now();
-            LocalDate diaSelecionado = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+            LocalDate today = LocalDate.now();
+            LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
 
-            if (!diaSelecionado.isEqual(hoje)) {
-                Toast.makeText(getContext(), "Só é permitido marcar presença no dia de hoje.", Toast.LENGTH_SHORT).show();
+            if (!selectedDay.isEqual(today)) {
+                if (isAdded()) Toast.makeText(requireContext(), "Só é permitido marcar presença no dia de hoje.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (isWeekend(selectedDay)) {
+                if (isAdded()) Toast.makeText(requireContext(), "Não é possível marcar presença no final de semana", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -135,7 +163,7 @@ public class CalendarFragment extends Fragment {
 
     private void selectCalendarDay(String acao, View root) {
         if (selectDay == null) {
-            Toast.makeText(getContext(), "Você deve primeiro selecionar um dia no calendário", Toast.LENGTH_SHORT).show();
+            if (isAdded()) Toast.makeText(requireContext(), "Você deve primeiro selecionar um dia no calendário", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -163,6 +191,11 @@ public class CalendarFragment extends Fragment {
         selectCalendar = existCalendar;
     }
 
+    private boolean isWeekend(LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
+    }
+
     private void sendUpdate() {
         if (selectCalendar != null) {
             selectCalendar.setPresence("falta".equals(actionSelect) ? false : true);
@@ -177,25 +210,31 @@ public class CalendarFragment extends Fragment {
                 updateCalender(selectCalendar.getId(), selectCalendar);
             }
         } else {
-            Toast.makeText(getContext(), "Nenhum dado preparado. Clique primeiro em 'Marcar falta' ou 'Marcar presença'.", Toast.LENGTH_SHORT).show();
+            if (isAdded()) Toast.makeText(requireContext(), "Nenhum dado preparado. Clique primeiro em 'Marcar falta' ou 'Marcar presença'.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void calenderByUser(String userId) {
         if (userId == null) return;
 
-        CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
+        CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
 
         calendarService.searchUser(userId).enqueue(new Callback<List<Calendar>>() {
             @Override
             public void onResponse(Call<List<Calendar>> call, Response<List<Calendar>> response) {
+                if (!isAdded()) {
+                    Log.e("CALENDAR_DEBUG", "Fragment fechado");
+                    return;
+                }
+
                 if (response.isSuccessful() && response.body() != null) {
                     calenderByUser = response.body();
 
-                    List<CalendarDay> verdes = new ArrayList<>();
-                    List<CalendarDay> laranjas = new ArrayList<>();
+                    List<CalendarDay> greenFromDb = new ArrayList<>();
+                    List<CalendarDay> orange = new ArrayList<>();
+                    List<CalendarDay> greenVisual = new ArrayList<>();
 
-                    LocalDate hoje = LocalDate.now();
+                    LocalDate today = LocalDate.now();
 
                     for (Calendar event : calenderByUser) {
                         String dateStr = event.getDay() != null && event.getDay().length() >= 10
@@ -206,16 +245,13 @@ public class CalendarFragment extends Fragment {
 
                         try {
                             LocalDate date = LocalDate.parse(dateStr);
-                            CalendarDay dia = CalendarDay.from(date);
-
+                            CalendarDay day = CalendarDay.from(date);
                             Boolean presence = event.getPresence();
 
                             if (Boolean.FALSE.equals(presence)) {
-                                laranjas.add(dia);
+                                orange.add(day);
                             } else if (Boolean.TRUE.equals(presence)) {
-                                verdes.add(dia);
-                            } else if (date.isBefore(hoje)){
-                                verdes.add(dia);
+                                greenFromDb.add(day);
                             }
 
                         } catch (Exception e) {
@@ -223,42 +259,57 @@ public class CalendarFragment extends Fragment {
                         }
                     }
 
-                    binding.calendarView.removeDecorators();
-                    binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), verdes));
-                    binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), laranjas));
+                    LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+                    LocalDate cursor = firstDayOfMonth;
+                    while (cursor.isBefore(today)) {
+                        CalendarDay day = CalendarDay.from(cursor);
+                        if (!orange.contains(day) && !greenFromDb.contains(day)) {
+                            greenVisual.add(day);
+                        }
+                        cursor = cursor.plusDays(1);
+                    }
 
-                    if (blackBackgroundDecorator != null) {
-                        binding.calendarView.addDecorator(blackBackgroundDecorator);
+                    List<CalendarDay> greenAll = new ArrayList<>();
+                    greenAll.addAll(greenFromDb);
+                    greenAll.addAll(greenVisual);
+
+                    binding.calendarView.removeDecorators();
+                    if (getContext() != null) {
+                        binding.calendarView.addDecorator(new GrayBorderDecorator(getContext()));
+                        binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), orange));
+                        binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), greenAll));
+                        if (blackBackgroundDecorator != null) binding.calendarView.addDecorator(blackBackgroundDecorator);
                     }
 
                     binding.calendarView.invalidateDecorators();
+
                 } else {
-                    Log.e("CALENDAR_DEBUG", "Erro HTTP: " + response.errorBody());
+                    Log.e("CALENDAR_DEBUG", "Erro HTtP: " + response.errorBody());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Calendar>> call, Throwable t) {
                 Log.e("CALENDAR_DEBUG", "Falha na chamada da API", t);
-                Toast.makeText(getContext(), "Erro ao buscar calendários: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Erro ao buscar calendários: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
-
     private void createCalender(Calendar calendar) {
-        CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
+        CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
 
         calendarService.insertReport(calendar).enqueue(new Callback<Calendar>() {
             @Override
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
+                if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d("teste2", "Entrou aqui");
                     Calendar created = response.body();
                     calenderByUser.add(created);
                     selectCalendar = created;
-                    Toast.makeText(getContext(), "Dia salvo com sucesso!", Toast.LENGTH_SHORT).show();
-
+                    if (isAdded()) Toast.makeText(requireContext(), "Dia salvo com sucesso!", Toast.LENGTH_SHORT).show();
                     calenderByUser(idUsuario);
                 }
             }
@@ -266,19 +317,20 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(Call<Calendar> call, Throwable t) {
                 t.printStackTrace();
-                Toast.makeText(getContext(), "Erro ao criar calendário: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded()) Toast.makeText(requireContext(), "Erro ao criar calendário: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void updateCalender(String idCalendario, Calendar calendar) {
-        CalendarService calendarService = RetrofitCalendarNoSQL.createService(CalendarService.class);
+        CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
 
         calendarService.updateReport(idCalendario, calendar).enqueue(new Callback<Calendar>() {
             @Override
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
+                if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(getContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) Toast.makeText(requireContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
                     calenderByUser(idUsuario);
                 }
             }
@@ -286,7 +338,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(Call<Calendar> call, Throwable t) {
                 t.printStackTrace();
-                Toast.makeText(getContext(), "Erro na atualização: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded()) Toast.makeText(requireContext(), "Erro na atualização: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
