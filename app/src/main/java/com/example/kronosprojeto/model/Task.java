@@ -1,22 +1,24 @@
 package com.example.kronosprojeto.model;
 
+import com.example.kronosprojeto.dto.UserResponseDto;
+
 public class Task {
 
     private int id;
     private String nome;
-    private long usuarioRelator; // String
+    private Long usuarioRelator;
     private int gravidade;
     private int urgencia;
     private int tendencia;
     private int tempoEstimado;
     private String descricao;
     private String status;
-    private String dataAtribuicao; // agora String
-    private String dataConclusao;   // agora String
+    private String dataAtribuicao;
+    private String dataConclusao;
     private String origemTarefa;
 
     // Construtor completo
-    public Task(int id, String nome, long usuarioRelator, int gravidade, int urgencia, int tendencia,
+    public Task(int id, String nome, Long usuarioRelator, int gravidade, int urgencia, int tendencia,
                 int tempoEstimado, String descricao, String status, String dataAtribuicao,
                 String dataConclusao, String origemTarefa) {
         this.id = id;
@@ -35,7 +37,7 @@ public class Task {
 
     // Construtor simplificado
     public Task(String nome, String dataAtribuicao, int gravidade, int urgencia, int tendencia,
-                long usuarioRelator, String origemTarefa, String descricao, String dataConclusao) {
+                Long usuarioRelator, String origemTarefa, String descricao, String dataConclusao) {
         this.nome = nome;
         this.dataAtribuicao = dataAtribuicao;
         this.gravidade = gravidade;
@@ -56,8 +58,8 @@ public class Task {
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 
-    public long getUsuarioRelator() { return usuarioRelator; }
-    public void setUsuarioRelator(long usuarioRelator) { this.usuarioRelator = usuarioRelator; }
+    public Long getUsuarioRelator() { return usuarioRelator; }
+    public void setUsuarioRelator(Long usuarioRelator) { this.usuarioRelator = usuarioRelator; }
 
     public int getGravidade() { return gravidade; }
     public void setGravidade(int gravidade) { this.gravidade = gravidade; }
