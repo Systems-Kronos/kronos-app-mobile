@@ -108,9 +108,6 @@ public class HomeFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("app", Context.MODE_PRIVATE);
 
 
-
-
-
         String token = prefs.getString("jwt", null);
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
@@ -179,24 +176,19 @@ public class HomeFragment extends Fragment {
                         porcentagemConcluidas = (int) ((concluidas * 100.0f) / total);
                     }
 
-                    // 🔹 Atualiza texto central
                     pieChart.setCenterText(porcentagemConcluidas + "%");
-
-                    // 🔹 Zera as entradas antigas
                     entries.clear();
 
-                    // 🔹 Adiciona as novas
                     entries.add(new PieEntry(porcentagemConcluidas, ""));
                     entries.add(new PieEntry(100 - porcentagemConcluidas, ""));
 
-                    // 🔹 Cria um novo DataSet e aplica no gráfico
                     PieDataSet dataSet = new PieDataSet(entries, "");
                     dataSet.setColors(Color.parseColor("#E6B648"), Color.parseColor("#FFFFFF"));
                     dataSet.setDrawValues(false);
 
                     PieData data = new PieData(dataSet);
                     pieChart.setData(data);
-                    pieChart.invalidate(); // redesenha
+                    pieChart.invalidate();
 
                     adapter.updateList(tarefas);
                 } else {

@@ -39,6 +39,11 @@ public interface TaskService {
     @PUT("/api/tarefa/atualizar")
     Call<String> updateTask(@Body TaskStatusDto tarefa, @Header("Authorization") String token);
 
-
+    @PUT("/api/tarefa/atualizarStatus/{id}")
+    Call<String> updateStatus(
+            @Header("Authorization") String token,
+            @Path("id") Long id,
+            @Body TaskStatusDto status
+    );
 
 }

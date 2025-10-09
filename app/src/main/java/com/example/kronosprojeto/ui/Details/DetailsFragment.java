@@ -32,6 +32,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
+
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,17 +50,10 @@ public class DetailsFragment extends Fragment {
     private FlexboxLayout step1Layout;
     private FlexboxLayout step2Layout;
 
-    private long idTarefa;
+    private long idTarefa = -1;
     private String problem;
     private String description;
-    private String currentStatus; // <-- nova variável para status atual
-
-    public DetailsFragment() {
-    }
-
-    public static DetailsFragment newInstance() {
-        return new DetailsFragment();
-    }
+    private String currentStatus;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,7 +66,6 @@ public class DetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ImageView back = view.findViewById(R.id.imgBack);
-        idTarefa = -1;
 
         if (getArguments() != null) {
             idTarefa = getArguments().getLong("idTarefa", -1);
@@ -93,77 +88,94 @@ public class DetailsFragment extends Fragment {
         constraintLayout.setVisibility(View.GONE);
         loadingOverlay.setVisibility(View.VISIBLE);
 
-        MaterialButton btnUpdate = view.findViewById(R.id.btnUpdate);
-        btnUpdate.setOnClickListener(v -> showUpdateBottomSheet());
-
-        View btnReport = view.findViewById(R.id.imgReport);
-        btnReport.setOnClickListener(v -> showReportBottomSheet());
-
-        ImageView imgHistorico = view.findViewById(R.id.imgHistorico);
-        imgHistorico.setOnClickListener(s -> {
-            NavController navController = NavHostFragment.findNavController(DetailsFragment.this);
+        view.findViewById(R.id.imgReport).setOnClickListener(v -> showReportBottomSheet());
+        view.findViewById(R.id.imgHistorico).setOnClickListener(v -> {
+            NavController navController = NavHostFragment.findNavController(this);
             navController.navigate(R.id.action_details_to_assignmentHistoryFragment);
         });
 
         back.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(DetailsFragment.this);
+            NavController navController = NavHostFragment.findNavController(this);
             navController.navigate(R.id.action_details_to_HomeFragment);
         });
 
         loadTaskDetails(txtTituloTarefa, txtDescription, txtInicialDate, txtSituation, txtSection, txtRapporteur, txtAdditionalContacts);
     }
 
-    private void loadTaskDetails(
-            TextView txtTituloTarefa,
-            TextView txtDescription,
-            TextView txtInicialDate,
-            TextView txtSituation,
-            TextView txtSection,
-            TextView txtRapporteur,
-            TextView txtAdditionalContacts
-    ) {
+    private void loadTaskDetails(TextView txtTituloTarefa, TextView txtDescription, TextView txtInicialDate,
+                                 TextView txtSituation, TextView txtSection, TextView txtRapporteur, TextView txtAdditionalContacts) {
+
         SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
 
-        if (idTarefa != -1 && token != null) {
-            Call<TaskDetailsDto> call = taskService.getTaskById(idTarefa, "Bearer " + token);
-            call.enqueue(new Callback<TaskDetailsDto>() {
-                @Override
-                public void onResponse(Call<TaskDetailsDto> call, Response<TaskDetailsDto> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        TaskDetailsDto task = response.body();
-
-                        txtTituloTarefa.setText(task.getNome());
-                        txtDescription.setText(task.getDescricao() != null ? task.getDescricao() : "-");
-                        txtInicialDate.setText(task.getDataAtribuicao() != null ? task.getDataAtribuicao() : "-");
-
-                        currentStatus = task.getStatus(); // <-- guarda status atual
-                        txtSituation.setText(currentStatus != null ? currentStatus : "-");
-
-                        txtRapporteur.setText(task.getUsuarioRelator().getNome() != null ? task.getUsuarioRelator().getNome() : "-");
-                        txtAdditionalContacts.setText(task.getUsuarioRelator().getEmail() != null ? task.getUsuarioRelator().getEmail() : "-");
-                        txtSection.setText(task.getUsuarioRelator().getSetor().getNome() != null ? task.getUsuarioRelator().getSetor().getNome() : "-");
-
-                        constraintLayout.setVisibility(View.VISIBLE);
-                        loadingOverlay.setVisibility(View.GONE);
-                    } else {
-                        Log.e(TAG, "Erro na resposta: " + response.code());
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<TaskDetailsDto> call, Throwable t) {
-                    Log.e(TAG, "Falha ao buscar tarefa", t);
-                }
-            });
-        } else {
+        if (idTarefa == -1 || token == null) {
             Log.e(TAG, "idTarefa inválido ou token nulo: " + idTarefa + ", " + token);
+            return;
         }
+
+        taskService.getTaskById(idTarefa, "Bearer " + token).enqueue(new Callback<TaskDetailsDto>() {
+            @Override
+            public void onResponse(Call<TaskDetailsDto> call, Response<TaskDetailsDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TaskDetailsDto task = response.body();
+
+                    txtTituloTarefa.setText(task.getNome());
+                    txtDescription.setText(task.getDescricao() != null ? task.getDescricao() : "-");
+                    txtInicialDate.setText(task.getDataAtribuicao() != null ? task.getDataAtribuicao() : "-");
+
+                    currentStatus = task.getStatus();
+                    txtSituation.setText(currentStatus != null ? currentStatus : "-");
+
+                    txtRapporteur.setText(task.getUsuarioRelator().getNome() != null ? task.getUsuarioRelator().getNome() : "-");
+                    txtAdditionalContacts.setText(task.getUsuarioRelator().getEmail() != null ? task.getUsuarioRelator().getEmail() : "-");
+                    txtSection.setText(task.getUsuarioRelator().getSetor().getNome() != null ? task.getUsuarioRelator().getSetor().getNome() : "-");
+
+                    constraintLayout.setVisibility(View.VISIBLE);
+                    loadingOverlay.setVisibility(View.GONE);
+
+                    MaterialButton btnUpdate = requireView().findViewById(R.id.btnUpdate);
+                    btnUpdate.setOnClickListener(v -> {
+                        if ("Pendente".equalsIgnoreCase(currentStatus)) {
+                            showStartBottomSheet();
+                        } else {
+                            showUpdateBottomSheet();
+                        }
+                    });
+
+                } else {
+                    Log.e(TAG, "Erro na resposta: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TaskDetailsDto> call, Throwable t) {
+                Log.e(TAG, "Falha ao buscar tarefa", t);
+            }
+        });
+    }
+
+
+    private void showStartBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.TransparentBottomSheetDialog);
+        View sheetStart = getLayoutInflater().inflate(R.layout.bottom_sheet_start, null);
+        if (sheetStart == null) return;
+
+        TextView txtStartTask = sheetStart.findViewById(R.id.txtStartTask);
+        txtStartTask.setOnClickListener(v2 -> {
+            updateTaskStatus("Em Andamento");
+            currentStatus = "Em Andamento";
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.setContentView(sheetStart);
+        setBottomSheetBehavior(bottomSheetDialog);
     }
 
     private void showUpdateBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.TransparentBottomSheetDialog);
         View sheetViewChoice = getLayoutInflater().inflate(R.layout.bottom_sheet_choice, null);
+        if (sheetViewChoice == null) return;
+
         bottomSheetDialog.setContentView(sheetViewChoice);
         setBottomSheetBehavior(bottomSheetDialog);
 
@@ -171,78 +183,57 @@ public class DetailsFragment extends Fragment {
         TextView txtFinishTask = sheetViewChoice.findViewById(R.id.txtFinishTask);
 
         txtDescriptionDetails.setOnClickListener(v -> {
-            if ("Pendente".equals(currentStatus)) {
-                View sheetStart = getLayoutInflater().inflate(R.layout.bottom_sheet_start, null);
-                MaterialButton txtStartTask = sheetStart.findViewById(R.id.txtStartTask);
+            View sheetDetails = getLayoutInflater().inflate(R.layout.bottom_sheet_details, null);
+            MaterialButton btnConfirm = sheetDetails.findViewById(R.id.btnConfirm);
+            TextInputEditText txtDescriptionDetails2 = sheetDetails.findViewById(R.id.txtDescriptionDetails);
 
-                txtStartTask.setOnClickListener(v2 -> {
-                    updateTaskStatus("Em Andamento");
-                    currentStatus = "Em Andamento"; // Atualiza o status local
-                    bottomSheetDialog.dismiss();
-                });
+            btnConfirm.setOnClickListener(v1 -> {
+                String observacao = txtDescriptionDetails2.getText() != null ? txtDescriptionDetails2.getText().toString().trim() : "";
 
-                bottomSheetDialog.setContentView(sheetStart);
-                setBottomSheetBehavior(bottomSheetDialog);
-            } else {
-                View sheetDetails = getLayoutInflater().inflate(R.layout.bottom_sheet_details, null);
-                MaterialButton btnConfirm = sheetDetails.findViewById(R.id.btnConfirm);
-                TextInputEditText txtDescriptionDetails2 = sheetDetails.findViewById(R.id.txtDescriptionDetails);
+                if (observacao.isEmpty()) {
+                    ToastHelper.showFeedbackToast(requireActivity(), "error", "Campo vazio", "Por favor, descreva o que foi feito no dia.");
+                    return;
+                }
 
-                btnConfirm.setOnClickListener(v1 -> {
-                    String observacao = txtDescriptionDetails2.getText() != null ?
-                            txtDescriptionDetails2.getText().toString().trim() : "";
+                SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
+                String token = prefs.getString("jwt", null);
+                long idUsuario = Long.parseLong(prefs.getString("id", "0"));
 
-                    if (observacao.isEmpty()) {
-                        ToastHelper.showFeedbackToast(requireActivity(), "error", "Campo vazio", "Por favor, descreva o que foi feito no dia.");
-                        return;
+                if (token == null || idUsuario == 0 || idTarefa == -1) {
+                    ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Não foi possível obter os dados do usuário.");
+                    return;
+                }
+
+                Date dataHoje = new Date();
+                String data2 = String.valueOf(dataHoje);
+                LogAtribuicaoTarefaDto dto = new LogAtribuicaoTarefaDto(idTarefa, idUsuario, data2, observacao);
+
+                taskService.adicionarLog("Bearer " + token, dto).enqueue(new Callback<LogAtribuicaoTarefaDto>() {
+                    @Override
+                    public void onResponse(Call<LogAtribuicaoTarefaDto> call, Response<LogAtribuicaoTarefaDto> response) {
+                        if (response.isSuccessful()) {
+                            ToastHelper.showFeedbackToast(requireActivity(), "successo", "Log salvo", "Observação registrada com sucesso!");
+                        } else {
+                            ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Falha ao salvar log: " + response.code());
+                        }
+                        bottomSheetDialog.dismiss();
                     }
 
-                    SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
-                    String token = prefs.getString("jwt", null);
-                    Long idUsuario = Long.parseLong(prefs.getString("id", "0"));
-
-                    if (token == null || idUsuario == 0 || idTarefa == -1) {
-                        ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Não foi possível obter os dados do usuário.");
-                        return;
+                    @Override
+                    public void onFailure(Call<LogAtribuicaoTarefaDto> call, Throwable t) {
+                        ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro de conexão", t.getMessage());
+                        bottomSheetDialog.dismiss();
                     }
-
-                    // Data de hoje
-                    String dataHoje = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                            .format(new java.util.Date());
-
-                    // Cria DTO
-                    LogAtribuicaoTarefaDto dto = new LogAtribuicaoTarefaDto(idTarefa, idUsuario, observacao, dataHoje);
-
-                    // Chama a API
-                    TaskService logService = RetrofitClientSQL.createService(TaskService.class);
-                    logService.adicionarLog("Bearer " + token, dto).enqueue(new retrofit2.Callback<LogAtribuicaoTarefaDto>() {
-                        @Override
-                        public void onResponse(Call<LogAtribuicaoTarefaDto> call, retrofit2.Response<LogAtribuicaoTarefaDto> response) {
-                            if (response.isSuccessful()) {
-                                ToastHelper.showFeedbackToast(requireActivity(), "successo", "Log salvo", "Observação registrada com sucesso!");
-                            } else {
-                                ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Falha ao salvar log: " + response.code());
-                            }
-                            bottomSheetDialog.dismiss();
-                        }
-
-                        @Override
-                        public void onFailure(Call<LogAtribuicaoTarefaDto> call, Throwable t) {
-                            ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro de conexão", t.getMessage());
-                            bottomSheetDialog.dismiss();
-                        }
-                    });
                 });
+            });
 
-                bottomSheetDialog.setContentView(sheetDetails);
-                setBottomSheetBehavior(bottomSheetDialog);
-            }
-
+            bottomSheetDialog.setContentView(sheetDetails);
+            setBottomSheetBehavior(bottomSheetDialog);
         });
 
         txtFinishTask.setOnClickListener(v -> {
-            updateTaskStatus("Concluída");
-            currentStatus = "Concluída"; // Atualiza o status local
+            updateTaskStatus("Concluído");
+            currentStatus = "Concluído";
             bottomSheetDialog.dismiss();
         });
     }
@@ -250,7 +241,6 @@ public class DetailsFragment extends Fragment {
     private void showReportBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.TransparentBottomSheetDialog);
         View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_input_report, null);
-
         if (sheetView == null) return;
 
         step1Layout = sheetView.findViewById(R.id.step1);
@@ -273,7 +263,7 @@ public class DetailsFragment extends Fragment {
             SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
             String token = prefs.getString("jwt", null);
             long idUsuario = Long.parseLong(prefs.getString("id", "1"));
-            description = descriptionInput.getText().toString();
+            description = descriptionInput.getText() != null ? descriptionInput.getText().toString().trim() : "";
 
             ReportService reportService = RetrofitClientSQL.createService(ReportService.class);
             ReportRequestDto reportRequestDto = new ReportRequestDto(idTarefa, idUsuario, description, problem, "Pendente");
@@ -311,30 +301,36 @@ public class DetailsFragment extends Fragment {
     private void updateTaskStatus(String newStatus) {
         SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
+        if (token == null || idTarefa == -1) return;
 
-        if (token == null) return;
+        Log.d(TAG, "Atualizando tarefa id=" + idTarefa + " para status=" + newStatus);
 
-        TaskStatusDto dto = new TaskStatusDto(idTarefa, newStatus);
-        taskService.updateTask(dto, "Bearer " + token).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    ToastHelper.showFeedbackToast(requireActivity(), "successo", "Tarefa atualizada", "Status atualizado para: " + newStatus);
-                } else {
-                    ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Falha ao atualizar: " + response.code());
-                }
-            }
+        TaskStatusDto statusDto = new TaskStatusDto(newStatus);
+        Log.d(TAG, "JSON enviado: " + new Gson().toJson(statusDto));
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro de conexão", t.getMessage());
-            }
-        });
+        taskService.updateStatus("Bearer " + token, idTarefa, statusDto)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        if (response.isSuccessful()) {
+                            ToastHelper.showFeedbackToast(requireActivity(), "successo", "Tarefa atualizada", "Status atualizado para: " + newStatus);
+                        } else {
+                            ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Falha ao atualizar: " + response.code());
+                            Log.e(TAG, "Erro resposta: " + response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Log.e(TAG, "Erro de conexão: " + t.getMessage(), t);
+                        ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro de conexão", t.getMessage());
+                    }
+                });
     }
+
 
     private void setBottomSheetBehavior(BottomSheetDialog dialog) {
         View container = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-
         if (container != null) {
             container.setBackgroundResource(android.R.color.transparent);
             BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(container);
@@ -342,7 +338,6 @@ public class DetailsFragment extends Fragment {
             behavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
-
         dialog.show();
     }
 }

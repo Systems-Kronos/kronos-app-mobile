@@ -4,25 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class TaskStatusDto {
 
-    @SerializedName("id")
-    private long id;
-
-    @SerializedName("status")
     private String status;
 
-    public TaskStatusDto() {}
-
-    public TaskStatusDto(long id, String status) {
-        this.id = id;
+    public TaskStatusDto(String status) {
         this.status = status;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getStatus() {
@@ -33,3 +18,7 @@ public class TaskStatusDto {
         this.status = status;
     }
 }
+
+
+
+
