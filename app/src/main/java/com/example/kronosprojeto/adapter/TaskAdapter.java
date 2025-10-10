@@ -50,7 +50,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
             holder.getDayView().setText("Data: -");
         }
 
-
+// AQUIII
         holder.getTitleView().setText(tarefas.get(position).getNome());
         holder.getSectorView().setText(" ");
         int tempo = tarefas.get(position).getTempoEstimado();

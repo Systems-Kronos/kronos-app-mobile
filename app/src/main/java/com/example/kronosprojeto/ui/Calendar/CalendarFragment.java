@@ -189,6 +189,10 @@ public class CalendarFragment extends Fragment {
         calendarService.searchUser(userId).enqueue(new Callback<List<Calendar>>() {
             @Override
             public void onResponse(Call<List<Calendar>> call, Response<List<Calendar>> response) {
+                if (binding == null || getActivity() == null) {
+                    return;
+                }
+
                 if (response.isSuccessful() && response.body() != null) {
                     calenderByUser = response.body();
 
