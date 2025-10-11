@@ -1,3 +1,4 @@
+
 package com.example.kronosprojeto;
 
 import android.content.Intent;
@@ -19,7 +20,7 @@ import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.example.kronosprojeto.config.RetrofitCalendarNoSQL;
+import com.example.kronosprojeto.config.RetrofitClientNoSQL;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.ActivityMainBinding;
 import com.example.kronosprojeto.dto.UserResponseDto;
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.assignmentHistoryFragment,
                 R.id.details
         ).build();
+
+
 
 
 
@@ -143,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void carregarNotificacoes(long idUsuario) {
-        NotificationService notificationService = RetrofitCalendarNoSQL.createService(NotificationService.class);
+        NotificationService notificationService = RetrofitClientNoSQL.createService(NotificationService.class);
         Call<List<Notification>> callNotificacoes = notificationService.getNotificationsByUserID(idUsuario);
 
         callNotificacoes.enqueue(new Callback<List<Notification>>() {

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.kronosprojeto.config.RetrofitCalendarNoSQL;
+import com.example.kronosprojeto.config.RetrofitClientNoSQL;
 import com.example.kronosprojeto.model.Notification;
 import com.example.kronosprojeto.service.NotificationService;
 import com.example.kronosprojeto.utils.NotificationProcessor;
@@ -28,7 +28,7 @@ public class NotificationWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        NotificationService service = RetrofitCalendarNoSQL.createService(NotificationService.class);
+        NotificationService service = RetrofitClientNoSQL.createService(NotificationService.class);
         Context context = getApplicationContext();
 
         Log.e("Worker", "ATIVOU");

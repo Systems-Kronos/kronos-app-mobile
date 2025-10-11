@@ -9,8 +9,8 @@ public class Calendar {
         @SerializedName("usuario")
         private Long user;
 
-        @SerializedName("dia")
-        private String day;
+        @SerializedName("evento")
+        private String event;
 
         @SerializedName("presenca")
         private Boolean presence;
@@ -35,7 +35,7 @@ public class Calendar {
                         String crm, String cid, Boolean accepted, String attest) {
                 this.id = id;
                 this.user = user;
-                this.day = day;
+                this.event = day;
                 this.presence = presence;
                 this.observation = observation;
                 this.crm = crm;
@@ -62,11 +62,11 @@ public class Calendar {
         }
 
         public String getDay() {
-                return day;
+                return event;
         }
 
         public void setDay(String day) {
-                this.day = day;
+                this.event = day;
         }
 
         public Boolean getPresence() {
