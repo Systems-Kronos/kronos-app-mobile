@@ -368,6 +368,10 @@ public class CalendarFragment extends Fragment {
         binding = null;
     }
     private void updateGreenDaysForMonth(CalendarDay month) {
+        if (orange == null || greenFromDb == null) {
+            Log.w("CALENDAR_DEBUG", "Listas ainda não carregadas. Ignorando updateGreenDaysForMonth.");
+            return;
+        }
         List<CalendarDay> greenVisual = new ArrayList<>();
 
         LocalDate firstDayOfMonth = LocalDate.of(month.getYear(), month.getMonth(), 1);
