@@ -326,7 +326,7 @@ public class ProfileFragment extends Fragment {
                             realocadas++;
                         }
 
-                        if ("Atribuída".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
+                        if ("Original".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
                             atribuidas++;
                         }
 
