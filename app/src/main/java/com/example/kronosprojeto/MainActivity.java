@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private NotificationViewModel notificationViewModel;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
+    TextView tvUsername;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +70,14 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view_drawer);
+
+        NavigationView navigationView = findViewById(R.id.nav_view_drawer);
+
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView tvUsername = headerView.findViewById(R.id.tv_username);
+
+
 
         // Inflar custom view da toolbar
         View customView = getLayoutInflater().inflate(R.layout.toolbar_custom, toolbar, false);
@@ -173,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
                         TextView title = customView.findViewById(R.id.toolbar_title);
                         title.setText("Olá, " + response.body().getNome().split(" ")[0] + ", como você está?");
-
+                        tvUsername.setText(("Olá, " + response.body().getNome().split(" ")[0] ));
                         toolbar.removeView(customView);
                         toolbar.addView(customView);
                     } else if (response.code() == 403) {
