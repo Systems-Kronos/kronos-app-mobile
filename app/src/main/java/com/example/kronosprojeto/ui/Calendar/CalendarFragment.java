@@ -197,6 +197,20 @@ public class CalendarFragment extends Fragment {
     }
 
     private void sendUpdate() {
+        // Hideko caso tenha dúvida esse isAdded serve meio que pra dizer
+        // “Mostre o Toast somente se o fragment ainda estiver visível e associado a uma Activity" pra não dar mais aquele crash
+
+        if (selectDay == null) {
+            if (isAdded()) Toast.makeText(requireContext(), "Selecione um dia primeiro.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+        if (isWeekend(selectedDay)) {
+            if (isAdded()) Toast.makeText(requireContext(), "Não é possível salvar marcações em finais de semana.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (selectCalendar != null) {
             selectCalendar.setPresence("falta".equals(actionSelect) ? false : true);
 
