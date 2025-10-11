@@ -5,16 +5,25 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.Visibility;
@@ -48,6 +57,8 @@ public class HomeFragment extends Fragment {
     TaskAdapter adapter;
     PieChart pieChart;
     ArrayList<PieEntry> entries;
+    FrameLayout loadingOverlay;
+    NestedScrollView nestedScrollView;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -56,6 +67,37 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         List<Task> tarefas = new ArrayList<>();
+        loadingOverlay= binding.loadingOverlay;
+        nestedScrollView = binding.contentScroll;
+        TextView presentTodayText = binding.presentTodayQuestion;
+
+        String texto = "Não estará presente no trabalho hoje? clique aqui!";
+        SpannableString spannable = new SpannableString(texto);
+
+        int start = texto.indexOf(" clique aqui!");
+        int end = start + " clique aqui!".length();
+
+        presentTodayText.setOnClickListener(v -> {
+            NavController navController = NavHostFragment.findNavController(this);
+
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(R.id.mobile_navigation, true) // limpa toda a pilha do gráfico principal
+                    .setLaunchSingleTop(true)
+                    .build();
+
+            navController.navigate(R.id.CalendarioFragment, null, navOptions);
+
+        });
+
+        spannable.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.YellowMessage)),
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+
+        presentTodayText.setText(spannable);
+
 
         recyclerView = binding.tomorrowstasks;
         Button buttonAll = binding.btnTarefaTodas;
@@ -101,9 +143,6 @@ public class HomeFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("app", Context.MODE_PRIVATE);
 
 
-
-
-
         String token = prefs.getString("jwt", null);
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
@@ -139,12 +178,17 @@ public class HomeFragment extends Fragment {
 
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
         Call<List<Task>> call = service.getTasksByUserID(usuarioId, "Bearer " + token, tipoTarefa, status);
+        nestedScrollView.setVisibility(View.GONE);
+        loadingOverlay.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<List<Task>>() {
+
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Task> tarefas = response.body();
+                    loadingOverlay.setVisibility(View.GONE);
+                    nestedScrollView.setVisibility(View.VISIBLE);
 
                     int total = tarefas.size();
                     int concluidas = 0;
@@ -167,24 +211,19 @@ public class HomeFragment extends Fragment {
                         porcentagemConcluidas = (int) ((concluidas * 100.0f) / total);
                     }
 
-                    // 🔹 Atualiza texto central
                     pieChart.setCenterText(porcentagemConcluidas + "%");
-
-                    // 🔹 Zera as entradas antigas
                     entries.clear();
 
-                    // 🔹 Adiciona as novas
                     entries.add(new PieEntry(porcentagemConcluidas, ""));
                     entries.add(new PieEntry(100 - porcentagemConcluidas, ""));
 
-                    // 🔹 Cria um novo DataSet e aplica no gráfico
                     PieDataSet dataSet = new PieDataSet(entries, "");
                     dataSet.setColors(Color.parseColor("#E6B648"), Color.parseColor("#FFFFFF"));
                     dataSet.setDrawValues(false);
 
                     PieData data = new PieData(dataSet);
                     pieChart.setData(data);
-                    pieChart.invalidate(); // redesenha
+                    pieChart.invalidate();
 
                     adapter.updateList(tarefas);
                 } else {
