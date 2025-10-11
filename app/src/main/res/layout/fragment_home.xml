@@ -10,7 +10,7 @@
         android:id="@+id/contentScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="8dp"
+        android:paddingTop="0dp"
         android:fillViewport="true"
         app:flexDirection="column">
 
@@ -18,12 +18,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".ui.Home.HomeFragment">
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:alignContent="center"
+                android:background="@drawable/bordaroxa_arredondada_inferior">
+                <TextView
+                    android:id="@+id/presentTodayQuestion"
+                    android:layout_marginTop="15dp"
+                    android:layout_width="match_parent"
+                    android:textAlignment="center"
+                    android:layout_height="wrap_content"
+                    android:text="Não estará presente no trabalho hoje? clique aqui!"
+                    android:fontFamily="@font/anekodia"
+                    android:textStyle="bold"
+                    android:textColor="#ffff">
+
+                </TextView>
+            </com.google.android.flexbox.FlexboxLayout>
 
             <FrameLayout
+
                 android:id="@+id/graficFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="95dp"
+                android:layout_marginTop="120dp"
                 android:padding="16dp">
 
                 <View
@@ -53,9 +72,12 @@
             </FrameLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_marginTop="40dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:backgroundTint="#F7EAFF">
+
+
 
                 <TextView
                     android:id="@+id/txtTarefaTitle"
@@ -207,7 +229,7 @@
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
                         android:backgroundTint="#F7EAFF"
-                        android:text="Tarefas semanais"
+                        android:text="Todas as tarefas"
                         android:textAllCaps="false"
                         android:textColor="#0F0F0F"
                         android:textSize="14sp"
@@ -220,7 +242,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:backgroundTint="#BE8F35"
-                        android:text="Tarefas diárias"
+                        android:text="Tarefas realocadas\"
                         android:textAllCaps="false"
                         android:textColor="#0F0F0F"
                         android:textSize="13sp"

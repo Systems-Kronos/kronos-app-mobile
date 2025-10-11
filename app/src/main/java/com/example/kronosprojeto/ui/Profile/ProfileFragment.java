@@ -286,7 +286,7 @@ public class ProfileFragment extends Fragment {
 
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
-        carregarTarefasUsuario(token,usuarioId, "1", "1");
+        carregarTarefasUsuario(token,usuarioId, "1", "4");
         return root;
     }
 

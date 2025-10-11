@@ -5,18 +5,25 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.Visibility;
@@ -62,6 +69,34 @@ public class HomeFragment extends Fragment {
         List<Task> tarefas = new ArrayList<>();
         loadingOverlay= binding.loadingOverlay;
         nestedScrollView = binding.contentScroll;
+        TextView presentTodayText = binding.presentTodayQuestion;
+
+        String texto = "Não estará presente no trabalho hoje? clique aqui!";
+        SpannableString spannable = new SpannableString(texto);
+
+        int start = texto.indexOf(" clique aqui!");
+        int end = start + " clique aqui!".length();
+
+        presentTodayText.setOnClickListener(v -> {
+            NavController navController = NavHostFragment.findNavController(this);
+
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(R.id.mobile_navigation, true) // limpa toda a pilha do gráfico principal
+                    .setLaunchSingleTop(true)
+                    .build();
+
+            navController.navigate(R.id.CalendarioFragment, null, navOptions);
+
+        });
+
+        spannable.setSpan(
+                new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.YellowMessage)),
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+
+        presentTodayText.setText(spannable);
 
 
         recyclerView = binding.tomorrowstasks;

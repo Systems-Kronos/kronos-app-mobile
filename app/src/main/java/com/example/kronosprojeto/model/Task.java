@@ -5,7 +5,7 @@ import com.example.kronosprojeto.dto.UserResponseDto;
 public class Task {
 
     private int id;
-    private String nome;
+    private String titulo;
     private Long usuarioRelator;
     private int gravidade;
     private int urgencia;
@@ -22,7 +22,7 @@ public class Task {
                 int tempoEstimado, String descricao, String status, String dataAtribuicao,
                 String dataConclusao, String origemTarefa) {
         this.id = id;
-        this.nome = nome;
+        this.titulo = nome;
         this.usuarioRelator = usuarioRelator;
         this.gravidade = gravidade;
         this.urgencia = urgencia;
@@ -38,7 +38,7 @@ public class Task {
     // Construtor simplificado
     public Task(String nome, String dataAtribuicao, int gravidade, int urgencia, int tendencia,
                 Long usuarioRelator, String origemTarefa, String descricao, String dataConclusao) {
-        this.nome = nome;
+        this.titulo = nome;
         this.dataAtribuicao = dataAtribuicao;
         this.gravidade = gravidade;
         this.urgencia = urgencia;
@@ -55,8 +55,8 @@ public class Task {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() { return titulo; }
+    public void setNome(String nome) { this.titulo = nome; }
 
     public Long getUsuarioRelator() { return usuarioRelator; }
     public void setUsuarioRelator(Long usuarioRelator) { this.usuarioRelator = usuarioRelator; }
