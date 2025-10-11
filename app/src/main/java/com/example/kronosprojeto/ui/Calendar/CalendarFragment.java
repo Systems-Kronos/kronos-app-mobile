@@ -45,9 +45,12 @@ public class CalendarFragment extends Fragment {
     private Calendar selectCalendar;
     private String actionSelect;
     private String idUsuario;
+    List<CalendarDay> greenVisual;
+    List<CalendarDay> greenFromDb;
+    GreenBorderDecorator greenDecorator;
     private BlackBackgroundDecorator blackBackgroundDecorator;
     private Button btnAbscense, btnPresenceSelect;
-
+    List<CalendarDay> orange;
     private static final String[] DIAS_ABREV = {"D", "S", "T", "Q", "Q", "S", "S"};
 
     @Override
@@ -130,7 +133,9 @@ public class CalendarFragment extends Fragment {
             btnAbscense.setBackgroundResource(R.drawable.border_yellow);
             btnPresenceSelect.setBackgroundResource(R.drawable.border_normal);
         });
-
+        calendarView.setOnMonthChangedListener((widget, date) -> {
+            updateGreenDaysForMonth(date);
+        });
 
         btnPresenceSelect.setOnClickListener(v -> {
             if (selectDay == null) {
@@ -244,9 +249,9 @@ public class CalendarFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     calenderByUser = response.body();
 
-                    List<CalendarDay> greenFromDb = new ArrayList<>();
-                    List<CalendarDay> orange = new ArrayList<>();
-                    List<CalendarDay> greenVisual = new ArrayList<>();
+                    greenFromDb = new ArrayList<>();
+                    orange = new ArrayList<>();
+                    greenVisual = new ArrayList<>();
 
                     LocalDate today = LocalDate.now();
 
@@ -362,4 +367,47 @@ public class CalendarFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+    private void updateGreenDaysForMonth(CalendarDay month) {
+        if (orange == null || greenFromDb == null) {
+            Log.w("CALENDAR_DEBUG", "Listas ainda não carregadas. Ignorando updateGreenDaysForMonth.");
+            return;
+        }
+        List<CalendarDay> greenVisual = new ArrayList<>();
+
+        LocalDate firstDayOfMonth = LocalDate.of(month.getYear(), month.getMonth(), 1);
+        LocalDate lastDayOfMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.lengthOfMonth());
+
+        LocalDate today = LocalDate.now();
+        LocalDate cursor = firstDayOfMonth;
+
+        while (!cursor.isAfter(lastDayOfMonth)) {
+            // Só considera dias antes de hoje
+            if (!cursor.isBefore(today)) {
+                cursor = cursor.plusDays(1);
+                continue;
+            }
+
+            // Ignora finais de semana
+            DayOfWeek dayOfWeek = cursor.getDayOfWeek();
+            if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+                cursor = cursor.plusDays(1);
+                continue;
+            }
+
+            CalendarDay day = CalendarDay.from(cursor);
+
+            if (!orange.contains(day) && !greenFromDb.contains(day)) {
+                greenVisual.add(day);
+            }
+
+            cursor = cursor.plusDays(1);
+        }
+
+        // Atualiza decorator
+        if (greenDecorator != null) binding.calendarView.removeDecorator(greenDecorator);
+        greenDecorator = new GreenBorderDecorator(getContext(), greenVisual);
+        binding.calendarView.addDecorator(greenDecorator);
+        binding.calendarView.invalidateDecorators();
+    }
+
 }
