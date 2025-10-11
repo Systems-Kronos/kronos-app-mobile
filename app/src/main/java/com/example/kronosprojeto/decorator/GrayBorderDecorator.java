@@ -1,9 +1,6 @@
 package com.example.kronosprojeto.decorator;
 
-
 import android.content.Context;
-import android.graphics.Color;
-import android.text.style.ForegroundColorSpan;
 
 import androidx.core.content.ContextCompat;
 

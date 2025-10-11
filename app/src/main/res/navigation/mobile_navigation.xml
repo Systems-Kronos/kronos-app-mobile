@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_HomeFragment_to_details"
             app:destination="@id/details" />
+        <action
+            android:id="@+id/action_HomeFragment_to_CalendarioFragment"
+            app:destination="@id/CalendarioFragment" />
     </fragment>
 
     <fragment
