@@ -13,8 +13,8 @@
 
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView
             android:id="@+id/calendarView"
-            android:layout_width="411dp"
-            android:layout_height="354dp"
+            android:layout_width="410dp"
+            android:layout_height="351dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -27,8 +27,8 @@
             app:mcv_weekDayTextAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <com.google.android.flexbox.FlexboxLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="410dp"
+            android:layout_height="387dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/calendar_section_shape"
             android:padding="40dp"
