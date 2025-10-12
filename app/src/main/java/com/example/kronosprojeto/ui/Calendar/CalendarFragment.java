@@ -1,14 +1,21 @@
 package com.example.kronosprojeto.ui.Calendar;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,14 +30,17 @@ import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
 import com.example.kronosprojeto.model.Calendar;
 import com.example.kronosprojeto.service.CalendarService;
+import com.example.kronosprojeto.utils.ToastHelper;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,8 +49,9 @@ import retrofit2.Response;
 public class CalendarFragment extends Fragment {
 
     private FragmentCalendarBinding binding;
-
+    Activity activity;
     private List<Calendar> calenderByUser = new ArrayList<>();
+    TextView selectedDayTxt, selectedDayQuestionTxt;
     private CalendarDay selectDay;
     private Calendar selectCalendar;
     private String actionSelect;
@@ -60,6 +71,8 @@ public class CalendarFragment extends Fragment {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        activity = getActivity();
+
         MaterialCalendarView calendarView = binding.calendarView;
 
         calendarView.state().edit()
@@ -73,11 +86,63 @@ public class CalendarFragment extends Fragment {
             return DIAS_ABREV[index];
         });
 
+        ImageView infoImage = binding.infoBorders;
+        infoImage.setOnClickListener(v -> {
+            View legendaView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_legenda, null);
+
+            AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                    .setView(legendaView)
+                    .create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+
+            dialog.show();
+
+            if (dialog.getWindow() != null) {
+                Window window = dialog.getWindow();
+
+                // Define a posição
+                window.setGravity(Gravity.TOP | Gravity.END);
+
+                // Define margens da borda superior e direita
+                WindowManager.LayoutParams params = window.getAttributes();
+                params.y = 100; // distância do topo
+                params.x = 50;  // distância da direita
+                window.setAttributes(params);
+
+                // 💡 Define o tamanho máximo da janela
+                // Usando  wrap_content para não ocupar a tela inteira
+                window.setLayout(
+                        (int) (getResources().getDisplayMetrics().widthPixels * 0.45),
+                        WindowManager.LayoutParams.WRAP_CONTENT
+                );
+            }
+        });
+
+        selectedDayQuestionTxt = binding.selectedDayQuestionTxt;
+        selectedDayTxt = binding.selectedDayTxt;
         calendarView.setOnDateChangedListener((widget, date, selected) -> {
             blackBackgroundDecorator.setSelectedDay(date);
             widget.invalidateDecorators();
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"));
+            String dataFormatada = date.getDate().format(formatter);
+
             selectDay = date;
+
+            if (date.getDate().isEqual( LocalDate.now())){
+                selectedDayTxt.setText("Hoje");
+                selectedDayQuestionTxt.setText("Você estará presente?");
+
+
+            }else{
+                selectedDayTxt.setText("Dia: "+dataFormatada);
+                selectedDayQuestionTxt.setText("Você estará ausente?");
+            }
+
+
 
             EditText editTextArea = root.findViewById(R.id.editTextArea);
             editTextArea.setText("");
@@ -86,7 +151,8 @@ public class CalendarFragment extends Fragment {
             String localDateStr = localDate.toString();
 
             if (isWeekend(localDate)) {
-                if (isAdded()) Toast.makeText(requireContext(), "Final de semana não pode ser selecionado", Toast.LENGTH_SHORT).show();
+                if (isAdded())  ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Finais de semana não podem ser selecionados");
+
                 return;
             }
 
@@ -112,20 +178,20 @@ public class CalendarFragment extends Fragment {
 
         btnAbscense.setOnClickListener(v -> {
             if (selectDay == null) {
-                if (isAdded()) Toast.makeText(requireContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você precisa selecionar um dia primeiro");
                 return;
             }
 
             LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
 
             if (isWeekend(selectedDay)) {
-                if (isAdded()) Toast.makeText(requireContext(), "Não é possível marcar falta no final de semana", Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você não pode marcar falta em finais de semana");
                 return;
             }
             LocalDate today = LocalDate.now();
 
             if (selectedDay.isBefore(today)) {
-                if (isAdded()) Toast.makeText(requireContext(), "Só é permitido marcar uma falta hoje ou programada para o futuro", Toast.LENGTH_SHORT).show();
+                if (isAdded())  ToastHelper.showFeedbackToast(activity,"info","Ação não permitida:","Você só pode marcar uma falta no dia atual ou agenda-la para dias futuros");
                 return;
             }
 
@@ -139,7 +205,7 @@ public class CalendarFragment extends Fragment {
 
         btnPresenceSelect.setOnClickListener(v -> {
             if (selectDay == null) {
-                if (isAdded()) Toast.makeText(requireContext(), "Selecione um dia primeiro", Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você precisa selecionar um dia primeiro");
                 return;
             }
 
@@ -147,12 +213,12 @@ public class CalendarFragment extends Fragment {
             LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
 
             if (!selectedDay.isEqual(today)) {
-                if (isAdded()) Toast.makeText(requireContext(), "Só é permitido marcar presença no dia de hoje.", Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você só pode registrar presença no dia atual");
                 return;
             }
 
             if (isWeekend(selectedDay)) {
-                if (isAdded()) Toast.makeText(requireContext(), "Não é possível marcar presença no final de semana", Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você não pode marcar falta em finais de semana");
                 return;
             }
 
@@ -168,7 +234,7 @@ public class CalendarFragment extends Fragment {
 
     private void selectCalendarDay(String acao, View root) {
         if (selectDay == null) {
-            if (isAdded()) Toast.makeText(requireContext(), "Você deve primeiro selecionar um dia no calendário", Toast.LENGTH_SHORT).show();
+            if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos");
             return;
         }
 
@@ -206,13 +272,13 @@ public class CalendarFragment extends Fragment {
         // “Mostre o Toast somente se o fragment ainda estiver visível e associado a uma Activity" pra não dar mais aquele crash
 
         if (selectDay == null) {
-            if (isAdded()) Toast.makeText(requireContext(), "Selecione um dia primeiro.", Toast.LENGTH_SHORT).show();
+            if (isAdded())  ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
             return;
         }
 
         LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
         if (isWeekend(selectedDay)) {
-            if (isAdded()) Toast.makeText(requireContext(), "Não é possível salvar marcações em finais de semana.", Toast.LENGTH_SHORT).show();
+            if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Nenhuma ação é permitida nos finais de semana");
             return;
         }
 
@@ -229,7 +295,7 @@ public class CalendarFragment extends Fragment {
                 updateCalender(selectCalendar.getId(), selectCalendar);
             }
         } else {
-            if (isAdded()) Toast.makeText(requireContext(), "Nenhum dado preparado. Clique primeiro em 'Marcar falta' ou 'Marcar presença'.", Toast.LENGTH_SHORT).show();
+            if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
         }
     }
 
@@ -301,8 +367,27 @@ public class CalendarFragment extends Fragment {
                     }
 
                     binding.calendarView.invalidateDecorators();
+                    binding.calendarView.post(() -> {
+                        CalendarDay todayDay = CalendarDay.today();
+                        selectDay = todayDay;
+
+                        // Atualiza o decorator de fundo
+                        blackBackgroundDecorator.setSelectedDay(todayDay);
+                        binding.calendarView.setDateSelected(todayDay, true);
+                        binding.calendarView.invalidateDecorators();
+
+                        // Atualiza textos
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"));
+                        String dataFormatada = todayDay.getDate().format(formatter);
+                        selectedDayTxt.setText("Hoje");
+                        selectedDayQuestionTxt.setText("Você estará presente?");
+
+                        // (opcional) Foca no dia de hoje na visualização do calendário
+                        binding.calendarView.setCurrentDate(todayDay);
+                    });
 
                 } else {
+                    ToastHelper.showFeedbackToast(activity,"error","Erro inesperado:","Não foi possível concluir a ação");
                     Log.e("CALENDAR_DEBUG", "Erro HTtP: " + response.errorBody());
                 }
             }
@@ -311,7 +396,7 @@ public class CalendarFragment extends Fragment {
             public void onFailure(Call<List<Calendar>> call, Throwable t) {
                 Log.e("CALENDAR_DEBUG", "Falha na chamada da API", t);
                 if (isAdded() && getContext() != null) {
-                    Toast.makeText(getContext(), "Erro ao buscar calendários: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    ToastHelper.showFeedbackToast(activity,"error","Erro inesperado:","Não foi possível carregar os dias");
                 }
             }
         });
@@ -328,7 +413,8 @@ public class CalendarFragment extends Fragment {
                     Calendar created = response.body();
                     calenderByUser.add(created);
                     selectCalendar = created;
-                    if (isAdded()) Toast.makeText(requireContext(), "Dia salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                    if (isAdded())  ToastHelper.showFeedbackToast(activity,"success","Ação concluída!:","Sua falta ou presença foi salva");
+
                     calenderByUser(idUsuario);
                 }
             }
@@ -336,7 +422,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(Call<Calendar> call, Throwable t) {
                 t.printStackTrace();
-                if (isAdded()) Toast.makeText(requireContext(), "Erro ao criar calendário: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded())  ToastHelper.showFeedbackToast(activity,"error","Erro inesperado:","Não foi possível carregar os dias");
             }
         });
     }
