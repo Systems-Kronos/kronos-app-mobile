@@ -78,13 +78,12 @@
                 android:backgroundTint="#F7EAFF">
 
 
-
                 <TextView
                     android:id="@+id/txtTarefaTitle"
                     android:layout_width="167dp"
                     android:layout_height="28dp"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="344dp"
+                    android:layout_marginTop="300dp"
                     android:layout_marginEnd="353dp"
                     android:fontFamily="@font/anekodia"
                     android:text="Tarefas pendentes:"
@@ -96,119 +95,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <LinearLayout
-                    android:id="@+id/linearTasks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/txtTarefaTitle">
-
-                    <EditText
-                        android:id="@+id/lnTodayTask"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:cursorVisible="false"
-                        android:focusable="false"
-                        android:gravity="start|top"
-                        android:inputType="none|textMultiLine" />
-
-                    <TextView
-                        android:id="@+id/txtToday"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:text="hoje" />
-
-                    <EditText
-                        android:id="@+id/lnTodayTask2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_weight="1"
-                        android:cursorVisible="false"
-                        android:focusable="false"
-                        android:gravity="start|top"
-                        android:inputType="none|textMultiLine" />
-
-                </LinearLayout>
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tomorrowstasks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="28dp"
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearTasks" />
-
-                <LinearLayout
-                    android:id="@+id/linearTaskTomorrow"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tomorrowstasks">
-
-                    <EditText
-                        android:id="@+id/lnTomorowTask"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:cursorVisible="false"
-                        android:focusable="false"
-                        android:gravity="start|top"
-                        android:inputType="none|textMultiLine" />
-
-                    <TextView
-                        android:id="@+id/txtTomorrow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
-                        android:text="Amanhã" />
-
-                    <EditText
-                        android:id="@+id/lnTomorowTask2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:cursorVisible="false"
-                        android:focusable="false"
-                        android:gravity="start|top"
-                        android:inputType="none|textMultiLine" />
-
-                </LinearLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/todaytasks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearTaskTomorrow" />
+                    app:layout_constraintTop_toBottomOf="@+id/txtTarefaTitle" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

@@ -81,7 +81,7 @@ public class HomeFragment extends Fragment {
             NavController navController = NavHostFragment.findNavController(this);
 
             NavOptions navOptions = new NavOptions.Builder()
-                    .setPopUpTo(R.id.mobile_navigation, true) // limpa toda a pilha do gráfico principal
+                    .setPopUpTo(R.id.mobile_navigation, true)
                     .setLaunchSingleTop(true)
                     .build();
 
@@ -190,15 +190,21 @@ public class HomeFragment extends Fragment {
                     loadingOverlay.setVisibility(View.GONE);
                     nestedScrollView.setVisibility(View.VISIBLE);
 
+                    // 🔹 Ordena pela prioridade (gravidade * urgencia * tendencia)
+                    tarefas.sort((t1, t2) -> {
+                        int prioridade1 = (t1.getGravidade() * t1.getUrgencia() * t1.getTendencia());
+                        int prioridade2 = (t2.getGravidade() * t2.getUrgencia() * t2.getTendencia());
+                        return Integer.compare(prioridade2, prioridade1); // maior prioridade primeiro
+                    });
+
                     int total = tarefas.size();
                     int concluidas = 0;
 
-                    Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
                     for (Task tarefa : tarefas) {
                         Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
                                 + ", Gravidade: " + tarefa.getGravidade()
-                                + ", Origem: " + tarefa.getOrigemTarefa()
-                                + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
+                                + ", Urgência: " + tarefa.getUrgencia()
+                                + ", Tendência: " + tarefa.getTendencia()
                                 + ", Status: " + tarefa.getStatus());
 
                         if ("Concluída".equalsIgnoreCase(tarefa.getStatus())) {
@@ -206,10 +212,7 @@ public class HomeFragment extends Fragment {
                         }
                     }
 
-                    int porcentagemConcluidas = 0;
-                    if (total > 0) {
-                        porcentagemConcluidas = (int) ((concluidas * 100.0f) / total);
-                    }
+                    int porcentagemConcluidas = total > 0 ? (int) ((concluidas * 100.0f) / total) : 0;
 
                     pieChart.setCenterText(porcentagemConcluidas + "%");
                     entries.clear();
@@ -226,7 +229,8 @@ public class HomeFragment extends Fragment {
                     pieChart.invalidate();
 
                     adapter.updateList(tarefas);
-                } else {
+                }
+                else {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
                 }
             }
