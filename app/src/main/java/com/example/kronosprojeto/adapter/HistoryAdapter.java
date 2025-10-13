@@ -27,7 +27,7 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
-public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class HistoryAdapter{
 
     private final List<LogAtribuicaoTarefaDto> logs;
     private final Context context;
@@ -37,46 +37,46 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.logs = log;
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_assignment_history, container, false);
-    }
+//    @Override
+//    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        return inflater.inflate(R.layout.fragment_assignment_history, container, false);
+//    }
 
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.history_view, parent, false);
-        return new HistoryViewHolder(view);
-    }
+//    @NonNull
+//    @Override
+//    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//        LayoutInflater inflater = LayoutInflater.from(context);
+//        View view = inflater.inflate(R.layout.history_view, parent, false);
+//        return new HistoryViewHolder(view);
+//    }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        String history = logs.get(position).getId();
-
-        ChatMessage message = messages.get(position);
-        if (holder instanceof ChatAdapter.UserViewHolder) {
-            ((ChatAdapter.UserViewHolder) holder).txtMessage.setText(message.getText());
-        } else if (holder instanceof ChatAdapter.BotViewHolder) {
-            ((ChatAdapter.BotViewHolder) holder).txtMessage.setText(message.getText());
-        }
-
-        back.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.action_details_to_HomeFragment);
-        });
-    }
-
-    static class HistoryViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTittle;
-        TextView txtDescription;
-        TextView txtUser;
-        public HistoryViewHolder(@NonNull View itemView) {
-            super(itemView);
-            txtTittle = itemView.findViewById(R.id.txtRealocation);
-            txtDescription = itemView.findViewById(R.id.txtDescription);
-            txtUser = itemView.findViewById(R.id.txtUserHistory);
-        }
-    }
+//    @Override
+//    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+//        String history = logs.get(position).getId();
+//
+//        ChatMessage message = messages.get(position);
+//        if (holder instanceof ChatAdapter.UserViewHolder) {
+//            ((ChatAdapter.UserViewHolder) holder).txtMessage.setText(message.getText());
+//        } else if (holder instanceof ChatAdapter.BotViewHolder) {
+//            ((ChatAdapter.BotViewHolder) holder).txtMessage.setText(message.getText());
+//        }
+//
+//        back.setOnClickListener(v -> {
+//            NavController navController = NavHostFragment.findNavController(this);
+//            navController.navigate(R.id.action_details_to_HomeFragment);
+//        });
+//    }
+//
+//    static class HistoryViewHolder extends RecyclerView.ViewHolder {
+//        TextView txtTittle;
+//        TextView txtDescription;
+//        TextView txtUser;
+//        public HistoryViewHolder(@NonNull View itemView) {
+//            super(itemView);
+//            txtTittle = itemView.findViewById(R.id.txtRealocation);
+//            txtDescription = itemView.findViewById(R.id.txtDescription);
+//            txtUser = itemView.findViewById(R.id.txtUserHistory);
+//        }
+//    }
 
 }
