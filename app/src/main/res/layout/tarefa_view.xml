@@ -33,7 +33,7 @@
                 android:id="@+id/txtTitle"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
+                android:textColor="@color/purple_700"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="Titulo" />
@@ -67,6 +67,7 @@
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@+id/textAlign"
             >
+
             <TextView
                 android:id="@+id/txtDay"
                 android:layout_width="wrap_content"
@@ -74,7 +75,6 @@
                 android:layout_marginTop="10dp"
                 android:textColor="@color/purple_700"
                 android:textSize="16sp"
-                android:textStyle="bold"
                 tools:text="Dia: A partir das 00:00h" />
             <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="80dp"
@@ -92,15 +92,15 @@
                     >
 
                 </ImageView>
+
                 <TextView
-                    android:layout_marginBottom="5dp"
                     android:id="@+id/priority"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
                     android:textColor="@color/purple_700"
                     android:textSize="16sp"
-                    android:textStyle="bold"
                     tools:text="0/5" />
 
             </com.google.android.flexbox.FlexboxLayout>
@@ -113,7 +113,6 @@
                 android:layout_marginTop="3dp"
                 android:textColor="@color/purple_700"
                 android:textSize="16sp"
-                android:textStyle="bold"
                 tools:text="Data de Término: 20/08/2025" />
         </LinearLayout>
 
