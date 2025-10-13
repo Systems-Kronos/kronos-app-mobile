@@ -95,6 +95,11 @@ public class ChatFragment extends Fragment {
 
                     sessionReady = true;
                     binding.btnSend.setEnabled(true);
+
+                    String welcomeMessage = "Olá, para tirar dúvidas sobre o aplicativo estou à sua disposição! 😉";
+                    adapter.addMessage(new ChatMessage(welcomeMessage, false));
+                    binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
+
                 } else {
                     sessionReady = false;
                 }
@@ -107,6 +112,7 @@ public class ChatFragment extends Fragment {
             }
         });
     }
+
 
     private void sendMessage(String userMessage) {
         adapter.addMessage(new ChatMessage(userMessage, true));
