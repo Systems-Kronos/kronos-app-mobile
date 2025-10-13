@@ -54,7 +54,9 @@ import com.example.kronosprojeto.viewmodel.UserViewModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -165,10 +167,13 @@ public class ProfileFragment extends Fragment {
                                         UserResponseDto userResponseDto = userViewModel.getUser().getValue();
                                         userResponseDto.setFoto(imageUrl);
 
+                                        Map<String, Object> updateFields = new HashMap<>();
+                                        updateFields.put("foto", imageUrl);
                                         usuarioService = RetrofitClientSQL.createService(UserService.class);
                                         Call<String> callUpdate = usuarioService.updateUser(
                                                 "Bearer " + token,
-                                                userResponseDto
+                                                updateFields, String.valueOf(userResponseDto.getId())
+
                                         );
 
                                         callUpdate.enqueue(new Callback<String>() {
@@ -326,7 +331,7 @@ public class ProfileFragment extends Fragment {
                             realocadas++;
                         }
 
-                        if ("Atribuída".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
+                        if ("Original".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
                             atribuidas++;
                         }
 
