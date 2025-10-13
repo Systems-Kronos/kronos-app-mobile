@@ -51,7 +51,11 @@ dependencies {
     // Retrofit e conversores
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0") // ✅ Adicione esta linha
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    // OkHttp e Logging Interceptor (necessário para HttpLoggingInterceptor)
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     // Outras libs
     implementation("com.google.android.flexbox:flexbox:3.0.0")
@@ -68,5 +72,4 @@ dependencies {
     // Navigation Component (para BottomNavigationView + Fragments)
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.1")
     implementation ("androidx.navigation:navigation-ui-ktx:2.7.1")
-
 }

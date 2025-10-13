@@ -66,7 +66,6 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        List<Task> tarefas = new ArrayList<>();
         loadingOverlay= binding.loadingOverlay;
         nestedScrollView = binding.contentScroll;
         TextView presentTodayText = binding.presentTodayQuestion;
@@ -106,7 +105,7 @@ public class HomeFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TaskAdapter(getContext(), new ArrayList<>(), "home"); // lista vazia inicial
+        adapter = new TaskAdapter(getContext(), new ArrayList<>(), "home");
         recyclerView.setAdapter(adapter);
         Log.d("DEBUG_APP", "Iniciando a MainActivity...");
 
