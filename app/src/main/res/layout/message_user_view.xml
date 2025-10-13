@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="wrap_content"
+    android:paddingVertical="4dp"
+    android:paddingHorizontal="8dp">
 
     <TextView
         android:id="@+id/txtMessageChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="4dp"
         android:background="@drawable/message_user_border"
-        android:paddingLeft="20dp"
-        android:maxWidth="350dp"
-        android:paddingRight="20dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:paddingTop="10dp"
-        android:paddingBottom="20dp"
-        android:text="Lorema Ipsum is simply dummy text Lorem Ipsum iorem Ipsum is simply dummy text Lorem Ipsum is simply dummy text Lorem Ipsum is simply dummy text"
+        android:paddingBottom="10dp"
+        android:maxWidth="350dp"
+        android:text="Lorem Ipsum is simply dummy text"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
