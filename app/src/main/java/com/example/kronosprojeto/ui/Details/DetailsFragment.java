@@ -61,6 +61,8 @@ public class DetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_details, container, false);
     }
 
+    // Aqui onde chamar tenho que pegar o id da tarefa atual e guardar no shared preference
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -141,6 +143,12 @@ public class DetailsFragment extends Fragment {
                             showUpdateBottomSheet();
                         }
                     });
+
+                    ImageView imgHistory = requireView().findViewById(R.id.imgHistorico);
+                    imgHistory.setOnClickListener( h -> {
+                        History adapter
+                            }
+                    );
 
                 } else {
                     Log.e(TAG, "Erro na resposta: " + response.code());
