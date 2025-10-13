@@ -15,52 +15,48 @@ import com.example.kronosprojeto.model.Notification;
 
 import java.util.List;
 
-public class AssignmentHistoryAdapter extends RecyclerView.Adapter<AssignmentHistoryAdapter.ViewHolder>  {
+public class AssignmentHistoryAdapter extends RecyclerView.Adapter<AssignmentHistoryAdapter.ViewHolder> {
 
-    Context context;
-    List<AssignmentHistory> historyList;
+    private final List<AssignmentHistory> historyList;
 
-    public AssignmentHistoryAdapter(Context context, List<AssignmentHistory> historyList) {
-        this.context = context;
+    public AssignmentHistoryAdapter(List<AssignmentHistory> historyList) {
         this.historyList = historyList;
+    }
+
+    public void updateList(List<AssignmentHistory> newList) {
+        historyList.clear();
+        historyList.addAll(newList);
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.history_view, parent, false));
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_view, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AssignmentHistoryAdapter.ViewHolder holder, int position) {
-        holder.getTitle().setText(historyList.get(position).getTitulo());
-        holder.getUser().setText(historyList.get(position).getUsuario());
-        holder.getDescription().setText(historyList.get(position).getDescricao());
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        AssignmentHistory item = historyList.get(position);
+        holder.title.setText(item.getTitulo());
+        holder.user.setText(item.getUsuario());
+        holder.description.setText(item.getDescricao());
     }
 
     @Override
     public int getItemCount() {
         return historyList.size();
     }
-    public class ViewHolder extends RecyclerView.ViewHolder{
-            TextView title, user, description;
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                title = itemView.findViewById(R.id.txtRealocation);
-                user = itemView.findViewById(R.id.txtUserHistory);
-                description = itemView.findViewById(R.id.txtDescription);
-            }
 
-            public TextView getTitle() {
-                return title;
-            }
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView title, user, description;
 
-            public TextView getUser() {
-                return user;
-            }
-
-            public TextView getDescription(){
-                return description;
-            }
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            title = itemView.findViewById(R.id.txtRealocation);
+            user = itemView.findViewById(R.id.txtUserHistory);
+            description = itemView.findViewById(R.id.txtDescription);
         }
+    }
 }

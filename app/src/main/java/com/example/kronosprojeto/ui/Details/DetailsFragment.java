@@ -63,7 +63,6 @@ public class DetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_details, container, false);
     }
 
-    // Aqui onde chamar tenho que pegar o id da tarefa atual e guardar no shared preference
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -75,6 +74,10 @@ public class DetailsFragment extends Fragment {
             idTarefa = getArguments().getLong("idTarefa", -1);
             Log.d(TAG, "Id da tarefa recebido: " + idTarefa);
         }
+
+        SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
+        prefs.edit().putLong("selectedTask", idTarefa).apply();
+
 
         taskService = RetrofitClientSQL.createService(TaskService.class);
 
@@ -145,12 +148,6 @@ public class DetailsFragment extends Fragment {
                             showUpdateBottomSheet();
                         }
                     });
-
-//                    ImageView imgHistory = requireView().findViewById(R.id.imgHistorico);
-//                    imgHistory.setOnClickListener( h -> {
-//                        History adapter
-//                            }
-//                    );
 
                 } else {
                     Log.e(TAG, "Erro na resposta: " + response.code());

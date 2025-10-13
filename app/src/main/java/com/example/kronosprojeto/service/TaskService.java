@@ -47,9 +47,11 @@ public interface TaskService {
     );
 
     @GET("/api/log-atribuicao/selecionarTarefa/{id}")
-    Call<LogAtribuicaoTarefaDto> searchLogByTask(
-            @Path("id")long idTarefa
+    Call<List<LogAtribuicaoTarefaDto>> searchLogByTask(
+            @Header("Authorization") String token,
+            @Path("id") long idTarefa
     );
+
 
 
 }

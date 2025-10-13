@@ -5,7 +5,7 @@ public class LogAtribuicaoTarefaDto {
     private Long idTarefa;
     private Long idUsuarioAtribuido;
     private String observacao;
-    private String dataRealocacao; // formato yyyy-MM-dd
+    private String dataRealocacao;
 
     public LogAtribuicaoTarefaDto(Long idTarefa, Long idUsuarioAtribuido, String observacao, String dataRealocacao) {
         this.idTarefa = idTarefa;
@@ -14,8 +14,6 @@ public class LogAtribuicaoTarefaDto {
         this.dataRealocacao = dataRealocacao;
     }
 
-
-    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getIdTarefa() { return idTarefa; }
