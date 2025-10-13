@@ -60,5 +60,9 @@
         android:id="@+id/assignmentHistoryFragment"
         android:name="com.example.kronosprojeto.ui.AssignmentHistory.AssignmentHistoryFragment"
         android:label="fragment_assignment_history"
-        tools:layout="@layout/fragment_assignment_history" />
+        tools:layout="@layout/fragment_assignment_history" >
+        <action
+            android:id="@+id/action_assignmentHistoryFragment_to_details"
+            app:destination="@id/details" />
+    </fragment>
 </navigation>

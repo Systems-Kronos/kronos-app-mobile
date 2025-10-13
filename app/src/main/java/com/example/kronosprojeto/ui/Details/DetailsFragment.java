@@ -34,7 +34,9 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,6 +63,7 @@ public class DetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_details, container, false);
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -71,6 +74,10 @@ public class DetailsFragment extends Fragment {
             idTarefa = getArguments().getLong("idTarefa", -1);
             Log.d(TAG, "Id da tarefa recebido: " + idTarefa);
         }
+
+        SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
+        prefs.edit().putLong("selectedTask", idTarefa).apply();
+
 
         taskService = RetrofitClientSQL.createService(TaskService.class);
 
@@ -204,9 +211,11 @@ public class DetailsFragment extends Fragment {
                     return;
                 }
 
-                Date dataHoje = new Date();
-                String data2 = String.valueOf(dataHoje);
-                LogAtribuicaoTarefaDto dto = new LogAtribuicaoTarefaDto(idTarefa, idUsuario, data2, observacao);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String data2 = sdf.format(new Date());
+
+                LogAtribuicaoTarefaDto dto = new LogAtribuicaoTarefaDto(idTarefa, idUsuario, observacao, data2);
+                Log.d(TAG, "JSON enviado para adicionarLog: " + new Gson().toJson(dto));
 
                 taskService.adicionarLog("Bearer " + token, dto).enqueue(new Callback<LogAtribuicaoTarefaDto>() {
                     @Override
@@ -215,6 +224,7 @@ public class DetailsFragment extends Fragment {
                             ToastHelper.showFeedbackToast(requireActivity(), "successo", "Log salvo", "Observação registrada com sucesso!");
                         } else {
                             ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Falha ao salvar log: " + response.code());
+                            Log.e(TAG, "Erro resposta adicionarLog: " + response.message());
                         }
                         bottomSheetDialog.dismiss();
                     }
@@ -222,6 +232,7 @@ public class DetailsFragment extends Fragment {
                     @Override
                     public void onFailure(Call<LogAtribuicaoTarefaDto> call, Throwable t) {
                         ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro de conexão", t.getMessage());
+                        Log.e(TAG, "Falha na conexão ao adicionar log", t);
                         bottomSheetDialog.dismiss();
                     }
                 });
