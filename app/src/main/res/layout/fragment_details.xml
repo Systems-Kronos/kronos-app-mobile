@@ -6,200 +6,213 @@
     android:layout_height="match_parent"
     tools:context=".ui.Details.DetailsFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:id="@+id/scrollViewDetails"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/constraint_layout"
-        >
+        android:fillViewport="true"
+        android:scrollbars="vertical">
 
-        <ImageView
-            android:id="@+id/imgBack"
-            android:layout_width="28dp"
-            android:layout_height="31dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/baseline_arrow_back_ios_24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/imgHistorico"
-            android:layout_width="31dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/historico_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/imgReport"
-            android:layout_width="34dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/alerta_icon"
-            app:layout_constraintEnd_toStartOf="@id/imgHistorico"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <TextView
-            android:id="@+id/txtTarefaPendente"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:text="Tarefa pendente"
-            android:textColor="#312070"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgBack" />
-
-        <TextView
-            android:id="@+id/txtTituloTarefa"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="Título"
-            android:textColor="#5A1B9B"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtTarefaPendente" />
-
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/flexDescricaoRelator"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            app:alignItems="flex_start"
-            app:flexDirection="column"
-            app:justifyContent="flex_start"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtTituloTarefa">
+            android:paddingBottom="32dp">
 
+            <!-- Ícones do topo -->
+            <ImageView
+                android:id="@+id/imgBack"
+                android:layout_width="28dp"
+                android:layout_height="31dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/baseline_arrow_back_ios_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgHistorico"
+                android:layout_width="31dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/historico_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgReport"
+                android:layout_width="34dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/alerta_icon"
+                app:layout_constraintEnd_toStartOf="@id/imgHistorico"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Título e subtítulo -->
             <TextView
-                android:id="@+id/txtTitleDescription"
+                android:id="@+id/txtTarefaPendente"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Descrição:"
-                android:textColor="#0B0B0B"
-                android:textStyle="bold" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="Tarefa pendente"
+                android:textColor="#312070"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgBack" />
 
             <TextView
-                android:id="@+id/txtDescription"
+                android:id="@+id/txtTituloTarefa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Título"
+                android:textColor="#5A1B9B"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtTarefaPendente" />
+
+            <!-- Flexbox com informações -->
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/flexDescricaoRelator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Exemplo de descrição" />
-
-            <TextView
-                android:id="@+id/txtTitleSection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Setor:"
-                android:textColor="#0B0B0B"
-                android:textStyle="bold" />
+                app:alignItems="flex_start"
+                app:flexDirection="column"
+                app:justifyContent="flex_start"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtTituloTarefa">
 
-            <TextView
-                android:id="@+id/txtSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="TI" />
+                <TextView
+                    android:id="@+id/txtTitleDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Descrição:"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/txtTitleInicialDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Data Início:"
-                android:textColor="#0B0B0B"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Exemplo de descrição"
+                    android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtInicialDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="18/09/2023"
-                android:textColor="#090909" />
+                <TextView
+                    android:id="@+id/txtTitleSection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Setor:"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/txtTitleSituation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Situação:"
-                android:textColor="#0B0B0B"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="TI"
+                    android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtSituation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Em desenvolvimento"
-                android:textColor="#090909" />
+                <TextView
+                    android:id="@+id/txtTitleInicialDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Data Início:"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/txtTitleAdditionalContacts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Contatos adicionais:"
-                android:textColor="#090909"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtInicialDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="18/09/2023"
+                    android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtAdditionalContacts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="chefe@email.com (Chefe do setor)" />
+                <TextView
+                    android:id="@+id/txtTitleSituation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Situação:"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/txtRapporteurTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Relator:"
-                android:textColor="#090909"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtSituation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Em desenvolvimento"
+                    android:textColor="#000000" />
 
-            <TextView
-                android:id="@+id/txtRapporteur"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Marcos da Silva"
-                android:textColor="#090909" />
+                <TextView
+                    android:id="@+id/txtTitleAdditionalContacts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Contatos adicionais:"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
 
-        </com.google.android.flexbox.FlexboxLayout>
+                <TextView
+                    android:id="@+id/txtAdditionalContacts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="chefe@email.com (Chefe do setor)"
+                    android:textColor="#000000" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUpdate"
-            android:layout_width="0dp"
-            android:layout_height="49dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="36dp"
-            android:layout_marginEnd="32dp"
-            android:text="Atualizar"
-            android:textColor="#000000"
-            android:textStyle="bold"
-            app:backgroundTint="#E6B648"
-            app:cornerRadius="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/flexDescricaoRelator" />
+                <TextView
+                    android:id="@+id/txtRapporteurTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Relator:"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/txtRapporteur"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Marcos da Silva"
+                    android:textColor="#000000" />
+            </com.google.android.flexbox.FlexboxLayout>
 
+            <!-- Botão Atualizar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdate"
+                android:layout_width="0dp"
+                android:layout_height="49dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="36dp"
+                android:layout_marginEnd="32dp"
+                android:text="Atualizar"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                app:backgroundTint="#E6B648"
+                app:cornerRadius="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/flexDescricaoRelator" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <!-- Overlay de carregamento -->
     <FrameLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
