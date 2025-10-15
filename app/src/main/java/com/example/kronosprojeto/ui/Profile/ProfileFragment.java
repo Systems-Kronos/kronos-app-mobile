@@ -323,7 +323,11 @@ public class ProfileFragment extends Fragment {
                                 + ", Origem: " + tarefa.getOrigemTarefa()
                                 + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
                                 + ", Status: " + tarefa.getStatus());
-                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus())) {
+                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus()) ||
+                                "Concluida".equalsIgnoreCase(tarefa.getStatus()) ||
+                                "Concluído".equalsIgnoreCase(tarefa.getStatus()) ||
+                                "Concluido".equalsIgnoreCase(tarefa.getStatus())
+                        ) {
                             concluidas++;
                         }
 

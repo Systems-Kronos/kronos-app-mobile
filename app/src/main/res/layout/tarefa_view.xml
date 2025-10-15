@@ -1,24 +1,26 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.flexbox.FlexboxLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="170dp"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="12dp"
     android:layout_marginStart="20dp"
-    android:background="@drawable/borda_tarefa">
+    android:background="@drawable/borda_tarefa"
+    app:alignItems="stretch">
 
     <View
         android:id="@+id/barra_decorativa"
-        android:layout_width="25dp"
-        android:layout_height="170dp"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:background="@drawable/bordaverde_arredondada" />
+
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/cardTask"
         android:layout_width="match_parent"
-        android:layout_height="190dp"
-        android:paddingLeft="35dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
         android:paddingTop="8dp"
         android:paddingRight="20dp"
         app:flexDirection="column">
@@ -36,12 +38,13 @@
                 android:textColor="@color/purple_700"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                tools:text="Titulo" />
+                android:breakStrategy="simple"
+                tools:text="TidsaatsdddTid" />
 
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/tag_box"
                 android:layout_width="110dp"
-                android:layout_height="25dp"
+                android:layout_height="20dp"
                 android:layout_alignParentStart="true"
                 android:background="@drawable/borda_tag_roxa"
                 app:alignItems="center"
@@ -61,7 +64,8 @@
 
         </com.google.android.flexbox.FlexboxLayout>
 
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
+            app:flexDirection="column"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -114,11 +118,12 @@
                 android:textColor="@color/purple_700"
                 android:textSize="16sp"
                 tools:text="Data de Término: 20/08/2025" />
-        </LinearLayout>
+        </com.google.android.flexbox.FlexboxLayout>
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             app:justifyContent="space_between">
 
             <TextView
@@ -151,5 +156,5 @@
 
 
 
-</RelativeLayout>
+</com.google.android.flexbox.FlexboxLayout>
 
