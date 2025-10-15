@@ -99,7 +99,7 @@ public class AssignmentHistoryFragment extends Fragment {
                     List<AssignmentHistory> newHistoryList = new ArrayList<>();
 
                     for (LogAtribuicaoTarefaDto log : logs) {
-                        String tittle = "#00" + log.getId() + " Data: " + log.getDataRealocacao();
+                        String tittle = "#00" + log.getId() + " Log gerado em: " + log.getDataRealocacao();
                         String description = log.getObservacao();
                         String user = "Por: " + log.getIdUsuarioAtribuido();
 

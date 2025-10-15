@@ -31,16 +31,14 @@
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/containerDay"
             android:layout_width="match_parent"
-            android:layout_height="387dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:background="@drawable/calendar_section_shape"
             android:padding="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/calendarView"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
@@ -95,7 +93,6 @@
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
-
                 </com.google.android.flexbox.FlexboxLayout>
 
                 <TextView
@@ -129,12 +126,21 @@
                         android:src="@drawable/file_icon" />
 
                     <TextView
+                        android:id="@+id/txtAnexo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Enviar arquivo"
                         android:textColor="#25173A" />
 
                 </com.google.android.flexbox.FlexboxLayout>
+
+                <ImageView
+                    android:id="@+id/imageAtestado"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="12dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:layout_width="match_parent"
