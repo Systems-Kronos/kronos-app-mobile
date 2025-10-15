@@ -3,7 +3,9 @@ package com.example.kronosprojeto.ui.Calendar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,18 +20,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.config.RetrofitClientNoSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
 import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
+import com.example.kronosprojeto.dto.UploadResultDto;
 import com.example.kronosprojeto.model.Calendar;
 import com.example.kronosprojeto.service.CalendarService;
+import com.example.kronosprojeto.service.CloudinaryService;
 import com.example.kronosprojeto.utils.ToastHelper;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -38,10 +46,15 @@ import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,6 +63,7 @@ public class CalendarFragment extends Fragment {
 
     private FragmentCalendarBinding binding;
     Activity activity;
+    private String uploadedImageUrl;
     private List<Calendar> calenderByUser = new ArrayList<>();
     TextView selectedDayTxt, selectedDayQuestionTxt;
     private CalendarDay selectDay;
@@ -62,7 +76,19 @@ public class CalendarFragment extends Fragment {
     private BlackBackgroundDecorator blackBackgroundDecorator;
     private Button btnAbscense, btnPresenceSelect;
     List<CalendarDay> orange;
+
     private static final String[] DIAS_ABREV = {"D", "S", "T", "Q", "Q", "S", "S"};
+
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    if (imageUri != null) {
+                        uploadImageToCloudinary(imageUri);
+                    }
+                }
+            });
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -70,6 +96,7 @@ public class CalendarFragment extends Fragment {
 
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        View view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         activity = getActivity();
 
@@ -156,15 +183,39 @@ public class CalendarFragment extends Fragment {
                 return;
             }
 
+            Calendar calendarDay = null;
             for (Calendar c : calenderByUser) {
                 String saveDate = c.getDay() != null && c.getDay().length() >= 10 ? c.getDay().substring(0, 10) : "";
                 if (saveDate.equals(localDateStr)) {
+                    calendarDay = c;
                     if (c.getObservation() != null) {
                         editTextArea.setText(c.getObservation());
                     }
                     break;
                 }
             }
+
+            if (calendarDay != null && calendarDay.getAttest() != null && !calendarDay.getAttest().isEmpty()) {
+                binding.imageAtestado.setVisibility(View.VISIBLE);
+                Log.d("CALENDAR_DEBUG", "URL do atestado para " + localDateStr + ": " + calendarDay.getAttest());
+                String url = calendarDay.getAttest();
+                if (url != null && url.startsWith("http://")) {
+                    url = url.replace("http://", "https://");
+                }
+                Glide.with(requireContext())
+                        .load(url)
+                        .into(binding.imageAtestado);
+
+                uploadedImageUrl = calendarDay.getAttest();
+            } else {
+                binding.imageAtestado.setVisibility(View.GONE);
+                binding.imageAtestado.setImageDrawable(null);
+                uploadedImageUrl = null;
+            }
+
+
+
+
         });
 
         SharedPreferences prefs = getContext().getSharedPreferences("app", Context.MODE_PRIVATE);
@@ -228,10 +279,65 @@ public class CalendarFragment extends Fragment {
         });
 
         btnSend.setOnClickListener(v -> sendUpdate());
+        TextView txtAnexo = root.findViewById(R.id.txtAnexo);
+        txtAnexo.setOnClickListener(v -> abrirGaleria());
 
         return root;
     }
 
+    private void uploadImageToCloudinary(Uri imageUri) {
+        try {
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            inputStream.close();
+
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), bytes);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", "atestado.jpg", requestFile);
+
+            RequestBody preset = RequestBody.create(MultipartBody.FORM, "kronos-upload");
+
+            CloudinaryService service = RetrofitClientCloudinary.createService(CloudinaryService.class);
+
+            Call<UploadResultDto> call = service.uploadImage("dblwo3rra", body, preset);
+
+            Toast.makeText(getContext(), "Enviando imagem...", Toast.LENGTH_SHORT).show();
+
+            call.enqueue(new Callback<UploadResultDto>() {
+                @Override
+                public void onResponse(@NonNull Call<UploadResultDto> call, @NonNull Response<UploadResultDto> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String uploadedImageUrl = response.body().getUrl();
+                        Toast.makeText(getContext(), "Imagem enviada com sucesso!", Toast.LENGTH_SHORT).show();
+
+                        binding.imageAtestado.setVisibility(View.VISIBLE);
+                        binding.imageAtestado.setImageURI(imageUri);
+
+                        CalendarFragment.this.uploadedImageUrl = uploadedImageUrl;
+
+                    } else {
+                        Toast.makeText(getContext(), "Erro ao enviar imagem!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<UploadResultDto> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), "Falha no upload: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Erro ao processar imagem: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+
+    private void abrirGaleria() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(intent);
+    }
     private void selectCalendarDay(String acao, View root) {
         if (selectDay == null) {
             if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos");
@@ -268,17 +374,16 @@ public class CalendarFragment extends Fragment {
     }
 
     private void sendUpdate() {
-        // Hideko caso tenha dúvida esse isAdded serve meio que pra dizer
-        // “Mostre o Toast somente se o fragment ainda estiver visível e associado a uma Activity" pra não dar mais aquele crash
-
         if (selectDay == null) {
-            if (isAdded())  ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
+            if (isAdded())
+                ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
             return;
         }
 
         LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
         if (isWeekend(selectedDay)) {
-            if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Nenhuma ação é permitida nos finais de semana");
+            if (isAdded())
+                ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Nenhuma ação é permitida nos finais de semana");
             return;
         }
 
@@ -289,13 +394,18 @@ public class CalendarFragment extends Fragment {
             String observation = editTextArea.getText().toString();
             selectCalendar.setObservation(observation);
 
+            if (uploadedImageUrl != null && !uploadedImageUrl.isEmpty()) {
+                selectCalendar.setAttest(uploadedImageUrl);
+            }
+
             if (selectCalendar.getId() == null) {
                 createCalender(selectCalendar);
             } else {
                 updateCalender(selectCalendar.getId(), selectCalendar);
             }
         } else {
-            if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
+            if (isAdded())
+                ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
         }
     }
 
@@ -371,18 +481,15 @@ public class CalendarFragment extends Fragment {
                         CalendarDay todayDay = CalendarDay.today();
                         selectDay = todayDay;
 
-                        // Atualiza o decorator de fundo
                         blackBackgroundDecorator.setSelectedDay(todayDay);
                         binding.calendarView.setDateSelected(todayDay, true);
                         binding.calendarView.invalidateDecorators();
 
-                        // Atualiza textos
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"));
                         String dataFormatada = todayDay.getDate().format(formatter);
                         selectedDayTxt.setText("Hoje");
                         selectedDayQuestionTxt.setText("Você estará presente?");
 
-                        // (opcional) Foca no dia de hoje na visualização do calendário
                         binding.calendarView.setCurrentDate(todayDay);
                     });
 
@@ -467,13 +574,11 @@ public class CalendarFragment extends Fragment {
         LocalDate cursor = firstDayOfMonth;
 
         while (!cursor.isAfter(lastDayOfMonth)) {
-            // Só considera dias antes de hoje
             if (!cursor.isBefore(today)) {
                 cursor = cursor.plusDays(1);
                 continue;
             }
 
-            // Ignora finais de semana
             DayOfWeek dayOfWeek = cursor.getDayOfWeek();
             if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
                 cursor = cursor.plusDays(1);
@@ -489,7 +594,6 @@ public class CalendarFragment extends Fragment {
             cursor = cursor.plusDays(1);
         }
 
-        // Atualiza decorator
         if (greenDecorator != null) binding.calendarView.removeDecorator(greenDecorator);
         greenDecorator = new GreenBorderDecorator(getContext(), greenVisual);
         binding.calendarView.addDecorator(greenDecorator);
