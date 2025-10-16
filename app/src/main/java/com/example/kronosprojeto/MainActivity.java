@@ -146,6 +146,12 @@ public class MainActivity extends AppCompatActivity {
                                 .setLaunchSingleTop(true)
                                 .setPopUpTo(startDestination, true)
                                 .build());
+            }else if (id == R.id.nav_restrict) {
+                navController.navigate(R.id.RestrictLogin, null,
+                        new androidx.navigation.NavOptions.Builder()
+                                .setLaunchSingleTop(true)
+                                .setPopUpTo(startDestination, true)
+                                .build());
             } else if (id == R.id.nav_logout) {
                 SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
                 prefs.edit().clear().apply();

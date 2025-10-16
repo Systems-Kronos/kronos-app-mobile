@@ -65,4 +65,8 @@
             android:id="@+id/action_assignmentHistoryFragment_to_details"
             app:destination="@id/details" />
     </fragment>
+    <fragment
+        android:id="@+id/RestrictLogin"
+        android:name="com.example.kronosprojeto.ui.RestrictArea.RestrictLogin"
+        android:label="RestrictLogin" />
 </navigation>
