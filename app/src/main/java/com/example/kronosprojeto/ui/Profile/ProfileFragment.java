@@ -4,6 +4,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.palette.graphics.Palette;
@@ -35,22 +37,20 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.kronosprojeto.R;
-
-import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.adapter.TaskAdapter;
-import com.example.kronosprojeto.databinding.FragmentProfileBinding;
-import com.example.kronosprojeto.model.Task;
+import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
+import com.example.kronosprojeto.databinding.FragmentProfileBinding;
 import com.example.kronosprojeto.dto.UploadResultDto;
 import com.example.kronosprojeto.dto.UserResponseDto;
-
+import com.example.kronosprojeto.model.Task;
 import com.example.kronosprojeto.service.CloudinaryService;
-
 import com.example.kronosprojeto.service.TaskService;
 import com.example.kronosprojeto.service.UserService;
 import com.example.kronosprojeto.utils.ToastHelper;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -65,11 +65,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
-    private TextView nameTextView, emailView,sectionView;
+    private TextView nameTextView, emailView, sectionView;
     private UserViewModel userViewModel;
     private ImageView pencilImage;
     private CloudinaryService cloudinaryService;
@@ -84,16 +83,14 @@ public class ProfileFragment extends Fragment {
     Activity activity;
 
     private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private ActivityResultLauncher<Intent> cameraLauncher;
+    private Uri cameraImageUri;
 
+    public ProfileFragment() {}
 
-    public ProfileFragment() {
-    }
-
-
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -114,119 +111,30 @@ public class ProfileFragment extends Fragment {
         pencilImage = binding.pencilIcon;
         banner = binding.viewBanner;
         cloudinaryService = RetrofitClientCloudinary.createService(CloudinaryService.class);
+        loadingOverlay = binding.loadingOverlay;
 
-        loadingOverlay= binding.loadingOverlay;
-
-
+        // Launcher para abrir a galeria
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri imageUri = result.getData().getData();
-                        profileImg.setImageURI(imageUri);
-                        Glide.with(this)
-                                .load(imageUri)
-                                .circleCrop()
-                                .into(profileImg);
-
-                        try {
-                            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
-                            byte[] bytes = new byte[inputStream.available()];
-                            inputStream.read(bytes);
-                            inputStream.close();
-
-                            InputStream inputStreamBitmap = requireContext().getContentResolver().openInputStream(imageUri);
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStreamBitmap);
-                            inputStreamBitmap.close();
-
-                            if (bitmap != null) {
-                                Palette.from(bitmap).generate(palette -> {
-                                    int corPredominante = palette.getDominantColor(Color.GRAY);
-                                    banner.setBackgroundColor(corPredominante);
-                                });
-                            }
-
-                            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), bytes);
-                            MultipartBody.Part body = MultipartBody.Part.createFormData(
-                                    "file",
-                                    "imagem.jpg",
-                                    requestFile
-                            );
-
-                            RequestBody preset = RequestBody.create(MultipartBody.FORM, "kronos-upload");
-
-                            Call<UploadResultDto> call = cloudinaryService.uploadImage("dblwo3rra", body, preset);
-                            call.enqueue(new Callback<UploadResultDto>() {
-                                @Override
-                                public void onResponse(Call<UploadResultDto> call, Response<UploadResultDto> response) {
-                                    if (response.isSuccessful() && response.body() != null) {
-                                        String imageUrl = response.body().secure_url;
-                                        Log.d("Cloudinary", "URL: " + imageUrl);
-
-
-                                        UserResponseDto userResponseDto = userViewModel.getUser().getValue();
-                                        userResponseDto.setFoto(imageUrl);
-
-                                        Map<String, Object> updateFields = new HashMap<>();
-                                        updateFields.put("foto", imageUrl);
-                                        usuarioService = RetrofitClientSQL.createService(UserService.class);
-                                        Call<String> callUpdate = usuarioService.updateUser(
-                                                "Bearer " + token,
-                                                updateFields, String.valueOf(userResponseDto.getId())
-
-                                        );
-
-                                        callUpdate.enqueue(new Callback<String>() {
-                                            @Override
-                                            public void onResponse(Call<String> call, Response<String> response) {
-
-
-                                                if (response.isSuccessful()) {
-                                                    ToastHelper.showFeedbackToast(activity,"sucesso","SUCESSO:","Informações salvas!");
-
-                                                    Log.d("UpdateUsuario", "Usuário atualizado com sucesso!");
-
-
-                                                } else {
-                                                    Log.e("UpdateUsuario", "Erro: " + response.code());
-                                                    ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
-
-
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onFailure(Call<String> call, Throwable t) {
-                                                Log.e("UpdateUsuario", "Falha: " + t.getMessage());
-                                                ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
-
-                                            }
-                                        });
-
-                                    } else {
-                                        Log.e("Cloudinary", "Erro no upload: " + response.errorBody());
-                                        ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
-
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<UploadResultDto> call, Throwable t) {
-                                    Log.e("Cloudinary", "Falhou: " + t.getMessage());
-                                    ToastHelper.showFeedbackToast(activity,"error","ERROR:","Não foi possível concluir a operação");
-
-                                }
-                            });
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
+                        processarImagemSelecionada(imageUri);
                     }
-
                 });
 
-        pencilImage.setOnClickListener(v -> abrirGaleria());
+        // Launcher para abrir a câmera
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        if (cameraImageUri != null) {
+                            processarImagemSelecionada(cameraImageUri);
+                        }
+                    }
+                });
+
+        pencilImage.setOnClickListener(v -> abrirEscolhaImagem());
 
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
@@ -237,18 +145,13 @@ public class ProfileFragment extends Fragment {
                 sectionView.setText(user.getSetor().getNome());
                 loadingOverlay.setVisibility(View.VISIBLE);
 
-                Log.e("FOTO", user.getFoto() );
-                if (user.getFoto() == null || user.getFoto().isEmpty()){
+                if (user.getFoto() == null || user.getFoto().isEmpty()) {
                     Glide.with(this)
                             .load(R.drawable.profile_mock)
                             .circleCrop()
                             .into(profileImg);
-
                     loadingOverlay.setVisibility(View.GONE);
-
-
-
-                }else {
+                } else {
                     Glide.with(this)
                             .load(userViewModel.getUser().getValue().getFoto())
                             .circleCrop()
@@ -266,7 +169,6 @@ public class ProfileFragment extends Fragment {
                                         banner.setBackgroundColor(corPredominante);
                                     });
                                     loadingOverlay.setVisibility(View.GONE);
-
                                 }
 
                                 @Override
@@ -277,13 +179,9 @@ public class ProfileFragment extends Fragment {
         });
 
         List<Task> tarefas = new ArrayList<>();
-
-
-
         recyclerView = binding.userTasks;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TaskAdapter(getContext(), tarefas,"profile");
-
+        adapter = new TaskAdapter(getContext(), tarefas, "profile");
         recyclerView.setAdapter(adapter);
 
         concluidasTxt = binding.concluidasTxt;
@@ -292,20 +190,164 @@ public class ProfileFragment extends Fragment {
 
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
-        carregarTarefasUsuario(token,usuarioId, "1", "4");
+        carregarTarefasUsuario(token, usuarioId, "1", "4");
+
         return root;
     }
 
-    private void abrirGaleria() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        imagePickerLauncher.launch(intent);
+    // Escolher entre câmera ou galeria
+    private void abrirEscolhaImagem() {
+        String[] options = {"Escolher da Galeria", "Tirar Foto"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Selecionar Imagem")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        Intent intent = new Intent(Intent.ACTION_PICK);
+                        intent.setType("image/*");
+                        imagePickerLauncher.launch(intent);
+                    } else {
+                        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        File photoFile = new File(requireContext().getCacheDir(), "foto_temp.jpg");
+                        cameraImageUri = FileProvider.getUriForFile(
+                                requireContext(),
+                                requireContext().getPackageName() + ".fileprovider",
+                                photoFile
+                        );
+                        cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, cameraImageUri);
+                        cameraLauncher.launch(cameraIntent);
+                    }
+                })
+                .show();
+    }
+
+    private void processarImagemSelecionada(Uri imageUri) {
+        ImageView profileImg = binding.profileImg;
+
+        Glide.with(this)
+                .load(imageUri)
+                .circleCrop()
+                .into(profileImg);
+
+        try {
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            inputStream.close();
+
+            InputStream inputStreamBitmap = requireContext().getContentResolver().openInputStream(imageUri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStreamBitmap);
+            inputStreamBitmap.close();
+
+            if (bitmap != null) {
+                Palette.from(bitmap).generate(palette -> {
+                    int corPredominante = palette.getDominantColor(Color.GRAY);
+                    banner.setBackgroundColor(corPredominante);
+                });
+            }
+
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), bytes);
+            MultipartBody.Part body = MultipartBody.Part.createFormData(
+                    "file",
+                    "imagem.jpg",
+                    requestFile
+            );
+
+            RequestBody preset = RequestBody.create(MultipartBody.FORM, "kronos-upload");
+
+            Call<UploadResultDto> call = cloudinaryService.uploadImage("dblwo3rra", body, preset);
+            call.enqueue(new Callback<UploadResultDto>() {
+                @Override
+                public void onResponse(Call<UploadResultDto> call, Response<UploadResultDto> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String imageUrl = response.body().secure_url;
+                        atualizarFotoUsuario(imageUrl);
+                    } else {
+                        ToastHelper.showFeedbackToast(activity, "error", "ERROR:", "Falha ao enviar imagem");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UploadResultDto> call, Throwable t) {
+                    ToastHelper.showFeedbackToast(activity, "error", "ERROR:", "Erro de conexão com Cloudinary");
+                }
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void atualizarFotoUsuario(String imageUrl) {
+        UserResponseDto userResponseDto = userViewModel.getUser().getValue();
+        if (userResponseDto == null) return;
+
+        userResponseDto.setFoto(imageUrl);
+
+        // Garante que o fragmento ainda está ativo
+        if (!isAdded()) return;
+
+        Activity activity = getActivity();
+        if (activity == null) return;
+
+        // Obtém SharedPreferences corretamente
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("app", MODE_PRIVATE);
+        String token = sharedPreferences.getString("jwt", null);
+
+        if (token == null) {
+            Log.e("ProfileFragment", "Token JWT não encontrado nas SharedPreferences");
+            return;
+        }
+
+        Map<String, Object> updateFields = new HashMap<>();
+        updateFields.put("foto", imageUrl);
+
+        usuarioService = RetrofitClientSQL.createService(UserService.class);
+
+        Call<String> callUpdate = usuarioService.updateUser(
+                "Bearer " + token,
+                updateFields,
+                String.valueOf(userResponseDto.getId())
+        );
+
+        callUpdate.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Log.d("ProfileFragment", "Foto atualizada com sucesso!");
+
+                    // Atualiza o SharedPreferences localmente
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("foto", imageUrl);
+                    editor.apply();
+
+                    // Atualiza a imagem na interface
+                    if (isAdded() && getView() != null) {
+                        ImageView imageView = getView().findViewById(R.id.profile_img);
+                        if (imageView != null) {
+                            Glide.with(requireContext())
+                                    .load(imageUrl)
+                                    .placeholder(R.drawable.profile_mock)
+                                    .into(imageView);
+                        }
+                    }
+
+                    ToastHelper.showFeedbackToast(activity, "success", "IMAGEM SALVA:", "Sua foto de perfil foi atualizada");
+
+                } else {
+                    Log.e("ProfileFragment", "Erro ao atualizar foto: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("ProfileFragment", "Falha na requisição de atualização de foto", t);
+            }
+        });
     }
 
     private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
-
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
-        Call<List<Task>> call = service.getTasksByUserID(usuarioId,"Bearer "+ token, tipoTarefa, status);
+        Call<List<Task>> call = service.getTasksByUserID(usuarioId, "Bearer " + token, tipoTarefa, status);
 
         call.enqueue(new Callback<List<Task>>() {
             @Override
@@ -317,18 +359,9 @@ public class ProfileFragment extends Fragment {
                     int realocadas = 0;
                     int atribuidas = 0;
 
-                    Log.d("DEBUG_TASKS", "Quantidade de tarefas recebidas: " + tarefas.size());
                     for (Task tarefa : tarefas) {
-                        Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
-                                + ", Gravidade: " + tarefa.getGravidade()
-                                + ", Origem: " + tarefa.getOrigemTarefa()
-                                + ", Data Atribuicao: " + tarefa.getDataAtribuicao()
-                                + ", Status: " + tarefa.getStatus());
                         if ("Concluída".equalsIgnoreCase(tarefa.getStatus()) ||
-                                "Concluida".equalsIgnoreCase(tarefa.getStatus()) ||
-                                "Concluído".equalsIgnoreCase(tarefa.getStatus()) ||
-                                "Concluido".equalsIgnoreCase(tarefa.getStatus())
-                        ) {
+                                "Concluido".equalsIgnoreCase(tarefa.getStatus())) {
                             concluidas++;
                         }
 
@@ -339,24 +372,21 @@ public class ProfileFragment extends Fragment {
                         if ("Original".equalsIgnoreCase(tarefa.getOrigemTarefa())) {
                             atribuidas++;
                         }
-
-                        concluidasTxt.setText(String.valueOf(concluidas));
-                        realocadasTxt.setText(String.valueOf(realocadas));
-                        atribuidasTxt.setText(String.valueOf(atribuidas));
-
-
                     }
+
+                    concluidasTxt.setText(String.valueOf(concluidas));
+                    realocadasTxt.setText(String.valueOf(realocadas));
+                    atribuidasTxt.setText(String.valueOf(atribuidas));
+
                     adapter.updateList(tarefas);
                 } else {
-                    Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
+                    ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao carregar tarefas");
                 }
             }
 
             @Override
             public void onFailure(Call<List<Task>> call, Throwable t) {
-                Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
-                ToastHelper.showFeedbackToast(activity,"error","ERRO:","Não foi possível carregar as tarefas");
-
+                ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Erro de conexão ao carregar tarefas");
             }
         });
     }
