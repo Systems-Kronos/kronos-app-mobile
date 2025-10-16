@@ -77,6 +77,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             txtMessage = itemView.findViewById(R.id.txtMessageChat);
         }
     }
+    public void removeMessage(ChatMessage message) {
+        int index = messages.indexOf(message);
+        if (index != -1) {
+            messages.remove(index);
+            notifyItemRemoved(index);
+        }
+    }
+
 
     public void addMessage(ChatMessage message) {
         messages.add(message);

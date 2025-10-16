@@ -29,6 +29,8 @@ import retrofit2.Response;
 public class ChatFragment extends Fragment {
     private FragmentChatBinding binding;
     private ChatAdapter adapter;
+
+    private ChatMessage loadingMessage = null;
     private List<ChatMessage> messages;
     private String sessionId;
     private boolean sessionReady = false;
@@ -116,19 +118,30 @@ public class ChatFragment extends Fragment {
 
     private void sendMessage(String userMessage) {
         adapter.addMessage(new ChatMessage(userMessage, true));
+        binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
+        loadingMessage = new ChatMessage("Pensando na sua resposta...", false);
+        binding.btnSend.setEnabled(false);
+
+        adapter.addMessage(loadingMessage);
+        binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
 
         Call<ChatBotResponseDto> call = chatBotService.sendMessage(userMessage, sessionId);
         call.enqueue(new Callback<ChatBotResponseDto>() {
             @Override
             public void onResponse(Call<ChatBotResponseDto> call, Response<ChatBotResponseDto> response) {
-                if (!isAdded()) return;
+                if (!isAdded() || binding == null) return;
+
+                adapter.removeMessage(loadingMessage);
+                loadingMessage = null;
+                binding.btnSend.setEnabled(true);
+
                 if (response.isSuccessful() && response.body() != null) {
                     String botMessage = response.body().getResponse();
                     adapter.addMessage(new ChatMessage(botMessage, false));
-                    binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
                 } else {
                     adapter.addMessage(new ChatMessage("Erro: resposta inválida do servidor.", false));
                 }
+                binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
             }
 
             @Override
