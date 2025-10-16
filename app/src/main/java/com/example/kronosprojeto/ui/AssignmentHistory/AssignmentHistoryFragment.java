@@ -26,6 +26,7 @@ import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.adapter.NotificationAdapter;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
 import com.example.kronosprojeto.dto.LogAtribuicaoTarefaDto;
+import com.example.kronosprojeto.dto.LogAtribuicaoTarefaResponseDto;
 import com.example.kronosprojeto.model.AssignmentHistory;
 import com.example.kronosprojeto.model.Notification;
 import com.example.kronosprojeto.service.TaskService;
@@ -91,17 +92,17 @@ public class AssignmentHistoryFragment extends Fragment {
         }
 
         TaskService taskService = RetrofitClientSQL.createService(TaskService.class);
-        taskService.searchLogByTask("Bearer " + token, idTarefa).enqueue(new Callback<List<LogAtribuicaoTarefaDto>>() {
+        taskService.searchLogByTask("Bearer " + token, idTarefa).enqueue(new Callback<List<LogAtribuicaoTarefaResponseDto>>() {
             @Override
-            public void onResponse(Call<List<LogAtribuicaoTarefaDto>> call, Response<List<LogAtribuicaoTarefaDto>> response) {
+            public void onResponse(Call<List<LogAtribuicaoTarefaResponseDto>> call, Response<List<LogAtribuicaoTarefaResponseDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<LogAtribuicaoTarefaDto> logs = response.body();
+                    List<LogAtribuicaoTarefaResponseDto> logs = response.body();
                     List<AssignmentHistory> newHistoryList = new ArrayList<>();
 
-                    for (LogAtribuicaoTarefaDto log : logs) {
+                    for (LogAtribuicaoTarefaResponseDto log : logs) {
                         String tittle = "#00" + log.getId() + " Log gerado em: " + log.getDataRealocacao();
                         String description = log.getObservacao();
-                        String user = "Por: " + log.getIdUsuarioAtribuido();
+                        String user = "Por: " + log.getNomeUsuarioAtribuido();
 
                         newHistoryList.add(new AssignmentHistory(tittle, description, user));
                     }
@@ -114,7 +115,7 @@ public class AssignmentHistoryFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<LogAtribuicaoTarefaDto>> call, Throwable t) {
+            public void onFailure(Call<List<LogAtribuicaoTarefaResponseDto>> call, Throwable t) {
                 ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro ao carregar histórico:", t.getMessage());
             }
         });
