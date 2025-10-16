@@ -3,7 +3,7 @@ package com.example.kronosprojeto.model;
 public class AssignmentHistory {
 
     private String titulo;
-    private String usuario;
+    private String nomeUsuarioAtribuido;
     private String descricao;
 
 
@@ -12,7 +12,7 @@ public class AssignmentHistory {
     }
 
     public String getUsuario() {
-        return usuario;
+        return nomeUsuarioAtribuido;
     }
 
     public String getDescricao() {
@@ -21,7 +21,7 @@ public class AssignmentHistory {
     public AssignmentHistory(String titulo, String descricao, String usuario) {
         this.titulo = titulo;
         this.descricao = descricao;
-        this.usuario = usuario;
+        this.nomeUsuarioAtribuido = usuario;
     }
 }
 

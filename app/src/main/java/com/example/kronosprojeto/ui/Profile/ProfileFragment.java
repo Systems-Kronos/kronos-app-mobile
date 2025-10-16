@@ -237,7 +237,8 @@ public class ProfileFragment extends Fragment {
                 sectionView.setText(user.getSetor().getNome());
                 loadingOverlay.setVisibility(View.VISIBLE);
 
-                if (user.getFoto() == null){
+                Log.e("FOTO", user.getFoto() );
+                if (user.getFoto() == null || user.getFoto().isEmpty()){
                     Glide.with(this)
                             .load(R.drawable.profile_mock)
                             .circleCrop()

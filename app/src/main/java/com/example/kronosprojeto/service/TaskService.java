@@ -2,6 +2,7 @@ package com.example.kronosprojeto.service;
 
 
 import com.example.kronosprojeto.dto.LogAtribuicaoTarefaDto;
+import com.example.kronosprojeto.dto.LogAtribuicaoTarefaResponseDto;
 import com.example.kronosprojeto.dto.TaskDetailsDto;
 import com.example.kronosprojeto.dto.TaskStatusDto;
 import com.example.kronosprojeto.model.Calendar;
@@ -47,7 +48,7 @@ public interface TaskService {
     );
 
     @GET("/api/log-atribuicao/selecionarTarefa/{id}")
-    Call<List<LogAtribuicaoTarefaDto>> searchLogByTask(
+    Call<List<LogAtribuicaoTarefaResponseDto>> searchLogByTask(
             @Header("Authorization") String token,
             @Path("id") long idTarefa
     );
