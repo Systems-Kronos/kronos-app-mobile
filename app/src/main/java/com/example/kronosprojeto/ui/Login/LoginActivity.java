@@ -132,6 +132,16 @@ public class LoginActivity extends AppCompatActivity {
         String cpf = cpfInput.getText().toString();
         String password = passwordInput.getText().toString();
 
+        // Caso seja a primeira vez ou senha inicial
+        if(password.equals("senha123")){
+            loadingOverlay.setVisibility(View.GONE); // remove overlay
+            // Abre PhoneRecoveryActivity para iniciar recuperação de senha
+            Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
+            intent.putExtra("cpf_first_access", cpf); // opcional: passar cpf
+            startActivity(intent);
+            return; // interrompe o login normal
+        }
+
         LoginRequestDto loginRequest = new LoginRequestDto(cpf, password);
 
         Call<Token> call = authService.login(loginRequest);
@@ -139,6 +149,8 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<Token>() {
             @Override
             public void onResponse(Call<Token> call, Response<Token> response) {
+                loadingOverlay.setVisibility(View.GONE);
+
                 if (response.isSuccessful() && response.body() != null) {
                     Token token = response.body();
 
@@ -151,15 +163,10 @@ public class LoginActivity extends AppCompatActivity {
                             .putString("cpf", cpf)
                             .apply();
 
-
-
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    loadingOverlay.setVisibility(View.GONE);
-
                     startActivity(intent);
                     finish();
                 } else {
-                    loadingOverlay.setVisibility(View.GONE);
                     ToastHelper.showFeedbackToast(getApplicationContext(),"info","CREDENCIAIS INVÁLIDAS","CPF e senha não condizem!");
                 }
             }
@@ -168,11 +175,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<Token> call, Throwable t) {
                 loadingOverlay.setVisibility(View.GONE);
                 ToastHelper.showFeedbackToast(getApplicationContext(),"error","ERRO:","Ocorreu alguma instabilidade e não foi possível concluir a operação");
-
-
             }
         });
     }
+
+
 
 
 

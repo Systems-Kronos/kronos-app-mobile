@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.utils.ToastHelper;
 
 public class CodeRecoveryActivity extends AppCompatActivity {
 
@@ -23,7 +24,7 @@ public class CodeRecoveryActivity extends AppCompatActivity {
     private TextView txtSendTo;
     private TextView txtTimeReesend;
 
-    private static final long COUNTDOWN_MILLIS = 60_000; // 60 segundos
+    private static final long COUNTDOWN_MILLIS = 60_000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class CodeRecoveryActivity extends AppCompatActivity {
         });
 
         txtSendTo = findViewById(R.id.txtSendTo);
-        txtTimeReesend = findViewById(R.id.txtTimeReesend); // precisa ter no layout
+        txtTimeReesend = findViewById(R.id.txtTimeReesend);
         et1 = findViewById(R.id.otp1);
         et2 = findViewById(R.id.otp2);
         et3 = findViewById(R.id.otp3);
@@ -117,7 +118,7 @@ public class CodeRecoveryActivity extends AppCompatActivity {
             int codigoUsuario = Integer.parseInt(codigoDigitado);
 
             if (codigoUsuario == codigoSalvo) {
-                Toast.makeText(this, "Código verificado com sucesso!", Toast.LENGTH_SHORT).show();
+                ToastHelper.showFeedbackToast(getApplicationContext(),"success","SUCESSO","Código verificado com sucesso!");
 
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -126,10 +127,10 @@ public class CodeRecoveryActivity extends AppCompatActivity {
                         .commit();
 
             } else {
-                Toast.makeText(this, "Código incorreto. Tente novamente.", Toast.LENGTH_SHORT).show();
+                ToastHelper.showFeedbackToast(getApplicationContext(),"error","CÓDIGO INCORRETO","Código incorreto. Tente novamente");
             }
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Código inválido.", Toast.LENGTH_SHORT).show();
+            ToastHelper.showFeedbackToast(getApplicationContext(),"error","CÓDIGO INCORRETO","Código incorreto. Tente novamente");
         }
     }
 
