@@ -94,6 +94,12 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
 
         AppCompatButton verifyButton = findViewById(R.id.verifyButton);
         verifyButton.setOnClickListener(v -> sendSMS());
+
+        String initialCpf = getIntent().getStringExtra("cpf_first_access");
+        if(initialCpf != null && !initialCpf.isEmpty()) {
+            cpfInput.setText(initialCpf);
+            sendSMS();
+        }
     }
 
     private void sendSMS() {
