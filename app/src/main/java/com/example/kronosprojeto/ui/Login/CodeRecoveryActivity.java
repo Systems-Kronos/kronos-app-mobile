@@ -1,9 +1,10 @@
 package com.example.kronosprojeto.ui.Login;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,10 @@ import com.example.kronosprojeto.R;
 public class CodeRecoveryActivity extends AppCompatActivity {
 
     private EditText et1, et2, et3, et4;
+    private TextView txtSendTo;
+    private TextView txtTimeReesend;
+
+    private static final long COUNTDOWN_MILLIS = 60_000; // 60 segundos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +37,19 @@ public class CodeRecoveryActivity extends AppCompatActivity {
             return insets;
         });
 
-        TextView txtSendTo = findViewById(R.id.txtSendTo);
-
-        String telefone = getIntent().getStringExtra("telefone");
-        Log.d("CodeRecovery", "Telefone recebido: " + telefone);
-        if (telefone != null && telefone.length() >= 4) {
-            String ultimos4 = telefone.substring(telefone.length() - 4);
-            String maskedPhone = telefone.substring(0, telefone.length() - 4)
-                    .replaceAll("\\d", "*");
-
-            txtSendTo.setText("SMS enviado para o telefone: " + maskedPhone + ultimos4);
-        }
-
+        txtSendTo = findViewById(R.id.txtSendTo);
+        txtTimeReesend = findViewById(R.id.txtTimeReesend); // precisa ter no layout
         et1 = findViewById(R.id.otp1);
         et2 = findViewById(R.id.otp2);
         et3 = findViewById(R.id.otp3);
         et4 = findViewById(R.id.otp4);
+
+        String telefone = getIntent().getStringExtra("telefone");
+        if (telefone != null && telefone.length() >= 4) {
+            String ultimos4 = telefone.substring(telefone.length() - 4);
+            String maskedPhone = telefone.substring(0, telefone.length() - 4).replaceAll("\\d", "*");
+            txtSendTo.setText("SMS enviado para o telefone: " + maskedPhone + ultimos4);
+        }
 
         et1.addTextChangedListener(new GenericTextWatcher(et1, et2));
         et2.addTextChangedListener(new GenericTextWatcher(et2, et3));
@@ -66,6 +68,8 @@ public class CodeRecoveryActivity extends AppCompatActivity {
         });
 
         configurarBackspace();
+
+        iniciarContador();
     }
 
     private void configurarBackspace() {
@@ -127,6 +131,33 @@ public class CodeRecoveryActivity extends AppCompatActivity {
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Código inválido.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void iniciarContador() {
+        txtTimeReesend.setEnabled(false);
+        new CountDownTimer(COUNTDOWN_MILLIS, 1000) {
+            public void onTick(long millisUntilFinished) {
+                txtTimeReesend.setText("Reenviar código em " + millisUntilFinished / 1000 + " segundos");
+            }
+
+            public void onFinish() {
+                txtTimeReesend.setText("Clique aqui para reenviar SMS");
+                txtTimeReesend.setEnabled(true);
+                txtTimeReesend.setOnClickListener(v -> {
+                    String telefone = getIntent().getStringExtra("telefone");
+                    int novoCodigo = (int) (Math.random() * 9000) + 1000;
+
+                    if (telefone != null) {
+                        SendSMS.enviarSMS(CodeRecoveryActivity.this, telefone, novoCodigo);
+                        getSharedPreferences("app", MODE_PRIVATE)
+                                .edit()
+                                .putInt("verification_code", novoCodigo)
+                                .apply();
+                        iniciarContador();
+                    }
+                });
+            }
+        }.start();
     }
 
     public class GenericTextWatcher implements TextWatcher {
