@@ -14,16 +14,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/cinzel"
-        android:text="Telefone"
+        android:text="CPF"
         android:textColor="#E6B648"
         android:textSize="55sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.152" />
+        app:layout_constraintVertical_bias="0.167" />
+
 
     <TextView
         android:id="@+id/welcomeText"
@@ -38,7 +38,7 @@
         app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.106" />
+        app:layout_constraintVertical_bias="0.111" />
 
     <TextView
         android:id="@+id/welcomeText2"
@@ -52,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.227" />
+        app:layout_constraintVertical_bias="0.26" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/verifyButton"
@@ -65,10 +65,10 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.488"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.602" />
-
+        app:layout_constraintVertical_bias="0.532" />
 
     <EditText
         android:id="@+id/phoneInput"
@@ -76,27 +76,27 @@
         android:layout_height="53dp"
         android:layout_marginTop="56dp"
         android:background="@drawable/background_input"
-        android:drawableStart="@drawable/phone_icon"
+        android:drawableStart="@drawable/user_icon"
         android:drawablePadding="12dp"
-        android:hint="Digite o seu telefone"
+        android:hint="Digite o seu CPF"
         android:inputType="phone"
         android:paddingStart="18dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintHorizontal_bias="0.468"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.392" />
+        app:layout_constraintVertical_bias="0.373" />
 
     <TextView
         android:id="@+id/phoneLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_width="38dp"
+        android:layout_height="22dp"
+        android:layout_marginBottom="20dp"
         android:fontFamily="@font/anekodia"
-        android:text="Telefone"
+        android:text="CPF"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/phoneInput"

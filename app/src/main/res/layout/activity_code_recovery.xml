@@ -54,21 +54,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.227" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/appCompatButton"
-        android:layout_width="147dp"
-        android:layout_height="39dp"
-        android:background="@drawable/button_shape"
-        android:fontFamily="@font/anekodia"
-        android:text="VERIFICAR"
-        android:textColor="#25173A"
-        android:textStyle="bold"
+
+    <TextView
+        android:id="@+id/welcomeText3"
+        android:layout_width="184dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="87dp"
+        android:layout_marginEnd="88dp"
+        android:text="Reenviar código em 60 segundos"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.602" />
-
+        app:layout_constraintVertical_bias="0.499" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -99,13 +99,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginStart="87dp"
+        android:layout_marginEnd="88dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.431">
+        app:layout_constraintVertical_bias="0.421">
 
         <EditText
             android:id="@+id/otp1"
@@ -159,6 +161,21 @@
             android:textSize="24sp" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/txtSendTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="SMS enviado para o telefone: (xx) xxxx-xxxx"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/otpLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeText2"
+        app:layout_constraintVertical_bias="0.703" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

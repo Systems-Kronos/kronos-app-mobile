@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -21,104 +23,174 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
+import com.example.kronosprojeto.dto.UserResponseDto;
+import com.example.kronosprojeto.service.UserService;
+import com.example.kronosprojeto.utils.ToastHelper;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PhoneRecoveryActivity extends AppCompatActivity {
 
     private static final int SMS_PERMISSION_CODE = 1;
-    private EditText phoneInput;
+    private static final String TAG = "PhoneRecovery";
+    private EditText cpfInput;
+    private boolean isUpdating = false;
+    private final String mask = "###.###.###-##";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_phone_recovery);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+    private String unmask(String s) {
+        return s.replaceAll("[^0-9]", "");
+    }
 
-        phoneInput = findViewById(R.id.phoneInput);
-
-        phoneInput.addTextChangedListener(new TextWatcher() {
-            boolean isUpdating;
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
+    private void setupCpfMask(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if (isUpdating) {
                     isUpdating = false;
                     return;
                 }
-
-                String str = s.toString().replaceAll("[^\\d]", "");
-                String formatted = "";
-
-                if (str.length() > 11)
-                    str = str.substring(0, 11);
-
-                int len = str.length();
-
-                if (len > 0)
-                    formatted += "(";
-
-                if (len >= 1)
-                    formatted += str.substring(0, Math.min(2, len));
-
-                if (len >= 3)
-                    formatted += ") ";
-
-                if (len >= 3 && len <= 6)
-                    formatted += str.substring(2, len);
-                else if (len > 6)
-                    formatted += str.substring(2, 7) + "-" + str.substring(7, len);
-
+                String raw = unmask(s.toString());
+                StringBuilder masked = new StringBuilder();
+                int i = 0;
+                for (char m : mask.toCharArray()) {
+                    if (m != '#') {
+                        if (raw.length() > i) masked.append(m);
+                        else break;
+                    } else {
+                        if (raw.length() > i) masked.append(raw.charAt(i++));
+                        else break;
+                    }
+                }
                 isUpdating = true;
-                phoneInput.setText(formatted);
-                phoneInput.setSelection(formatted.length());
+                int selection = masked.length();
+                editText.setText(masked.toString());
+                editText.setSelection(selection <= editText.getText().length() ? selection : editText.getText().length());
             }
-        });
-
-        AppCompatButton verifyButton = findViewById(R.id.verifyButton);
-        verifyButton.setOnClickListener(v -> {
-            sendSMS();
-            Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
-            startActivity(intent);
         });
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_phone_recovery);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        cpfInput = findViewById(R.id.phoneInput);
+        setupCpfMask(cpfInput);
+
+        AppCompatButton verifyButton = findViewById(R.id.verifyButton);
+        verifyButton.setOnClickListener(v -> sendSMS());
+    }
+
     private void sendSMS() {
+        Log.d(TAG, "Botão pressionado — iniciando verificação de CPF...");
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
         } else {
+            String cpf = cpfInput.getText().toString().trim();
+
+            if (cpf.isEmpty() || cpf.length() != 14) {
+                ToastHelper.showFeedbackToast(getApplicationContext(),"info","CREDENCIAIS INVÁLIDAS","Digite um CPF válido");
+                return;
+            }
+
+            String token = getSharedPreferences("app", MODE_PRIVATE).getString("jwt", null);
+
+            if (token == null) {
+                return;
+            }
+
             try {
-                String phoneNumber = phoneInput.getText().toString().replaceAll("[^\\d]", "");
-                if (phoneNumber.isEmpty()) {
-                    Toast.makeText(this, "Digite um número válido", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                String cpfEncoded = URLEncoder.encode(cpf, StandardCharsets.UTF_8.toString());
 
-                Intent telaAtual = new Intent(this, PhoneRecoveryActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(this, 0, telaAtual, PendingIntent.FLAG_IMMUTABLE);
-                SmsManager sms = SmsManager.getDefault();
-                sms.sendTextMessage(phoneNumber, null, "123 321 tudo sobre 2", pi, null);
+                UserService userService = RetrofitClientSQL.createService(UserService.class);
+                Call<String> call = userService.getTelefoneByCpf(cpfEncoded);
 
-                Toast.makeText(this, "SMS enviado com sucesso!", Toast.LENGTH_SHORT).show();
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            String telefone = response.body();
+
+                            if (telefone == null || telefone.isEmpty()) {
+                                ToastHelper.showFeedbackToast(getApplicationContext(),
+                                        "info", "CREDENCIAIS INVÁLIDAS", "Telefone não encontrado");
+                                return;
+                            }
+
+                            enviarSmsParaTelefone(telefone);
+
+                        } else {
+                            ToastHelper.showFeedbackToast(getApplicationContext(),
+                                    "error", "ERRO", "Erro ao buscar telefone (" + response.code() + ")");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        ToastHelper.showFeedbackToast(getApplicationContext(),
+                                "error", "ERRO DE CONEXÃO", t.getMessage());
+                    }
+                });
+
             } catch (Exception e) {
-                Toast.makeText(this, "Falha ao enviar SMS: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                ToastHelper.showFeedbackToast(getApplicationContext(),"error","Erro ao processar CPF","Erro de conexão com o servidor: " +  e.getMessage() );
             }
         }
     }
 
+    private void enviarSmsParaTelefone(String phoneNumber) {
+        Log.d(TAG, "Enviando SMS para: " + phoneNumber);
+        try {
+            if (!phoneNumber.startsWith("+")) {
+                phoneNumber = "+55" + phoneNumber.replaceAll("[^\\d]", "");
+            }
+
+            int codigo = (int) (Math.random() * 9000) + 1000;
+            String mensagem = "Código de verificação: " + codigo;
+            Log.d(TAG, "Código gerado: " + codigo);
+
+            SmsManager sms = SmsManager.getDefault();
+            sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
+
+            Log.d(TAG, "SMS enviado com sucesso para " + phoneNumber);
+
+            getSharedPreferences("app", MODE_PRIVATE)
+                    .edit()
+                    .putInt("verification_code", codigo)
+                    .apply();
+
+            Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
+            intent.putExtra("telefone", phoneNumber);
+            startActivity(intent);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Erro enviando SMS", e);
+            ToastHelper.showFeedbackToast(getApplicationContext(),"error","Falha ao enviar SMS: ",e.getMessage());
+        }
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, "onRequestPermissionsResult chamado — código: " + requestCode);
     }
 }
