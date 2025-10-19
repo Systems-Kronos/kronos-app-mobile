@@ -56,7 +56,7 @@
 
 
     <TextView
-        android:id="@+id/welcomeText3"
+        android:id="@+id/txtTimeReesend"
         android:layout_width="184dp"
         android:layout_height="16dp"
         android:layout_marginStart="87dp"

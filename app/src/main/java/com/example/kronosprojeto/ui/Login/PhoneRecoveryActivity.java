@@ -135,8 +135,11 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            enviarSmsParaTelefone(telefone);
-
+                            int codigo = (int) (Math.random() * 9000) + 1000;
+                            SendSMS.enviarSMS(PhoneRecoveryActivity.this, telefone, codigo);
+                            Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
+                            intent.putExtra("telefone", telefone);
+                            startActivity(intent);
                         } else {
                             ToastHelper.showFeedbackToast(getApplicationContext(),
                                     "error", "ERRO", "Erro ao buscar telefone (" + response.code() + ")");
@@ -156,36 +159,6 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
         }
     }
 
-    private void enviarSmsParaTelefone(String phoneNumber) {
-        Log.d(TAG, "Enviando SMS para: " + phoneNumber);
-        try {
-            if (!phoneNumber.startsWith("+")) {
-                phoneNumber = "+55" + phoneNumber.replaceAll("[^\\d]", "");
-            }
-
-            int codigo = (int) (Math.random() * 9000) + 1000;
-            String mensagem = "Código de verificação: " + codigo;
-            Log.d(TAG, "Código gerado: " + codigo);
-
-            SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
-
-            Log.d(TAG, "SMS enviado com sucesso para " + phoneNumber);
-
-            getSharedPreferences("app", MODE_PRIVATE)
-                    .edit()
-                    .putInt("verification_code", codigo)
-                    .apply();
-
-            Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
-            intent.putExtra("telefone", phoneNumber);
-            startActivity(intent);
-
-        } catch (Exception e) {
-            Log.e(TAG, "Erro enviando SMS", e);
-            ToastHelper.showFeedbackToast(getApplicationContext(),"error","Falha ao enviar SMS: ",e.getMessage());
-        }
-    }
 
 
     @Override
