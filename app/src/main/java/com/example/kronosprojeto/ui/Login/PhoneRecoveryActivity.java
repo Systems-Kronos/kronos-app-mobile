@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -25,6 +26,7 @@ import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.dto.UserResponseDto;
 import com.example.kronosprojeto.service.UserService;
+import com.example.kronosprojeto.utils.ToastHelper;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -99,83 +101,57 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
-            Log.w(TAG, "Permissão de SMS ainda não concedida.");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, SMS_PERMISSION_CODE);
         } else {
             String cpf = cpfInput.getText().toString().trim();
-            Log.d(TAG, "CPF digitado (com máscara): " + cpf);
 
             if (cpf.isEmpty() || cpf.length() != 14) {
-                Toast.makeText(this, "Digite um CPF válido", Toast.LENGTH_SHORT).show();
-                Log.w(TAG, "CPF inválido: " + cpf);
+                ToastHelper.showFeedbackToast(getApplicationContext(),"info","CREDENCIAIS INVÁLIDAS","Digite um CPF válido");
                 return;
             }
 
             String token = getSharedPreferences("app", MODE_PRIVATE).getString("jwt", null);
-            Log.d(TAG, "Token JWT recuperado: " + (token != null ? token.substring(0, Math.min(token.length(), 20)) + "..." : "NULO"));
 
             if (token == null) {
-                Toast.makeText(this, "Token não encontrado. Faça login novamente.", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Token JWT não encontrado no SharedPreferences.");
                 return;
             }
 
             try {
                 String cpfEncoded = URLEncoder.encode(cpf, StandardCharsets.UTF_8.toString());
-                Log.d(TAG, "CPF codificado para URL: " + cpfEncoded);
 
                 UserService userService = RetrofitClientSQL.createService(UserService.class);
-                Call<UserResponseDto> call = userService.getUserByCPF("Bearer " + token, cpfEncoded);
+                Call<String> call = userService.getTelefoneByCpf(cpfEncoded);
 
-                Log.d(TAG, "Iniciando chamada Retrofit GET /api/usuario/selecionarCpf/" + cpfEncoded);
-
-                call.enqueue(new Callback<UserResponseDto>() {
+                call.enqueue(new Callback<String>() {
                     @Override
-                    public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
-                        Log.d(TAG, "onResponse chamado | Código HTTP: " + response.code());
+                    public void onResponse(Call<String> call, Response<String> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            Log.d(TAG, "Requisição bem-sucedida. Corpo recebido: " + response.body().toString());
-                            String telefone = response.body().getTelefone();
-                            Log.d(TAG, "Telefone retornado: " + telefone);
+                            String telefone = response.body();
 
                             if (telefone == null || telefone.isEmpty()) {
-                                Toast.makeText(PhoneRecoveryActivity.this, "Telefone não cadastrado para este usuário", Toast.LENGTH_SHORT).show();
-                                Log.w(TAG, "Usuário encontrado, mas sem telefone cadastrado.");
+                                ToastHelper.showFeedbackToast(getApplicationContext(),
+                                        "info", "CREDENCIAIS INVÁLIDAS", "Telefone não encontrado");
                                 return;
                             }
 
                             enviarSmsParaTelefone(telefone);
+
                         } else {
-                            String errorMsg = "Usuário não encontrado";
-                            try {
-                                if (response.errorBody() != null) {
-                                    errorMsg = response.errorBody().string();
-                                }
-                            } catch (Exception e) {
-                                Log.e(TAG, "Erro ao ler corpo de erro", e);
-                            }
-
-                            Toast.makeText(PhoneRecoveryActivity.this,
-                                    "Erro API (" + response.code() + "): " + errorMsg,
-                                    Toast.LENGTH_LONG).show();
-
-                            Log.e(TAG, "Erro API: Código " + response.code() + " | Body: " + errorMsg);
-                            Log.e(TAG, "Headers da resposta: " + response.headers());
+                            ToastHelper.showFeedbackToast(getApplicationContext(),
+                                    "error", "ERRO", "Erro ao buscar telefone (" + response.code() + ")");
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<UserResponseDto> call, Throwable t) {
-                        Log.e(TAG, "Falha total na chamada Retrofit: " + t.getMessage(), t);
-                        Toast.makeText(PhoneRecoveryActivity.this,
-                                "Erro de conexão com o servidor: " + t.getMessage(),
-                                Toast.LENGTH_LONG).show();
+                    public void onFailure(Call<String> call, Throwable t) {
+                        ToastHelper.showFeedbackToast(getApplicationContext(),
+                                "error", "ERRO DE CONEXÃO", t.getMessage());
                     }
                 });
+
             } catch (Exception e) {
-                Log.e(TAG, "Erro ao codificar CPF ou iniciar requisição", e);
-                Toast.makeText(this, "Erro ao processar CPF: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                ToastHelper.showFeedbackToast(getApplicationContext(),"error","Erro ao processar CPF","Erro de conexão com o servidor: " +  e.getMessage() );
             }
         }
     }
@@ -191,26 +167,23 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
             String mensagem = "Código de verificação: " + codigo;
             Log.d(TAG, "Código gerado: " + codigo);
 
-            Intent telaCodigo = new Intent(this, CodeRecoveryActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(this, 0, telaCodigo, PendingIntent.FLAG_IMMUTABLE);
-
             SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(phoneNumber, null, mensagem, pi, null);
+            sms.sendTextMessage(phoneNumber, null, mensagem, null, null);
 
-            Toast.makeText(this, "SMS enviado para " + phoneNumber, Toast.LENGTH_SHORT).show();
             Log.d(TAG, "SMS enviado com sucesso para " + phoneNumber);
 
             getSharedPreferences("app", MODE_PRIVATE)
                     .edit()
-                    .putInt("codigo_verificacao", codigo)
+                    .putInt("verification_code", codigo)
                     .apply();
 
             Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
+            intent.putExtra("telefone", phoneNumber);
             startActivity(intent);
 
         } catch (Exception e) {
             Log.e(TAG, "Erro enviando SMS", e);
-            Toast.makeText(this, "Falha ao enviar SMS: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            ToastHelper.showFeedbackToast(getApplicationContext(),"error","Falha ao enviar SMS: ",e.getMessage());
         }
     }
 

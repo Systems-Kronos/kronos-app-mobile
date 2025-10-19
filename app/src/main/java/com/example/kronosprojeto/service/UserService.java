@@ -19,6 +19,7 @@ public interface UserService {
     @PUT("/api/usuario/atualizar/{id}")
     Call<String> updateUser(@Header("Authorization") String token, @Body Map<String, Object>campos, @Path("id") String id);
 
-
+    @GET("/api/usuario/selecionarNoSec/{cpf}")
+    Call<String> getTelefoneByCpf(@Path("cpf") String cpf);
 }
 
