@@ -127,22 +127,25 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
                 String cpfEncoded = URLEncoder.encode(cpf, StandardCharsets.UTF_8.toString());
 
                 UserService userService = RetrofitClientSQL.createService(UserService.class);
-                Call<String> call = userService.getTelefoneByCpf(cpfEncoded);
+                Call<UserResponseDto> call = userService.getTelefoneByCpf(cpfEncoded);
 
-                call.enqueue(new Callback<String>() {
+                call.enqueue(new Callback<UserResponseDto>() {
                     @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
+                    public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            String telefone = response.body();
+                            UserResponseDto userResponse = response.body();
+                            String telefone = userResponse.getTelefone();
+                            long userId = userResponse.getId();
 
-                            if (telefone == null || telefone.isEmpty()) {
-                                ToastHelper.showFeedbackToast(getApplicationContext(),
-                                        "info", "CREDENCIAIS INVÁLIDAS", "Telefone não encontrado");
-                                return;
-                            }
+                            getSharedPreferences("app", MODE_PRIVATE)
+                                    .edit()
+                                    .putString("telefone", telefone)
+                                    .putLong("user_id", userId)
+                                    .apply();
 
                             int codigo = (int) (Math.random() * 9000) + 1000;
                             SendSMS.enviarSMS(PhoneRecoveryActivity.this, telefone, codigo);
+
                             Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
                             intent.putExtra("telefone", telefone);
                             startActivity(intent);
@@ -153,11 +156,12 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<String> call, Throwable t) {
+                    public void onFailure(Call<UserResponseDto> call, Throwable t) {
                         ToastHelper.showFeedbackToast(getApplicationContext(),
                                 "error", "ERRO DE CONEXÃO", t.getMessage());
                     }
                 });
+
 
             } catch (Exception e) {
                 ToastHelper.showFeedbackToast(getApplicationContext(),"error","Erro ao processar CPF","Erro de conexão com o servidor: " +  e.getMessage() );
