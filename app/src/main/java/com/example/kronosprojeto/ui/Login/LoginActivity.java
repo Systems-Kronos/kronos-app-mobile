@@ -132,14 +132,12 @@ public class LoginActivity extends AppCompatActivity {
         String cpf = cpfInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        // Caso seja a primeira vez ou senha inicial
         if(password.equals("senha123")){
-            loadingOverlay.setVisibility(View.GONE); // remove overlay
-            // Abre PhoneRecoveryActivity para iniciar recuperação de senha
+            loadingOverlay.setVisibility(View.GONE);
             Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
-            intent.putExtra("cpf_first_access", cpf); // opcional: passar cpf
+            intent.putExtra("cpf_first_access", cpf);
             startActivity(intent);
-            return; // interrompe o login normal
+            return;
         }
 
         LoginRequestDto loginRequest = new LoginRequestDto(cpf, password);
@@ -178,9 +176,4 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
 }
