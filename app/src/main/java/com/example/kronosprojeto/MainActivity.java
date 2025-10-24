@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private UserViewModel userViewModel;
     private NotificationViewModel notificationViewModel;
     private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
     TextView tvUsername;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view_drawer);
-
         NavigationView navigationView = findViewById(R.id.nav_view_drawer);
 
         View headerView = navigationView.getHeaderView(0);
@@ -147,18 +144,14 @@ public class MainActivity extends AppCompatActivity {
                                 .setPopUpTo(startDestination, true)
                                 .build());
             }else if (id == R.id.nav_restrict) {
-                navController.navigate(R.id.RestrictLogin, null,
-                        new androidx.navigation.NavOptions.Builder()
-                                .setLaunchSingleTop(true)
-                                .setPopUpTo(startDestination, true)
-                                .build());
+                navController.navigate(R.id.action_HomeFragment_to_RestrictLoginFragment);
             } else if (id == R.id.nav_logout) {
                 SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
                 prefs.edit().clear().apply();
 
 
                 Intent intent = new Intent(MainActivity.this, SplashScreen.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // limpa back stack
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);            }
 
             drawerLayout.closeDrawer(GravityCompat.START);
