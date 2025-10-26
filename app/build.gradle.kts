@@ -67,9 +67,13 @@ dependencies {
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.4")
     implementation("androidx.palette:palette:1.0.0")
     implementation("androidx.work:work-runtime:2.9.0")
+    implementation ("com.google.guava:guava:31.1-android")
     implementation ("com.google.android.material:material:1.10.0")
 
     // Navigation Component (para BottomNavigationView + Fragments)
     implementation ("androidx.navigation:navigation-fragment-ktx:2.7.1")
     implementation ("androidx.navigation:navigation-ui-ktx:2.7.1")
+
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
+
 }

@@ -58,7 +58,7 @@
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="90dp"
                     android:fontFamily="@font/anekodia"
-                    android:text="Progresso de suas tarefas diárias"
+                    android:text="Progresso de suas tarefas mensais"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -119,27 +119,27 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnTarefaTodas"
                         android:layout_width="0dp"
                         android:layout_height="58dp"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:backgroundTint="#F7EAFF"
+                        android:backgroundTint="@color/YellowMessage"
                         android:text="Todas as tarefas"
                         android:textAllCaps="false"
                         android:textColor="#0F0F0F"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnTarefaRealocadas"
                         android:layout_width="0dp"
                         android:layout_height="58dp"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:backgroundTint="#BE8F35"
-                        android:text="Tarefas realocadas\"
+                        android:backgroundTint="@color/PurpleLight"
+                        android:text="Tarefas realocadas"
                         android:textAllCaps="false"
                         android:textColor="#0F0F0F"
                         android:textSize="13sp"
