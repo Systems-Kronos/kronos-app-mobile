@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -17,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
@@ -99,8 +101,8 @@ public class HomeFragment extends Fragment {
 
 
         recyclerView = binding.tomorrowstasks;
-        Button buttonAll = binding.btnTarefaTodas;
-        Button buttonRealocadas = binding.btnTarefaRealocadas;
+        AppCompatButton buttonAll = binding.btnTarefaTodas;
+        AppCompatButton buttonRealocadas = binding.btnTarefaRealocadas;
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -190,11 +192,13 @@ public class HomeFragment extends Fragment {
                     nestedScrollView.setVisibility(View.VISIBLE);
 
                     // 🔹 Ordena pela prioridade (gravidade * urgencia * tendencia)
-                    tarefas.sort((t1, t2) -> {
-                        int prioridade1 = (t1.getGravidade() * t1.getUrgencia() * t1.getTendencia());
-                        int prioridade2 = (t2.getGravidade() * t2.getUrgencia() * t2.getTendencia());
-                        return Integer.compare(prioridade2, prioridade1); // maior prioridade primeiro
-                    });
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        tarefas.sort((t1, t2) -> {
+                            int prioridade1 = (t1.getGravidade() * t1.getUrgencia() * t1.getTendencia());
+                            int prioridade2 = (t2.getGravidade() * t2.getUrgencia() * t2.getTendencia());
+                            return Integer.compare(prioridade2, prioridade1); // maior prioridade primeiro
+                        });
+                    }
 
                     int total = tarefas.size();
                     int concluidas = 0;
