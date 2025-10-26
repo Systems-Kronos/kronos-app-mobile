@@ -5,12 +5,7 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/HomeFragment">
 
-    <fragment
-        android:id="@+id/CalendarioFragment"
-        android:name="com.example.kronosprojeto.ui.Calendar.CalendarFragment"
-        android:label="CalendarioFragment"
-        tools:layout="@layout/fragment_calendar" />
-
+    <!-- Home Fragment -->
     <fragment
         android:id="@+id/HomeFragment"
         android:name="com.example.kronosprojeto.ui.Home.HomeFragment"
@@ -22,13 +17,26 @@
         <action
             android:id="@+id/action_HomeFragment_to_CalendarioFragment"
             app:destination="@id/CalendarioFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_RestrictLoginFragment"
+            app:destination="@id/RestrictLogin" />
     </fragment>
 
+    <!-- Calendário Fragment -->
+    <fragment
+        android:id="@+id/CalendarioFragment"
+        android:name="com.example.kronosprojeto.ui.Calendar.CalendarFragment"
+        android:label="CalendarioFragment"
+        tools:layout="@layout/fragment_calendar" />
+
+    <!-- Chat Fragment -->
     <fragment
         android:id="@+id/ChatFragment"
         android:name="com.example.kronosprojeto.ui.Chat.ChatFragment"
         android:label="ChatFragment"
         tools:layout="@layout/fragment_chat" />
+
+    <!-- Perfil Fragment -->
     <fragment
         android:id="@+id/PerfilFragment"
         android:name="com.example.kronosprojeto.ui.Profile.ProfileFragment"
@@ -39,11 +47,14 @@
             app:destination="@id/details" />
     </fragment>
 
+    <!-- Notificações Fragment -->
     <fragment
         android:id="@+id/NotificationsFragment"
         android:name="com.example.kronosprojeto.ui.Notifications.NotificationsFragment"
         android:label="Notificacoes"
         tools:layout="@layout/fragment_notifications" />
+
+    <!-- Detalhes Fragment -->
     <fragment
         android:id="@+id/details"
         android:name="com.example.kronosprojeto.ui.Details.DetailsFragment"
@@ -56,6 +67,8 @@
             android:id="@+id/action_details_to_HomeFragment"
             app:destination="@id/HomeFragment" />
     </fragment>
+
+    <!-- Histórico de Tarefas -->
     <fragment
         android:id="@+id/assignmentHistoryFragment"
         android:name="com.example.kronosprojeto.ui.AssignmentHistory.AssignmentHistoryFragment"
@@ -65,8 +78,20 @@
             android:id="@+id/action_assignmentHistoryFragment_to_details"
             app:destination="@id/details" />
     </fragment>
+
+    <!-- Restrict Area Login -->
     <fragment
         android:id="@+id/RestrictLogin"
-        android:name="com.example.kronosprojeto.ui.RestrictArea.RestrictLogin"
-        android:label="RestrictLogin" />
+        android:name="com.example.kronosprojeto.ui.RestrictArea.RestrictLoginFragment"
+        android:label="RestrictLogin" >
+        <action
+            android:id="@+id/action_RestrictLogin_to_BI"
+            app:destination="@id/RestrictBIFragment" />
+    </fragment>
+
+    <!-- Restrict BI Fragment -->
+    <fragment
+        android:id="@+id/RestrictBIFragment"
+        android:name="com.example.kronosprojeto.ui.RestrictArea.RestrictBIFragment"
+        android:label="RestrictBI" />
 </navigation>

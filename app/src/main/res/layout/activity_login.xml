@@ -160,8 +160,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <!-- === OVERLAY DE LOADING === -->
     <FrameLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
