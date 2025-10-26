@@ -38,6 +38,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.adapter.TaskAdapter;
+import com.example.kronosprojeto.config.CloudinaryManager;
 import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentProfileBinding;
@@ -103,6 +104,7 @@ public class ProfileFragment extends Fragment {
 
         String token = prefs.getString("jwt", null);
         activity = getActivity();
+        CloudinaryManager.init(requireContext());
 
         ImageView profileImg = binding.profileImg;
         nameTextView = binding.usernameText;
@@ -223,17 +225,14 @@ public class ProfileFragment extends Fragment {
     private void processarImagemSelecionada(Uri imageUri) {
         ImageView profileImg = binding.profileImg;
 
+        // Mostra a imagem escolhida
         Glide.with(this)
                 .load(imageUri)
                 .circleCrop()
                 .into(profileImg);
 
         try {
-            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-            inputStream.close();
-
+            // Gera cor do banner a partir da imagem
             InputStream inputStreamBitmap = requireContext().getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStreamBitmap);
             inputStreamBitmap.close();
@@ -245,32 +244,43 @@ public class ProfileFragment extends Fragment {
                 });
             }
 
-            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), bytes);
-            MultipartBody.Part body = MultipartBody.Part.createFormData(
-                    "file",
-                    "imagem.jpg",
-                    requestFile
-            );
+            // 🔥 Upload direto para o Cloudinary unsigned
+            com.cloudinary.android.MediaManager.get()
+                    .upload(imageUri)
+                    .option("upload_preset", "kronos-upload") // o nome do seu preset unsigned
+                    .callback(new com.cloudinary.android.callback.UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+                            loadingOverlay.setVisibility(View.VISIBLE);
+                        }
 
-            RequestBody preset = RequestBody.create(MultipartBody.FORM, "kronos-upload");
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                        }
 
-            Call<UploadResultDto> call = cloudinaryService.uploadImage("dblwo3rra", body, preset);
-            call.enqueue(new Callback<UploadResultDto>() {
-                @Override
-                public void onResponse(Call<UploadResultDto> call, Response<UploadResultDto> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        String imageUrl = response.body().secure_url;
-                        atualizarFotoUsuario(imageUrl);
-                    } else {
-                        ToastHelper.showFeedbackToast(activity, "error", "ERROR:", "Falha ao enviar imagem");
-                    }
-                }
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            loadingOverlay.setVisibility(View.GONE);
+                            String imageUrl = resultData.get("secure_url").toString();
+                            Log.d("Cloudinary", "Upload completo: " + imageUrl);
 
-                @Override
-                public void onFailure(Call<UploadResultDto> call, Throwable t) {
-                    ToastHelper.showFeedbackToast(activity, "error", "ERROR:", "Erro de conexão com Cloudinary");
-                }
-            });
+                            atualizarFotoUsuario(imageUrl);
+                        }
+
+                        @Override
+                        public void onError(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
+                            loadingOverlay.setVisibility(View.GONE);
+                            ToastHelper.showFeedbackToast(activity, "error", "ERROR:", "Falha ao enviar imagem");
+                            Log.e("Cloudinary", "Erro: " + error.getDescription());
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
+                            loadingOverlay.setVisibility(View.GONE);
+                            Log.w("Cloudinary", "Reagendado: " + error.getDescription());
+                        }
+                    })
+                    .dispatch();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -283,13 +293,11 @@ public class ProfileFragment extends Fragment {
 
         userResponseDto.setFoto(imageUrl);
 
-        // Garante que o fragmento ainda está ativo
         if (!isAdded()) return;
 
         Activity activity = getActivity();
         if (activity == null) return;
 
-        // Obtém SharedPreferences corretamente
         SharedPreferences sharedPreferences = activity.getSharedPreferences("app", MODE_PRIVATE);
         String token = sharedPreferences.getString("jwt", null);
 
@@ -361,7 +369,9 @@ public class ProfileFragment extends Fragment {
 
                     for (Task tarefa : tarefas) {
                         if ("Concluída".equalsIgnoreCase(tarefa.getStatus()) ||
-                                "Concluido".equalsIgnoreCase(tarefa.getStatus())) {
+                                "Concluido".equalsIgnoreCase(tarefa.getStatus())
+                        || "Concluído".equalsIgnoreCase(tarefa.getStatus())
+                        || "Concluida".equalsIgnoreCase(tarefa.getStatus())){
                             concluidas++;
                         }
 
