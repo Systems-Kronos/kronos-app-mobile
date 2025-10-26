@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:allowBackup="true"
-        android:forceDarkAllowed="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:forceDarkAllowed="false"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -21,6 +22,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KronosProjeto"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.RestrictArea.RestrictAreaActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KronosProjeto" />
+        <activity
+            android:name=".ui.RestrictArea.RestrictBIActivity"
+            android:exported="false"
+            android:theme="@style/Theme.KronosProjeto" />
+        <activity
+            android:name=".ui.RestrictArea.RestrictBI"
+            android:exported="false"
+            android:theme="@style/Theme.KronosProjeto" />
         <activity
             android:name=".ui.Login.CodeRecoveryActivity"
             android:exported="false"
@@ -39,8 +52,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.SplashScreen.SplashScreen"
             android:exported="true"
@@ -52,6 +65,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Chat.ChatFragment">
+    android:background="@color/white"
+    tools:context=".ui.RestrictArea.RestrictLoginFragment">
 
-
+    <!-- Título -->
     <TextView
         android:id="@+id/txtTittleTarefa"
         android:layout_width="wrap_content"
@@ -16,71 +18,73 @@
         android:textColor="#1A1818"
         android:textSize="34sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Label E-mail -->
+
+    <!-- Campo E-mail -->
 
     <TextView
         android:id="@+id/cpfLabel"
         android:layout_width="wrap_content"
         android:layout_height="26dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="52dp"
+        android:layout_marginBottom="12dp"
         android:fontFamily="@font/anekodia"
         android:text="E-mail"
         android:textColor="#000000"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/cpfInput"
-        app:layout_constraintStart_toStartOf="@+id/cpfInput" />
+        app:layout_constraintBottom_toTopOf="@+id/txtEmail"
+        app:layout_constraintEnd_toEndOf="@+id/txtEmail"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txtEmail"
+        app:layout_constraintTop_toBottomOf="@+id/txtTittleTarefa" />
 
     <EditText
-        android:id="@+id/cpfInput"
-        android:layout_width="300dp"
-        android:layout_height="53dp"
-        android:layout_marginTop="56dp"
+        android:id="@+id/txtEmail"
+        android:layout_width="299dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/background_input"
         android:drawableStart="@drawable/user_icon"
         android:drawablePadding="12dp"
         android:hint="Digite o e-mail"
-        android:inputType="number"
+        android:inputType="textEmailAddress"
         android:paddingStart="18dp"
-        android:shadowColor="#9C27B0"
         android:textColor="@android:color/black"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintTop_toBottomOf="@+id/cpfLabel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.323" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Label Senha -->
+
+    <!-- Campo Senha -->
 
     <TextView
         android:id="@+id/passwordLabel"
-        android:layout_width="50dp"
-        android:layout_height="20dp"
+        android:layout_width="55dp"
+        android:layout_height="26dp"
         android:layout_marginStart="56dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="300dp"
+        android:layout_marginBottom="16dp"
         android:fontFamily="@font/anekodia"
         android:text="Senha"
         android:textColor="#070000"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/passwordInput"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cpfInput" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="448dp"
-        android:layout_height="446dp"
-        android:layout_marginStart="104dp"
-        android:layout_marginTop="352dp"
-        android:src="@drawable/img_gear"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
 
     <EditText
-        android:id="@+id/passwordInput4"
+        android:id="@+id/passwordInput"
         android:layout_width="306dp"
         android:layout_height="66dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/background_input"
         android:drawableStart="@drawable/padlock_icon"
         android:drawablePadding="12dp"
@@ -89,11 +93,52 @@
         android:paddingStart="18dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/passwordLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"/>
+
+    <!-- Botão Entrar -->
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="155dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_shape"
+        android:text="Entrar"
+        android:textSize="20sp"
+        android:fontFamily="@font/anekodia"
+        app:layout_constraintTop_toBottomOf="@+id/passwordInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Imagem decorativa -->
+
+    <!-- Loading Overlay -->
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="192dp"
+        android:layout_height="380dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="520dp"
+        android:src="@drawable/img_gear"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordLabel"
-        app:layout_constraintVertical_bias="0.038" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#80000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
