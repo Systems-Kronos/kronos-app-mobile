@@ -119,9 +119,6 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
 
             String token = getSharedPreferences("app", MODE_PRIVATE).getString("jwt", null);
 
-            if (token == null) {
-                return;
-            }
 
             try {
                 String cpfEncoded = URLEncoder.encode(cpf, StandardCharsets.UTF_8.toString());

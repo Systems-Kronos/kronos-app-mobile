@@ -1,28 +1,20 @@
 package com.example.kronosprojeto.ui.Login;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.R;
@@ -38,12 +30,12 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    TextView phoneRecoveryEntrypoint;
-    AppCompatButton loginButton;
-    EditText cpfInput;
-    EditText passwordInput;
+    private TextView phoneRecoveryEntrypoint;
+    private AppCompatButton loginButton;
+    private EditText cpfInput;
+    private EditText passwordInput;
+    private FrameLayout loadingOverlay;
     private AuthService authService;
-    FrameLayout loadingOverlay;
 
     private boolean isUpdating = false;
     private final String mask = "###.###.###-##";
@@ -54,8 +46,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setupCpfMask(EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -88,42 +85,44 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+
+        // ⚠️ Essencial: define o layout antes de usar findViewById
         setContentView(R.layout.activity_login);
+
+        // EdgeToEdge
+        EdgeToEdge.enable(this);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        loadingOverlay= findViewById(R.id.loadingOverlay);
-
-        phoneRecoveryEntrypoint = findViewById(R.id.passwordRecoveryText);
-        phoneRecoveryEntrypoint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
-                startActivity(intent);
-            }
-        }
-
-        );
-        loginButton = findViewById(R.id.loginButton);
-
+        // Views
+        loadingOverlay = findViewById(R.id.loadingOverlay);
         cpfInput = findViewById(R.id.cpfInput);
         passwordInput = findViewById(R.id.passwordInput);
+        loginButton = findViewById(R.id.loginButton);
+        phoneRecoveryEntrypoint = findViewById(R.id.passwordRecoveryText);
 
         authService = RetrofitClientSQL.createService(AuthService.class);
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
         setupCpfMask(cpfInput);
+
+        phoneRecoveryEntrypoint.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
+            startActivity(intent);
+        });
+
+        String openFragment = getIntent().getStringExtra("open_fragment");
+        if ("password_redefinition".equals(openFragment)) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main, new PasswordRedefinitionFragment())
+                    .commit();
+        }
+
+        loginButton.setOnClickListener(v -> login());
     }
 
     private void login() {
@@ -132,16 +131,16 @@ public class LoginActivity extends AppCompatActivity {
         String cpf = cpfInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        if(password.equals("senha123")){
+        if (cpf.isEmpty() || password.isEmpty()) {
+            ToastHelper.showFeedbackToast(getApplicationContext(),
+                    "info",
+                    "Campos vazios",
+                    "Preencha CPF e senha!");
             loadingOverlay.setVisibility(View.GONE);
-            Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
-            intent.putExtra("cpf_first_access", cpf);
-            startActivity(intent);
             return;
         }
 
         LoginRequestDto loginRequest = new LoginRequestDto(cpf, password);
-
         Call<Token> call = authService.login(loginRequest);
 
         call.enqueue(new Callback<Token>() {
@@ -155,25 +154,36 @@ public class LoginActivity extends AppCompatActivity {
                     getSharedPreferences("app", MODE_PRIVATE)
                             .edit()
                             .putString("jwt", token.getToken())
-                            .apply();
-                    getSharedPreferences("app", MODE_PRIVATE)
-                            .edit()
                             .putString("cpf", cpf)
                             .apply();
+
+                    if (password.equals("senha123")) {
+                        Intent intent = new Intent(LoginActivity.this, PasswordRedefinitionActivity.class);
+                        startActivity(intent);
+                        return;
+                    }
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
+
                 } else {
-                    ToastHelper.showFeedbackToast(getApplicationContext(),"info","CREDENCIAIS INVÁLIDAS","CPF e senha não condizem!");
+                    ToastHelper.showFeedbackToast(getApplicationContext(),
+                            "info",
+                            "CREDENCIAIS INVÁLIDAS",
+                            "CPF e senha não condizem!");
                 }
             }
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
                 loadingOverlay.setVisibility(View.GONE);
-                ToastHelper.showFeedbackToast(getApplicationContext(),"error","ERRO:","Ocorreu alguma instabilidade e não foi possível concluir a operação");
+                ToastHelper.showFeedbackToast(getApplicationContext(),
+                        "error",
+                        "ERRO:",
+                        "Ocorreu alguma instabilidade e não foi possível concluir a operação");
             }
         });
     }
+
 }
