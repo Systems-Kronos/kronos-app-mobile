@@ -52,6 +52,7 @@ import com.example.kronosprojeto.utils.ToastHelper;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -232,46 +233,71 @@ public class ProfileFragment extends Fragment {
                 .into(profileImg);
 
         try {
-            // Gera cor do banner a partir da imagem
-            InputStream inputStreamBitmap = requireContext().getContentResolver().openInputStream(imageUri);
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStreamBitmap);
-            inputStreamBitmap.close();
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
 
-            if (bitmap != null) {
-                Palette.from(bitmap).generate(palette -> {
-                    int corPredominante = palette.getDominantColor(Color.GRAY);
-                    banner.setBackgroundColor(corPredominante);
-                });
+            if (originalBitmap == null) {
+                ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Não foi possível processar a imagem");
+                return;
             }
 
-            // 🔥 Upload direto para o Cloudinary unsigned
+            // 🔹 1. Reduz a resolução (mantém proporção)
+            int maxDim = 1080; // tamanho máximo em px
+            float scale = Math.min(
+                    (float) maxDim / originalBitmap.getWidth(),
+                    (float) maxDim / originalBitmap.getHeight()
+            );
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(
+                    originalBitmap,
+                    (int) (originalBitmap.getWidth() * scale),
+                    (int) (originalBitmap.getHeight() * scale),
+                    true
+            );
+
+            // 🔹 2. Aplica cor predominante no banner
+            Palette.from(resizedBitmap).generate(palette -> {
+                int corPredominante = palette.getDominantColor(Color.GRAY);
+                banner.setBackgroundColor(corPredominante);
+            });
+
+            // 🔹 3. Salva imagem comprimida em cache
+            File compressedFile = new File(requireContext().getCacheDir(), "compressed_upload.jpg");
+            try (FileOutputStream out = new FileOutputStream(compressedFile)) {
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out); // qualidade 80%
+            }
+
+            // 🔹 4. Faz upload unsigned para o Cloudinary
             com.cloudinary.android.MediaManager.get()
-                    .upload(imageUri)
-                    .option("upload_preset", "kronos-upload") // o nome do seu preset unsigned
+                    .upload(compressedFile.getAbsolutePath())
+                    .unsigned("kronos-upload") // 👉 nome EXATO do seu preset unsigned
                     .callback(new com.cloudinary.android.callback.UploadCallback() {
                         @Override
                         public void onStart(String requestId) {
                             loadingOverlay.setVisibility(View.VISIBLE);
+                            Log.d("Cloudinary", "Iniciando upload...");
                         }
 
                         @Override
                         public void onProgress(String requestId, long bytes, long totalBytes) {
+                            double progress = (double) bytes / totalBytes * 100;
+                            Log.d("Cloudinary", "Progresso: " + String.format("%.2f", progress) + "%");
                         }
 
                         @Override
                         public void onSuccess(String requestId, Map resultData) {
                             loadingOverlay.setVisibility(View.GONE);
                             String imageUrl = resultData.get("secure_url").toString();
-                            Log.d("Cloudinary", "Upload completo: " + imageUrl);
-
+                            Log.d("Cloudinary", "✅ Upload completo: " + imageUrl);
+                            ToastHelper.showFeedbackToast(activity, "success", "SUCESSO:", "Imagem enviada!");
                             atualizarFotoUsuario(imageUrl);
                         }
 
                         @Override
                         public void onError(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
                             loadingOverlay.setVisibility(View.GONE);
-                            ToastHelper.showFeedbackToast(activity, "error", "ERROR:", "Falha ao enviar imagem");
-                            Log.e("Cloudinary", "Erro: " + error.getDescription());
+                            ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao enviar imagem");
+                            Log.e("Cloudinary", "❌ Erro: " + error.getDescription());
                         }
 
                         @Override
@@ -284,8 +310,11 @@ public class ProfileFragment extends Fragment {
 
         } catch (IOException e) {
             e.printStackTrace();
+            ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao processar imagem");
         }
     }
+
+
 
     private void atualizarFotoUsuario(String imageUrl) {
         UserResponseDto userResponseDto = userViewModel.getUser().getValue();

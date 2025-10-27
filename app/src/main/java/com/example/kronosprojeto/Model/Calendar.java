@@ -8,6 +8,8 @@ public class Calendar {
 
         @SerializedName("usuario")
         private Long user;
+        @SerializedName("idGestor")
+        private Long manager;
 
         @SerializedName("evento")
         private String event;
@@ -44,6 +46,13 @@ public class Calendar {
                 this.medicalCertificate = attest;
         }
 
+        public Long getManager() {
+                return manager;
+        }
+
+        public void setManager(Long manager) {
+                this.manager = manager;
+        }
 
         public String getId() {
                 return id;
@@ -116,4 +125,20 @@ public class Calendar {
         public void setAttest(String attest) {
                 this.medicalCertificate = attest;
         }
+        @Override
+        public String toString() {
+                return "Calendar{" +
+                        "id='" + id + '\'' +
+                        ", user=" + user +
+                        ", manager=" + manager +
+                        ", event='" + event + '\'' +
+                        ", presence=" + presence +
+                        ", observation='" + observation + '\'' +
+                        ", crm='" + crm + '\'' +
+                        ", cid='" + cid + '\'' +
+                        ", accepted=" + accepted +
+                        ", medicalCertificate='" + medicalCertificate + '\'' +
+                        '}';
+        }
+
 }
