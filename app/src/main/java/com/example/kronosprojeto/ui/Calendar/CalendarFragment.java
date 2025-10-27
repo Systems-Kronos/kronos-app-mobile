@@ -122,7 +122,12 @@ public class CalendarFragment extends Fragment {
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
-                idGestor = user.getGestor().getId();
+                if(user.getGestor() == null){
+                    idGestor = 0l;
+                }else{
+                    idGestor = user.getGestor().getId();
+
+                }
             }
         });
 
