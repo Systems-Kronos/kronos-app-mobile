@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- === CONTEÚDO EXISTENTE === -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/contentScroll"
         android:layout_width="match_parent"
@@ -38,7 +37,6 @@
             </com.google.android.flexbox.FlexboxLayout>
 
             <FrameLayout
-
                 android:id="@+id/graficFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,25 +49,44 @@
                     android:layout_gravity="center"
                     android:background="@drawable/borda_retangulo_roxo" />
 
-                <TextView
-                    android:id="@+id/textoDentroDoFrame"
-                    android:layout_width="150dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="90dp"
-                    android:fontFamily="@font/anekodia"
-                    android:text="Progresso de suas tarefas mensais"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <com.github.mikephil.charting.charts.PieChart
-                    android:id="@+id/pieChart"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="75dp" />
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/textoDentroDoFrame"
+                        android:layout_width="212dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/anekodia"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:text="Progresso de suas tarefas mensais"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChart"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
             </FrameLayout>
+
+
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_marginTop="40dp"
