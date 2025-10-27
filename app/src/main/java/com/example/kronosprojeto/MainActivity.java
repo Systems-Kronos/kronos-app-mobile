@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -77,16 +76,11 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tvUsername = headerView.findViewById(R.id.tv_username);
 
-
-
-        // Inflar custom view da toolbar
         View customView = getLayoutInflater().inflate(R.layout.toolbar_custom, toolbar, false);
         toolbar.addView(customView);
 
-        // NavController
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
-        // AppBarConfiguration (com todos os fragmentos top-level)
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.HomeFragment,
                 R.id.CalendarioFragment,
@@ -145,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                                 .setPopUpTo(startDestination, true)
                                 .build());
             }else if (id == R.id.nav_restrict) {
-                navController.navigate(R.id.action_HomeFragment_to_RestrictLoginFragment);
+                navController.navigate(R.id.RestrictLogin);
             } else if (id == R.id.nav_logout) {
                 SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
                 prefs.edit().clear().apply();

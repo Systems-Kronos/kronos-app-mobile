@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
@@ -43,6 +45,13 @@ public class RestrictLoginFragment extends Fragment {
 
         loginButton.setOnClickListener(v -> login(v));
 
+        ImageView imgBack = view.findViewById(R.id.imgBack);
+
+        imgBack.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            navController.popBackStack();
+        });
+
         return view;
     }
 
@@ -55,6 +64,8 @@ public class RestrictLoginFragment extends Fragment {
                     "Campos obrigatórios", "Preencha todos os campos antes de continuar.");
             return;
         }
+
+
 
         LoginAdmRequestDTO loginAdmRequest = new LoginAdmRequestDTO(email, password);
         Call<LoginAdmResponseDTO> call = admService.login(loginAdmRequest);
