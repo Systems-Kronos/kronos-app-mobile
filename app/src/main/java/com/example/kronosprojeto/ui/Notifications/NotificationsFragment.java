@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.example.kronosprojeto.adapter.NotificationAdapter;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
 
 import com.example.kronosprojeto.viewmodel.NotificationViewModel;
+import com.google.android.flexbox.FlexboxLayout;
 
 
 import java.util.ArrayList;
@@ -24,12 +26,13 @@ public class NotificationsFragment extends Fragment {
     private FragmentNotificationsBinding binding;
     private NotificationAdapter adapter;
     private NotificationViewModel notificationViewModel;
-
+    FlexboxLayout noContentFlex;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentNotificationsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        noContentFlex = binding.noContentNotifications;
 
         RecyclerView recyclerView = binding.recyclerviewNotifications;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -38,7 +41,15 @@ public class NotificationsFragment extends Fragment {
 
         notificationViewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
 
+        noContentFlex.setVisibility(View.VISIBLE);
+
         notificationViewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
+            if (notifications.isEmpty()){
+                Log.e("NOTIFICATIONS", "EMPTY");
+            }else {
+                noContentFlex.setVisibility(View.GONE);
+                Log.e("NOTIFICATIONS", "content");
+            }
             adapter.updateList(notifications);
         });
 

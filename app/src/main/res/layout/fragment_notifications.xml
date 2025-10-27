@@ -17,10 +17,42 @@
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
+            app:flexDirection="column"
             android:layout_height="match_parent"
             app:alignItems="center"
             app:justifyContent="center"
             >
+
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/no_content_notifications"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                app:alignContent="center"
+                app:alignItems="center"
+                app:flexDirection="column"
+                app:justifyContent="center"
+                app:layout_constraintTop_toBottomOf="@+id/txtTarefaTitle"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="-56dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nada por aqui"
+                    android:textSize="20dp"
+                    android:textColor="#D9D9D9"
+                    android:textStyle="bold">
+
+                </TextView>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/no_content_tasks"></ImageView>
+            </com.google.android.flexbox.FlexboxLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerviewNotifications"
