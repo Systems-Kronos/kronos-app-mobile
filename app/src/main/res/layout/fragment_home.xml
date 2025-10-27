@@ -107,6 +107,36 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/txtTarefaTitle" />
 
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/no_content"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    app:alignContent="center"
+                    app:alignItems="center"
+                    app:flexDirection="column"
+                    app:justifyContent="center"
+                    app:layout_constraintTop_toBottomOf="@+id/txtTarefaTitle"
+                    tools:ignore="MissingConstraints"
+                    tools:layout_editor_absoluteX="-56dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nada por aqui"
+                        android:textSize="20dp"
+                        android:textColor="#D9D9D9"
+                        android:textStyle="bold">
+
+                    </TextView>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/no_content_tasks"></ImageView>
+                </com.google.android.flexbox.FlexboxLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

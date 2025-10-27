@@ -5,6 +5,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,10 +27,19 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.palette.graphics.Palette;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.CloudinaryManager;
 import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.config.RetrofitClientNoSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
@@ -39,6 +52,8 @@ import com.example.kronosprojeto.model.Calendar;
 import com.example.kronosprojeto.service.CalendarService;
 import com.example.kronosprojeto.service.CloudinaryService;
 import com.example.kronosprojeto.utils.ToastHelper;
+import com.example.kronosprojeto.viewmodel.UserViewModel;
+import com.google.android.flexbox.FlexboxLayout;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
@@ -47,10 +62,13 @@ import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -68,6 +86,7 @@ public class CalendarFragment extends Fragment {
     TextView selectedDayTxt, selectedDayQuestionTxt;
     private CalendarDay selectDay;
     private Calendar selectCalendar;
+    private UserViewModel userViewModel;
     private String actionSelect;
     private String idUsuario;
     List<CalendarDay> greenVisual;
@@ -76,7 +95,7 @@ public class CalendarFragment extends Fragment {
     private BlackBackgroundDecorator blackBackgroundDecorator;
     private Button btnAbscense, btnPresenceSelect;
     List<CalendarDay> orange;
-
+    Long idGestor;
     private static final String[] DIAS_ABREV = {"D", "S", "T", "Q", "Q", "S", "S"};
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher =
@@ -97,8 +116,15 @@ public class CalendarFragment extends Fragment {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
-
         activity = getActivity();
+        CloudinaryManager.init(requireContext());
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                idGestor = user.getGestor().getId();
+            }
+        });
 
         MaterialCalendarView calendarView = binding.calendarView;
 
@@ -286,51 +312,75 @@ public class CalendarFragment extends Fragment {
     }
 
     private void uploadImageToCloudinary(Uri imageUri) {
+        if (imageUri == null) return;
+
+        Toast.makeText(getContext(), "Enviando imagem...", Toast.LENGTH_SHORT).show();
+
         try {
             InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
             inputStream.close();
 
-            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), bytes);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", "atestado.jpg", requestFile);
+            if (originalBitmap == null) {
+                ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Não foi possível processar a imagem");
+                return;
+            }
 
-            RequestBody preset = RequestBody.create(MultipartBody.FORM, "kronos-upload");
+            // 🔹 1. Salva a imagem original em cache sem reduzir qualidade
+            File uploadFile = new File(requireContext().getCacheDir(), "upload_original.jpg");
+            try (FileOutputStream out = new FileOutputStream(uploadFile)) {
+                originalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // qualidade máxima
+            }
 
-            CloudinaryService service = RetrofitClientCloudinary.createService(CloudinaryService.class);
+            // 🔹 2. Faz upload unsigned para o Cloudinary
+            com.cloudinary.android.MediaManager.get()
+                    .upload(uploadFile.getAbsolutePath())
+                    .unsigned("kronos-upload") // nome exato do preset unsigned
+                    .callback(new com.cloudinary.android.callback.UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+                            Log.d("Cloudinary", "Upload iniciado: " + requestId);
+                        }
 
-            Call<UploadResultDto> call = service.uploadImage("dblwo3rra", body, preset);
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                            double progress = (double) bytes / totalBytes * 100;
+                            Log.d("Cloudinary", "Progresso: " + String.format("%.2f", progress) + "%");
+                        }
 
-            Toast.makeText(getContext(), "Enviando imagem...", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            String uploadedImageUrl = resultData.get("secure_url").toString();
+                            Log.d("Cloudinary", "Upload completo: " + uploadedImageUrl);
+                            ToastHelper.showFeedbackToast(activity, "success", "SUCESSO:", "Imagem enviada!");
 
-            call.enqueue(new Callback<UploadResultDto>() {
-                @Override
-                public void onResponse(@NonNull Call<UploadResultDto> call, @NonNull Response<UploadResultDto> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        String uploadedImageUrl = response.body().getUrl();
-                        Toast.makeText(getContext(), "Imagem enviada com sucesso!", Toast.LENGTH_SHORT).show();
+                            // Atualiza ImageView
+                            binding.imageAtestado.setVisibility(View.VISIBLE);
+                            binding.imageAtestado.setImageURI(imageUri);
 
-                        binding.imageAtestado.setVisibility(View.VISIBLE);
-                        binding.imageAtestado.setImageURI(imageUri);
+                            // Guarda a URL para envio com o calendário
+                            CalendarFragment.this.uploadedImageUrl = uploadedImageUrl;
+                        }
 
-                        CalendarFragment.this.uploadedImageUrl = uploadedImageUrl;
+                        @Override
+                        public void onError(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
+                            Log.e("Cloudinary", "Erro no upload: " + error.getDescription());
+                            ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao enviar imagem");
+                        }
 
-                    } else {
-                        Toast.makeText(getContext(), "Erro ao enviar imagem!", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                        @Override
+                        public void onReschedule(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
+                            Log.w("Cloudinary", "Upload reagendado: " + error.getDescription());
+                        }
+                    })
+                    .dispatch();
 
-                @Override
-                public void onFailure(@NonNull Call<UploadResultDto> call, @NonNull Throwable t) {
-                    Toast.makeText(getContext(), "Falha no upload: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        } catch (Exception e) {
-            Toast.makeText(getContext(), "Erro ao processar imagem: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
             e.printStackTrace();
+            ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao processar imagem");
         }
     }
+
 
 
     private void abrirGaleria() {
@@ -510,12 +560,22 @@ public class CalendarFragment extends Fragment {
     }
 
     private void createCalender(Calendar calendar) {
+        calendar.setManager(idGestor);
+        calendar.setAccepted(false);
+        Log.d("CalendarDebug", calendar.toString());
+
         CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
 
+        Log.e("CALENDARIO INSERT", calendar.getDay() +" "+ calendar.getUser());
         calendarService.insertReport(calendar).enqueue(new Callback<Calendar>() {
             @Override
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (!isAdded()) return;
+                Log.e("CALENDARIO INSERT", ""+response.isSuccessful());
+                Log.e("CALENDARIO INSERT", ""+response.code());
+                Log.e("CALENDARIO INSERT", ""+response.message());
+
+
                 if (response.isSuccessful() && response.body() != null) {
                     Calendar created = response.body();
                     calenderByUser.add(created);

@@ -40,6 +40,7 @@ import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.flexbox.FlexboxLayout;
 
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class HomeFragment extends Fragment {
     ArrayList<PieEntry> entries;
     FrameLayout loadingOverlay;
     NestedScrollView nestedScrollView;
+    FlexboxLayout noContentFlex;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -70,6 +72,7 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
         loadingOverlay= binding.loadingOverlay;
         nestedScrollView = binding.contentScroll;
+        noContentFlex = binding.noContent;
         TextView presentTodayText = binding.presentTodayQuestion;
 
         String texto = "Não estará presente no trabalho hoje? clique aqui!";
@@ -232,6 +235,11 @@ public class HomeFragment extends Fragment {
                     pieChart.invalidate();
 
                     adapter.updateList(tarefas);
+                    if (tarefas.isEmpty()){
+                        noContentFlex.setVisibility(View.VISIBLE);
+                    }else {
+                        noContentFlex.setVisibility(View.GONE);
+                    }
                 }
                 else {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
