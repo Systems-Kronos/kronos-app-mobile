@@ -52,9 +52,13 @@
         android:id="@+id/NotificationsFragment"
         android:name="com.example.kronosprojeto.ui.Notifications.NotificationsFragment"
         android:label="Notificacoes"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_notifications" >
 
-    <!-- Detalhes Fragment -->
+        <action
+            android:id="@+id/action_NotificationsFragment_to_RestrictLogin"
+            app:destination="@id/RestrictLogin" />
+    </fragment>
+
     <fragment
         android:id="@+id/details"
         android:name="com.example.kronosprojeto.ui.Details.DetailsFragment"
@@ -68,7 +72,6 @@
             app:destination="@id/HomeFragment" />
     </fragment>
 
-    <!-- Histórico de Tarefas -->
     <fragment
         android:id="@+id/assignmentHistoryFragment"
         android:name="com.example.kronosprojeto.ui.AssignmentHistory.AssignmentHistoryFragment"

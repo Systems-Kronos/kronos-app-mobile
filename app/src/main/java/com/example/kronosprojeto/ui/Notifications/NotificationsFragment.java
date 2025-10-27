@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,7 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.adapter.NotificationAdapter;
 import com.example.kronosprojeto.databinding.FragmentNotificationsBinding;
 
@@ -42,6 +46,14 @@ public class NotificationsFragment extends Fragment {
         notificationViewModel = new ViewModelProvider(requireActivity()).get(NotificationViewModel.class);
 
         noContentFlex.setVisibility(View.VISIBLE);
+
+        ImageView imgBack = root.findViewById(R.id.imgBack);
+
+        imgBack.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+            navController.popBackStack(R.id.HomeFragment, false);
+        });
+
 
         notificationViewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
             if (notifications.isEmpty()){

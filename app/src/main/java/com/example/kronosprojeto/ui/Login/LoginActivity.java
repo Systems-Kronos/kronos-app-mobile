@@ -158,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                             .apply();
 
                     if (password.equals("senha123")) {
-                        Intent intent = new Intent(LoginActivity.this, PasswordRedefinitionActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
                         startActivity(intent);
                         return;
                     }
