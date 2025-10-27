@@ -221,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
                 ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi carregar as notificações");
-                startActivity(new Intent(MainActivity.this, SplashScreen.class));
             }
         });
 
