@@ -73,7 +73,8 @@
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/presenceSelect"
-                        android:layout_width="120dp"
+                        android:layout_width="0dp"
+                        app:layout_constraintWidth_percent="0.4"
                         android:layout_height="35dp"
                         android:background="@drawable/border_normal"
                         android:text="Estarei presente"
@@ -157,6 +158,8 @@
                         android:textColor="#25173A"
                         android:textStyle="bold" />
 
+
+
                 </com.google.android.flexbox.FlexboxLayout>
 
             </com.google.android.flexbox.FlexboxLayout>
@@ -175,3 +178,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
+
