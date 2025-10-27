@@ -53,6 +53,7 @@ import com.example.kronosprojeto.service.CalendarService;
 import com.example.kronosprojeto.service.CloudinaryService;
 import com.example.kronosprojeto.utils.ToastHelper;
 import com.example.kronosprojeto.viewmodel.UserViewModel;
+import com.google.android.flexbox.FlexboxLayout;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
@@ -115,7 +116,6 @@ public class CalendarFragment extends Fragment {
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
-        ;
         activity = getActivity();
         CloudinaryManager.init(requireContext());
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
