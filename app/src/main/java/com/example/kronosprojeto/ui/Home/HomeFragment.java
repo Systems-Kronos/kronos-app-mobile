@@ -1,6 +1,7 @@
 package com.example.kronosprojeto.ui.Home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -30,18 +31,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.Visibility;
 
+import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
 import com.example.kronosprojeto.adapter.TaskAdapter;
 import com.example.kronosprojeto.model.Task;
 import com.example.kronosprojeto.service.TaskService;
+import com.example.kronosprojeto.ui.SplashScreen.SplashScreen;
+import com.example.kronosprojeto.utils.ToastHelper;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.flexbox.FlexboxLayout;
 
+import java.net.SocketTimeoutException;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -244,12 +249,57 @@ public class HomeFragment extends Fragment {
                 else {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
                 }
+                if (!isAdded()) {
+                    // O fragment já não está mais anexado — não faça nada
+                    return;
+                }
+
+                if (response.code() == 403 || response.code() == 401) {
+                    Context context = getContext();
+                    if (context != null) {
+                        Intent intent = new Intent(context, SplashScreen.class);
+                        startActivity(intent);
+                        requireActivity().finish(); // opcional, pra fechar a tela atual
+                    }
+                }
+
+                Log.e("CALL",response.code() + "");
+
             }
 
             @Override
             public void onFailure(Call<List<Task>> call, Throwable t) {
                 Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
+
+                if (!isAdded() || getContext() == null) {
+                    // Fragment não está mais anexado — não faz nada
+                    return;
+                }
+
+                if (t instanceof SocketTimeoutException) {
+                    ToastHelper.showFeedbackToast(
+                            getContext(),
+                            "error",
+                            "Erro de conexão",
+                            "Tempo de resposta excedido"
+                    );
+                } else {
+                    ToastHelper.showFeedbackToast(
+                            getContext(),
+                            "error",
+                            "Erro",
+                            "Falha na conexão com o servidor"
+                    );
+                }
+
+                // Agora só abre a SplashScreen se o fragment ainda existir
+                requireActivity().runOnUiThread(() -> {
+                    Intent intent = new Intent(requireActivity(), SplashScreen.class);
+                    startActivity(intent);
+                    requireActivity().finish();
+                });
             }
+
         });
     }
 

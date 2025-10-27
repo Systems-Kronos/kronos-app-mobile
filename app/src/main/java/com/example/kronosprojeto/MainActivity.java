@@ -41,6 +41,7 @@ import com.example.kronosprojeto.workers.NotificationWorker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -193,6 +194,10 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<UserResponseDto> call, Throwable t) {
+                    if (t instanceof SocketTimeoutException) {
+                        startActivity(new Intent(MainActivity.this, SplashScreen.class));
+                        ToastHelper.showFeedbackToast(getApplicationContext(), "error", "Erro de conexão", "Tempo de resposta excedido");
+                    }
                     ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi possível carregar as tarefas");
                 }
             });
@@ -216,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
                 ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi carregar as notificações");
+                startActivity(new Intent(MainActivity.this, SplashScreen.class));
             }
         });
 
