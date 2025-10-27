@@ -109,11 +109,18 @@ public class LoginActivity extends AppCompatActivity {
 
         setupCpfMask(cpfInput);
 
-        // Click listeners
         phoneRecoveryEntrypoint.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
             startActivity(intent);
         });
+
+        String openFragment = getIntent().getStringExtra("open_fragment");
+        if ("password_redefinition".equals(openFragment)) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main, new PasswordRedefinitionFragment())
+                    .commit();
+        }
 
         loginButton.setOnClickListener(v -> login());
     }
@@ -151,8 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                             .apply();
 
                     if (password.equals("senha123")) {
-                        Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
-                        intent.putExtra("cpf_first_access", cpf);
+                        Intent intent = new Intent(LoginActivity.this, PasswordRedefinitionActivity.class);
                         startActivity(intent);
                         return;
                     }

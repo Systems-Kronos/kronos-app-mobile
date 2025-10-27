@@ -1,6 +1,7 @@
 package com.example.kronosprojeto.ui.Login;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -192,8 +193,13 @@ public class CodeRecoveryActivity extends AppCompatActivity {
             if (codigoUsuario == codigoSalvo) {
                 ToastHelper.showFeedbackToast(this,
                         "success", "SUCESSO", "Código verificado com sucesso!");
-                // Aqui você pode navegar para redefinição de senha
-            } else {
+
+                Intent intent = new Intent(CodeRecoveryActivity.this, PasswordRedefinitionActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
+            else {
                 ToastHelper.showFeedbackToast(this,
                         "error", "CÓDIGO INCORRETO", "Código incorreto. Tente novamente");
             }
