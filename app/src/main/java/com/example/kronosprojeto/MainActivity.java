@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity {
                 R.id.ChatFragment,
                 R.id.NotificationsFragment,
                 R.id.assignmentHistoryFragment,
-                R.id.details
+                R.id.details,
+                R.id.RestrictBIFragment,
+                R.id.RestrictLogin
         )
                 .build();
 
@@ -139,7 +141,12 @@ public class MainActivity extends AppCompatActivity {
                                 .setPopUpTo(startDestination, true)
                                 .build());
             }else if (id == R.id.nav_restrict) {
-                navController.navigate(R.id.RestrictLogin);
+                navController.navigate(R.id.RestrictLogin,null,
+                        new androidx.navigation.NavOptions.Builder()
+                                .setLaunchSingleTop(true)
+                                .setPopUpTo(startDestination, true)
+                                .build());
+
             } else if (id == R.id.nav_logout) {
                 SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
                 prefs.edit().clear().apply();
