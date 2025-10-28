@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        // Ícone de notificações
         ImageView notificationIcon = customView.findViewById(R.id.notification_logo);
         notificationIcon.setOnClickListener(v ->
                 navController.navigate(R.id.NotificationsFragment, null,
@@ -106,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                                 .build())
         );
 
-        // Ícone do menu (abre Drawer)
         ImageView menuIcon = customView.findViewById(R.id.menu_logo);
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
@@ -153,12 +151,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-
-        // ViewModels
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
-        // Carregar dados do usuário
         SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
         String cpf = prefs.getString("cpf", null);

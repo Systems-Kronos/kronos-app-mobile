@@ -8,7 +8,6 @@
     android:background="@color/white"
     tools:context=".ui.RestrictArea.RestrictLoginFragment">
 
-    <!-- Ícones do topo -->
     <ImageView
         android:id="@+id/imgBack"
         android:layout_width="28dp"
@@ -21,23 +20,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Título -->
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="131dp"
+        android:layout_height="253dp"
+        android:layout_marginStart="108dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginEnd="2dp"
+        android:src="@drawable/img_gear"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordInput"
+        app:layout_constraintVertical_bias="1.0" />
+
     <TextView
         android:id="@+id/txtTittleTarefa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="136dp"
         android:text="ÁREA RESTRITA"
         android:textColor="#1A1818"
         android:textSize="34sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Label E-mail -->
-
-    <!-- Campo E-mail -->
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/cpfLabel"
@@ -113,7 +122,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnUpdate"
+        android:id="@+id/loginButton"
         android:layout_width="210dp"
         android:layout_height="51dp"
         android:layout_marginStart="32dp"
@@ -125,19 +134,6 @@
         app:backgroundTint="#E6B648"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="192dp"
-        android:layout_height="380dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="41dp"
-        android:src="@drawable/img_gear"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
 
