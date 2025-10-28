@@ -199,12 +199,11 @@ public class HomeFragment extends Fragment {
                     loadingOverlay.setVisibility(View.GONE);
                     nestedScrollView.setVisibility(View.VISIBLE);
 
-                    // 🔹 Ordena pela prioridade (gravidade * urgencia * tendencia)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         tarefas.sort((t1, t2) -> {
                             int prioridade1 = (t1.getGravidade() * t1.getUrgencia() * t1.getTendencia());
                             int prioridade2 = (t2.getGravidade() * t2.getUrgencia() * t2.getTendencia());
-                            return Integer.compare(prioridade2, prioridade1); // maior prioridade primeiro
+                            return Integer.compare(prioridade2, prioridade1);
                         });
                     }
 
@@ -250,7 +249,6 @@ public class HomeFragment extends Fragment {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
                 }
                 if (!isAdded()) {
-                    // O fragment já não está mais anexado — não faça nada
                     return;
                 }
 
@@ -259,7 +257,7 @@ public class HomeFragment extends Fragment {
                     if (context != null) {
                         Intent intent = new Intent(context, SplashScreen.class);
                         startActivity(intent);
-                        requireActivity().finish(); // opcional, pra fechar a tela atual
+                        requireActivity().finish();
                     }
                 }
 
@@ -272,7 +270,6 @@ public class HomeFragment extends Fragment {
                 Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
 
                 if (!isAdded() || getContext() == null) {
-                    // Fragment não está mais anexado — não faz nada
                     return;
                 }
 
@@ -292,7 +289,6 @@ public class HomeFragment extends Fragment {
                     );
                 }
 
-                // Agora só abre a SplashScreen se o fragment ainda existir
                 requireActivity().runOnUiThread(() -> {
                     Intent intent = new Intent(requireActivity(), SplashScreen.class);
                     startActivity(intent);

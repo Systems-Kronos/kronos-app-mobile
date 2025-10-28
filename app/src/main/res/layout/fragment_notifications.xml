@@ -6,33 +6,27 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/imgBack"
-        android:layout_width="28dp"
-        android:layout_height="31dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="367dp"
-        android:src="@drawable/baseline_arrow_back_ios_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ScrollView
-        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
-            app:flexDirection="column"
-            android:layout_height="match_parent"
-            app:alignItems="center"
-            app:justifyContent="center"
-            >
+            android:layout_height="wrap_content"
+            app:flexDirection="column">
+
+            <ImageView
+                android:id="@+id/imgBack"
+                android:layout_width="28dp"
+                android:layout_height="31dp"
+                android:layout_margin="16dp"
+                android:src="@drawable/baseline_arrow_back_ios_24"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Voltar" />
 
 
             <com.google.android.flexbox.FlexboxLayout
