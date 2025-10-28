@@ -69,13 +69,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:justifyContent="space_around">
+                    app:justifyContent="space_between"
+                    app:flexWrap="wrap"
+                    app:alignItems="center">
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/presenceSelect"
                         android:layout_width="0dp"
-                        app:layout_constraintWidth_percent="0.4"
-                        android:layout_height="35dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        app:layout_flexGrow="1"
                         android:background="@drawable/border_normal"
                         android:text="Estarei presente"
                         android:textAllCaps="false"
@@ -85,8 +88,10 @@
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/absenceSelect"
-                        android:layout_width="120dp"
-                        android:layout_height="35dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        app:layout_flexGrow="1"
                         android:background="@drawable/border_normal"
                         android:text="Estarei ausente"
                         android:textAllCaps="false"

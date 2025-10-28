@@ -27,7 +27,7 @@ import retrofit2.Response;
 public class PasswordRedefinitionFragment extends Fragment {
 
     private EditText passwordInput, passwordInputRepeat;
-    private TextView criterioMaiuscula, criterioMinuscula, criterioNumero, criterioEspecial, criterioTamanho;
+    private TextView criterioCapitalLetter, criterioLowercase, criterioNumber, criterioEspecialCaracter, criterioLen, criterioEquals;
     private Button verifyButton;
 
     public PasswordRedefinitionFragment() { }
@@ -40,14 +40,16 @@ public class PasswordRedefinitionFragment extends Fragment {
         try {
             passwordInput = view.findViewById(R.id.passwordInput);
             passwordInputRepeat = view.findViewById(R.id.passwordInputRepeat);
-
-            criterioMaiuscula = view.findViewById(R.id.txtCapital);
-            criterioMinuscula = view.findViewById(R.id.txtOneLower);
-            criterioNumero = view.findViewById(R.id.txtOneNumber);
-            criterioEspecial = view.findViewById(R.id.txtEspecialCaracter);
-            criterioTamanho = view.findViewById(R.id.txtLen);
+            criterioCapitalLetter = view.findViewById(R.id.txtCapital);
+            criterioLowercase = view.findViewById(R.id.txtOneLower);
+            criterioNumber = view.findViewById(R.id.txtOneNumber);
+            criterioEspecialCaracter = view.findViewById(R.id.txtEspecialCaracter);
+            criterioLen = view.findViewById(R.id.txtLen);
+            criterioEquals = view.findViewById(R.id.txtPasswordEquals);
 
             verifyButton = view.findViewById(R.id.loginButton);
+
+
         } catch (Exception e) {
             Log.e("PasswordRedefFragment", "Erro ao encontrar views: ", e);
         }
@@ -55,11 +57,11 @@ public class PasswordRedefinitionFragment extends Fragment {
         Log.d("PasswordRedefFragment", "Views inicializadas: " +
                 "\npasswordInput=" + (passwordInput != null) +
                 "\npasswordInputRepeat=" + (passwordInputRepeat != null) +
-                "\ncriterioMaiuscula=" + (criterioMaiuscula != null) +
-                "\ncriterioMinuscula=" + (criterioMinuscula != null) +
-                "\ncriterioNumero=" + (criterioNumero != null) +
-                "\ncriterioEspecial=" + (criterioEspecial != null) +
-                "\ncriterioTamanho=" + (criterioTamanho != null) +
+                "\ncriterioMaiuscula=" + (criterioCapitalLetter != null) +
+                "\ncriterioMinuscula=" + (criterioLowercase != null) +
+                "\ncriterioNumero=" + (criterioNumber != null) +
+                "\ncriterioEspecial=" + (criterioEspecialCaracter != null) +
+                "\ncriterioTamanho=" + (criterioLen != null) +
                 "\nverifyButton=" + (verifyButton != null));
 
         verifyButton.setEnabled(false);
@@ -70,7 +72,7 @@ public class PasswordRedefinitionFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 Log.d("PasswordRedefFragment", "afterTextChanged chamado, senha atual: " + passwordInput.getText().toString());
-                validarSenha(passwordInput.getText().toString());
+                validarSenha(passwordInput.getText().toString(), passwordInputRepeat.getText().toString());
             }
         };
 
@@ -86,23 +88,22 @@ public class PasswordRedefinitionFragment extends Fragment {
     }
 
 
-    private void validarSenha(String senha) {
-        boolean temMaiuscula = senha.matches(".*[A-Z].*");
-        boolean temMinuscula = senha.matches(".*[a-z].*");
-        boolean temNumero = senha.matches(".*[0-9].*");
-        boolean temEspecial = senha.matches(".*[!@#$%^&*()_+=<>?].*");
-        boolean temTamanho = senha.length() >= 6;
+    private void validarSenha(String password, String passwordInputRepeat) {
+        boolean temMaiuscula = password.matches(".*[A-Z].*");
+        boolean temMinuscula = password.matches(".*[a-z].*");
+        boolean temNumero = password.matches(".*[0-9].*");
+        boolean temEspecial = password.matches(".*[!@#$%^&*()_+=<>?.].*");
+        boolean temTamanho = password.length() >= 6;
+        boolean passwordIsEquals = password.equals(passwordInputRepeat);
 
-        criterioMaiuscula.setVisibility(temMaiuscula ? View.GONE : View.VISIBLE);
-        criterioMinuscula.setVisibility(temMinuscula ? View.GONE : View.VISIBLE);
-        criterioNumero.setVisibility(temNumero ? View.GONE : View.VISIBLE);
-        criterioEspecial.setVisibility(temEspecial ? View.GONE : View.VISIBLE);
-        criterioTamanho.setVisibility(temTamanho ? View.GONE : View.VISIBLE);
-
-        boolean senhasIguais = senha.equals(passwordInputRepeat.getText().toString());
-        verifyButton.setEnabled(temMaiuscula && temMinuscula && temNumero && temEspecial && temTamanho && senhasIguais);
+        criterioCapitalLetter.setVisibility(temMaiuscula ? View.GONE : View.VISIBLE);
+        criterioLowercase.setVisibility(temMinuscula ? View.GONE : View.VISIBLE);
+        criterioNumber.setVisibility(temNumero ? View.GONE : View.VISIBLE);
+        criterioEspecialCaracter.setVisibility(temEspecial ? View.GONE : View.VISIBLE);
+        criterioLen.setVisibility(temTamanho ? View.GONE : View.VISIBLE);
+        criterioEquals.setVisibility(passwordIsEquals ? View.GONE : View.VISIBLE);
+        verifyButton.setEnabled(temMaiuscula && temMinuscula && temNumero && temEspecial && temTamanho && passwordIsEquals);
     }
-
 
     private void atualizarSenhaEVoltarLogin() {
         String senha = passwordInput.getText().toString();
