@@ -85,6 +85,7 @@ public class DetailsFragment extends Fragment {
         TextView txtDescription = view.findViewById(R.id.txtDescription);
         TextView txtInicialDate = view.findViewById(R.id.txtInicialDate);
         TextView txtSituation = view.findViewById(R.id.txtSituation);
+        TextView txtDueDate = view.findViewById(R.id.txtDueDate);
         TextView txtSection = view.findViewById(R.id.txtSection);
         TextView txtRapporteur = view.findViewById(R.id.txtRapporteur);
         TextView txtAdditionalContacts = view.findViewById(R.id.txtAdditionalContacts);
@@ -106,11 +107,11 @@ public class DetailsFragment extends Fragment {
             navController.navigate(R.id.action_details_to_HomeFragment);
         });
 
-        loadTaskDetails(txtTituloTarefa, txtDescription, txtInicialDate, txtSituation, txtSection, txtRapporteur, txtAdditionalContacts);
+        loadTaskDetails(txtTituloTarefa, txtDescription, txtInicialDate, txtSituation, txtSection, txtRapporteur, txtAdditionalContacts, txtDueDate);
     }
 
     private void loadTaskDetails(TextView txtTituloTarefa, TextView txtDescription, TextView txtInicialDate,
-                                 TextView txtSituation, TextView txtSection, TextView txtRapporteur, TextView txtAdditionalContacts) {
+                                 TextView txtSituation, TextView txtSection, TextView txtRapporteur, TextView txtAdditionalContacts, TextView txtDueDate) {
 
         SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
@@ -129,6 +130,8 @@ public class DetailsFragment extends Fragment {
                     txtTituloTarefa.setText(task.getNome());
                     txtDescription.setText(task.getDescricao() != null ? task.getDescricao() : "-");
                     txtInicialDate.setText(task.getDataAtribuicao() != null ? task.getDataAtribuicao() : "-");
+
+                    txtDueDate.setText(task.getDataPrazo() != null ? task.getDataPrazo() : "-");
 
                     currentStatus = task.getStatus();
                     txtSituation.setText(currentStatus != null ? currentStatus : "-");

@@ -5,11 +5,13 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -226,13 +228,14 @@ public class ProfileFragment extends Fragment {
     private void processarImagemSelecionada(Uri imageUri) {
         ImageView profileImg = binding.profileImg;
 
-        // Mostra a imagem escolhida
+        // Mostra a imagem escolhida (sem rotação)
         Glide.with(this)
                 .load(imageUri)
                 .circleCrop()
                 .into(profileImg);
 
         try {
+            // Lê o bitmap
             InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
             Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
             inputStream.close();
@@ -242,35 +245,25 @@ public class ProfileFragment extends Fragment {
                 return;
             }
 
-            // 🔹 1. Reduz a resolução (mantém proporção)
-            int maxDim = 1080; // tamanho máximo em px
-            float scale = Math.min(
-                    (float) maxDim / originalBitmap.getWidth(),
-                    (float) maxDim / originalBitmap.getHeight()
-            );
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(
-                    originalBitmap,
-                    (int) (originalBitmap.getWidth() * scale),
-                    (int) (originalBitmap.getHeight() * scale),
-                    true
-            );
+            // 🧭 Corrige a rotação da imagem com base nos metadados EXIF
+            Bitmap rotatedBitmap = corrigirRotacao(requireContext(), imageUri, originalBitmap);
 
-            // 🔹 2. Aplica cor predominante no banner
-            Palette.from(resizedBitmap).generate(palette -> {
+            // Calcula a cor predominante para o banner
+            Palette.from(rotatedBitmap).generate(palette -> {
                 int corPredominante = palette.getDominantColor(Color.GRAY);
                 banner.setBackgroundColor(corPredominante);
             });
 
-            // 🔹 3. Salva imagem comprimida em cache
-            File compressedFile = new File(requireContext().getCacheDir(), "compressed_upload.jpg");
-            try (FileOutputStream out = new FileOutputStream(compressedFile)) {
-                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out); // qualidade 80%
+            // Salva a imagem (sem reduzir qualidade)
+            File finalFile = new File(requireContext().getCacheDir(), "upload_final.jpg");
+            try (FileOutputStream out = new FileOutputStream(finalFile)) {
+                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // qualidade total
             }
 
-            // 🔹 4. Faz upload unsigned para o Cloudinary
+            // Faz upload unsigned
             com.cloudinary.android.MediaManager.get()
-                    .upload(compressedFile.getAbsolutePath())
-                    .unsigned("kronos-upload") // 👉 nome EXATO do seu preset unsigned
+                    .upload(finalFile.getAbsolutePath())
+                    .unsigned("kronos-upload")
                     .callback(new com.cloudinary.android.callback.UploadCallback() {
                         @Override
                         public void onStart(String requestId) {
@@ -311,6 +304,39 @@ public class ProfileFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
             ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao processar imagem");
+        }
+    }
+
+    private Bitmap corrigirRotacao(Context context, Uri imageUri, Bitmap bitmap) {
+        try {
+            InputStream input = context.getContentResolver().openInputStream(imageUri);
+            androidx.exifinterface.media.ExifInterface exif = new androidx.exifinterface.media.ExifInterface(input);
+            int orientation = exif.getAttributeInt(
+                    androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+                    androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL
+            );
+            input.close();
+
+            Matrix matrix = new Matrix();
+            switch (orientation) {
+                case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90:
+                    matrix.postRotate(90);
+                    break;
+                case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180:
+                    matrix.postRotate(180);
+                    break;
+                case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270:
+                    matrix.postRotate(270);
+                    break;
+                default:
+                    return bitmap;
+            }
+
+            return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return bitmap;
         }
     }
 

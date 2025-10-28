@@ -1,18 +1,26 @@
 
 package com.example.kronosprojeto;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
+import android.Manifest;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
@@ -57,6 +65,11 @@ public class MainActivity extends AppCompatActivity {
     private NotificationViewModel notificationViewModel;
     private DrawerLayout drawerLayout;
     TextView tvUsername;
+    private static final String POST_NOTIF = Manifest.permission.POST_NOTIFICATIONS;
+
+    private ActivityResultLauncher<String> requestNotificationPermission;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         View headerView = navigationView.getHeaderView(0);
 
+
         TextView tvUsername = headerView.findViewById(R.id.tv_username);
 
         View customView = getLayoutInflater().inflate(R.layout.toolbar_custom, toolbar, false);
@@ -88,7 +102,9 @@ public class MainActivity extends AppCompatActivity {
                 R.id.ChatFragment,
                 R.id.NotificationsFragment,
                 R.id.assignmentHistoryFragment,
-                R.id.details
+                R.id.details,
+                R.id.RestrictBIFragment,
+                R.id.RestrictLogin
         )
                 .build();
 
@@ -106,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
                                 .build())
         );
 
-        // Ícone do menu (abre Drawer)
+
+
         ImageView menuIcon = customView.findViewById(R.id.menu_logo);
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
@@ -139,7 +156,12 @@ public class MainActivity extends AppCompatActivity {
                                 .setPopUpTo(startDestination, true)
                                 .build());
             }else if (id == R.id.nav_restrict) {
-                navController.navigate(R.id.RestrictLogin);
+                navController.navigate(R.id.RestrictLogin,null,
+                        new androidx.navigation.NavOptions.Builder()
+                                .setLaunchSingleTop(true)
+                                .setPopUpTo(startDestination, true)
+                                .build());
+
             } else if (id == R.id.nav_logout) {
                 SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
                 prefs.edit().clear().apply();
@@ -158,7 +180,21 @@ public class MainActivity extends AppCompatActivity {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
-        // Carregar dados do usuário
+
+        requestNotificationPermission = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        ToastHelper.showFeedbackToast(this, "success", "SUCESSO", "Notificações ativadas!");
+                    } else {
+                        ToastHelper.showFeedbackToast(this, "error", "Aviso", "Permissão negada!");
+                    }
+                }
+        );
+
+
+        verificarPermissaoNotificacao();
+
         SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
         String cpf = prefs.getString("cpf", null);
@@ -215,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
                 ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi carregar as notificações");
-                startActivity(new Intent(MainActivity.this, SplashScreen.class));
             }
         });
 
@@ -235,5 +270,34 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         return navController.navigateUp() || super.onSupportNavigateUp();
+    }
+
+    private void verificarPermissaoNotificacao() {
+        Log.d("PERMISSION_DEBUG", "Status: " +
+                ContextCompat.checkSelfPermission(this, POST_NOTIF));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    POST_NOTIF
+            ) != PackageManager.PERMISSION_GRANTED) {
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Permitir notificações")
+                        .setMessage("O app usa notificações para te avisar de novas tarefas. Deseja permitir?")
+                        .setPositiveButton("Permitir", (dialog, which) -> {
+                            ActivityCompat.requestPermissions(
+                                    this,
+                                    new String[]{
+                                    POST_NOTIF
+                                    },
+                                    100
+                            );
+                        })
+                        .setNegativeButton("Agora não", (dialog, which) -> dialog.dismiss())
+                        .show();
+            }
+        }
+
     }
 }
