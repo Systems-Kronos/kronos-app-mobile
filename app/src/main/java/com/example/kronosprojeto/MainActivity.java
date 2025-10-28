@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        // Ícone de notificações
         ImageView notificationIcon = customView.findViewById(R.id.notification_logo);
         notificationIcon.setOnClickListener(v ->
                 navController.navigate(R.id.NotificationsFragment, null,
@@ -175,8 +174,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-
-        // ViewModels
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
@@ -251,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
                 ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi carregar as notificações");
+                startActivity(new Intent(MainActivity.this, SplashScreen.class));
             }
         });
 

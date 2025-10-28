@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.kronosprojeto.adapter.ChatAdapter;
 import com.example.kronosprojeto.config.RetrofitClientChatBot;
@@ -16,6 +17,7 @@ import com.example.kronosprojeto.model.ChatBotSession;
 import com.example.kronosprojeto.service.ChatBotService;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -30,6 +32,10 @@ public class ChatFragment extends Fragment {
     private FragmentChatBinding binding;
     private ChatAdapter adapter;
 
+
+    FrameLayout loadingOverlay;
+    NestedScrollView nestedScrollView;
+
     private ChatMessage loadingMessage = null;
     private List<ChatMessage> messages;
     private String sessionId;
@@ -42,7 +48,7 @@ public class ChatFragment extends Fragment {
 
         binding = FragmentChatBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
+        loadingOverlay= binding.loadingOverlay;
         messages = new ArrayList<>();
         adapter = new ChatAdapter(requireContext(), messages);
         binding.recyclerViewChat.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -79,6 +85,7 @@ public class ChatFragment extends Fragment {
 
         chatBotService = RetrofitClientChatBot.createService(ChatBotService.class);
         Call<ChatBotSession> call = chatBotService.createNewSession();
+        loadingOverlay.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<ChatBotSession>() {
             @Override
@@ -87,6 +94,7 @@ public class ChatFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     ChatBotSession session = response.body();
                     sessionId = session.getSession_id();
+                    loadingOverlay.setVisibility(View.GONE);
 
                     if (getContext() != null) {
                         getContext().getSharedPreferences("app", MODE_PRIVATE)

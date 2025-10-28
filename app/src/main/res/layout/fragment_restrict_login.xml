@@ -8,21 +8,6 @@
     android:background="@color/white"
     tools:context=".ui.RestrictArea.RestrictLoginFragment">
 
-    <!-- Ícones do topo -->
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="192dp"
-        android:layout_height="380dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="520dp"
-        android:src="@drawable/img_gear"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
     <ImageView
         android:id="@+id/imgBack"
         android:layout_width="28dp"
@@ -35,23 +20,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Título -->
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="131dp"
+        android:layout_height="253dp"
+        android:layout_marginStart="108dp"
+        android:layout_marginTop="41dp"
+        android:layout_marginEnd="2dp"
+        android:src="@drawable/img_gear"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordInput"
+        app:layout_constraintVertical_bias="1.0" />
+
     <TextView
         android:id="@+id/txtTittleTarefa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="136dp"
         android:text="ÁREA RESTRITA"
         android:textColor="#1A1818"
         android:textSize="34sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Label E-mail -->
-
-    <!-- Campo E-mail -->
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/cpfLabel"
@@ -120,25 +115,27 @@
         android:paddingStart="18dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@+id/passwordLabel"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
-
-    <!-- Botão Entrar -->
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="155dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:background="@drawable/button_shape"
-        android:text="Entrar"
-        android:textSize="20sp"
-        android:fontFamily="@font/anekodia"
-        app:layout_constraintTop_toBottomOf="@+id/passwordInput"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/passwordLabel" />
 
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/loginButton"
+        android:layout_width="210dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="32dp"
+        android:text="ENTRAR"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:backgroundTint="#E6B648"
+        app:cornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
 
     <FrameLayout
         android:id="@+id/loadingOverlay"

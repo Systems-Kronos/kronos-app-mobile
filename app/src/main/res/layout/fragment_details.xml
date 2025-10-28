@@ -211,7 +211,6 @@
 
             </com.google.android.flexbox.FlexboxLayout>
 
-            <!-- Botão Atualizar -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnUpdate"
                 android:layout_width="0dp"

@@ -48,12 +48,9 @@ public class NotificationsFragment extends Fragment {
         noContentFlex.setVisibility(View.VISIBLE);
 
         ImageView imgBack = root.findViewById(R.id.imgBack);
-
         imgBack.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.popBackStack(R.id.HomeFragment, false);
+            Navigation.findNavController(v).navigate(R.id.HomeFragment);
         });
-
 
         notificationViewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
             if (notifications.isEmpty()){
