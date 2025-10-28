@@ -48,10 +48,14 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import java.net.SocketTimeoutException;
 import java.nio.channels.FileLock;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -156,16 +160,16 @@ public class HomeFragment extends Fragment {
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
 
-        carregarTarefasUsuario(token,usuarioId, "1", "1");
+        carregarTarefasUsuario(token,usuarioId, "1", "4");
 
         buttonAll.setOnClickListener(v-> {
-            carregarTarefasUsuario(token,usuarioId, "1", "1");
+            carregarTarefasUsuario(token,usuarioId, "1", "4");
             buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
             buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
 
         });
         buttonRealocadas.setOnClickListener(v->{
-            carregarTarefasUsuario(token,usuarioId, "2", "1");
+            carregarTarefasUsuario(token,usuarioId, "2", "4");
             buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
             buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
         });
@@ -207,29 +211,38 @@ public class HomeFragment extends Fragment {
                             return Integer.compare(prioridade2, prioridade1); // maior prioridade primeiro
                         });
                     }
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // ajuste o formato conforme seu dataPrazo
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.MONTH, -1); // 1 mês atrás
+                    Date umMesAtras = cal.getTime();
 
-                    int total = tarefas.size();
+                    List<Task> tarefasUltimoMes = new ArrayList<>();
+                    for (Task tarefa : tarefas) {
+                        try {
+                            Date prazo = sdf.parse(tarefa.getDataPrazo());
+                            if (prazo != null && prazo.after(umMesAtras)) {
+                                tarefasUltimoMes.add(tarefa);
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    int total = tarefasUltimoMes.size();
                     int concluidas = 0;
 
-                    for (Task tarefa : tarefas) {
+                    for (Task tarefa : tarefasUltimoMes) {
                         Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
                                 + ", Gravidade: " + tarefa.getGravidade()
                                 + ", Urgência: " + tarefa.getUrgencia()
                                 + ", Tendência: " + tarefa.getTendencia()
                                 + ", Status: " + tarefa.getStatus());
 
-                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus())) {
+                        Log.e("CONCLUIDO", tarefa.getStatus());
+                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus()) || "Concluida".equalsIgnoreCase(tarefa.getStatus()) || "Concluido".equalsIgnoreCase(tarefa.getStatus()) || "Concluído".equalsIgnoreCase(tarefa.getStatus()) || "Cancelada".equalsIgnoreCase(tarefa.getStatus()) || "Cancelado".equalsIgnoreCase(tarefa.getStatus())) {
                             concluidas++;
                         }
                     }
 
-                    int porcentagemConcluidas = total > 0 ? (int) ((concluidas * 100.0f) / total) : 0;
-
-                    pieChart.setCenterText(porcentagemConcluidas + "%");
-                    entries.clear();
-
-                    entries.add(new PieEntry(porcentagemConcluidas, ""));
-                    entries.add(new PieEntry(100 - porcentagemConcluidas, ""));
 
                     PieDataSet dataSet = new PieDataSet(entries, "");
                     dataSet.setColors(Color.parseColor("#E6B648"), Color.parseColor("#FFFFFF"));
@@ -239,8 +252,29 @@ public class HomeFragment extends Fragment {
                     pieChart.setData(data);
                     pieChart.invalidate();
 
-                    adapter.updateList(tarefas);
-                    if (tarefas.isEmpty()){
+                    List<Task> tarefasPendentes = new ArrayList<>();
+                    for (Task tarefa : tarefas) {
+                        if ("Pendente".equalsIgnoreCase(tarefa.getStatus()) || "Em Desenvolvimento".equalsIgnoreCase(tarefa.getStatus()) || "Em Andamento".equalsIgnoreCase(tarefa.getStatus()) ) {
+                            tarefasPendentes.add(tarefa);
+                        }
+                    }
+
+                    Log.e("CONCLUIDO", ""+concluidas);
+                    Log.e("TOTAL", ""+total);
+
+
+
+
+                    int porcentagemConcluidas = total > 0 ? (int) ((concluidas * 100.0f) / total) : 0;
+
+                    pieChart.setCenterText(porcentagemConcluidas + "%");
+                    entries.clear();
+
+                    entries.add(new PieEntry(porcentagemConcluidas, ""));
+                    entries.add(new PieEntry(100 - porcentagemConcluidas, ""));
+
+                    adapter.updateList(tarefasPendentes);
+                    if (tarefasPendentes.isEmpty()){
                         noContentFlex.setVisibility(View.VISIBLE);
                     }else {
                         noContentFlex.setVisibility(View.GONE);
