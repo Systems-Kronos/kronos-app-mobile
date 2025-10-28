@@ -13,6 +13,15 @@ public class TaskDetailsDto {
     private String dataAtribuicao; // agora String
     private String dataConclusao;   // agora String
     private String origemTarefa;
+    private String dataPrazo;
+
+    public String getDataPrazo() {
+        return dataPrazo;
+    }
+
+    public void setDataPrazo(String dataPrazo) {
+        this.dataPrazo = dataPrazo;
+    }
 
     public int getId() {
         return id;

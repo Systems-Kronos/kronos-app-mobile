@@ -48,8 +48,7 @@ public class RestrictLoginFragment extends Fragment {
         ImageView imgBack = view.findViewById(R.id.imgBack);
 
         imgBack.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.popBackStack();
+            Navigation.findNavController(v).navigate(R.id.HomeFragment);
         });
 
         return view;

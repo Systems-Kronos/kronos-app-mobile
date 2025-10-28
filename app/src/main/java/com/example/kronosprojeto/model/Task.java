@@ -15,10 +15,10 @@ public class Task {
     private String status;
     private String dataAtribuicao;
     private String dataConclusao;
+    private String dataPrazo;
     private String origemTarefa;
 
-    // Construtor completo
-    public Task(int id, String nome, Long usuarioRelator, int gravidade, int urgencia, int tendencia,
+    public Task(int id, String nome, Long usuarioRelator, int gravidade, int urgencia, int tendencia, String dataPrazo,
                 int tempoEstimado, String descricao, String status, String dataAtribuicao,
                 String dataConclusao, String origemTarefa) {
         this.id = id;
@@ -35,7 +35,6 @@ public class Task {
         this.origemTarefa = origemTarefa;
     }
 
-    // Construtor simplificado
     public Task(String nome, String dataAtribuicao, int gravidade, int urgencia, int tendencia,
                 Long usuarioRelator, String origemTarefa, String descricao, String dataConclusao) {
         this.titulo = nome;
@@ -51,7 +50,22 @@ public class Task {
 
     public Task() {}
 
-    // Getters e Setters
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getDataPrazo() {
+        return dataPrazo;
+    }
+
+    public void setDataPrazo(String dataPrazo) {
+        this.dataPrazo = dataPrazo;
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
