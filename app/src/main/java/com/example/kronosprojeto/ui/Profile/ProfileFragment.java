@@ -390,6 +390,7 @@ public class ProfileFragment extends Fragment {
                             Glide.with(requireContext())
                                     .load(imageUrl)
                                     .placeholder(R.drawable.profile_mock)
+                                    .circleCrop()
                                     .into(imageView);
                         }
                     }

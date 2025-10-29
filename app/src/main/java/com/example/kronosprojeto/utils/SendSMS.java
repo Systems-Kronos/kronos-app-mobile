@@ -1,10 +1,8 @@
-package com.example.kronosprojeto.ui.Login;
+package com.example.kronosprojeto.utils;
 
 import android.content.Context;
 import android.telephony.SmsManager;
 import android.util.Log;
-
-import com.example.kronosprojeto.utils.ToastHelper;
 
 public class SendSMS {
 
