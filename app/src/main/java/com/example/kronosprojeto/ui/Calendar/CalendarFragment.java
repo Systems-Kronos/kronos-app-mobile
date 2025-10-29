@@ -1,0 +1,668 @@
+package com.example.kronosprojeto.ui.Calendar;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.palette.graphics.Palette;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
+import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.config.CloudinaryManager;
+import com.example.kronosprojeto.config.RetrofitClientCloudinary;
+import com.example.kronosprojeto.config.RetrofitClientNoSQL;
+import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
+import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
+import com.example.kronosprojeto.decorator.GrayBorderDecorator;
+import com.example.kronosprojeto.decorator.GreenBorderDecorator;
+import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
+import com.example.kronosprojeto.dto.UploadResultDto;
+import com.example.kronosprojeto.model.Calendar;
+import com.example.kronosprojeto.service.CalendarService;
+import com.example.kronosprojeto.service.CloudinaryService;
+import com.example.kronosprojeto.utils.ToastHelper;
+import com.example.kronosprojeto.viewmodel.UserViewModel;
+import com.google.android.flexbox.FlexboxLayout;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+
+import org.threeten.bp.DayOfWeek;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class CalendarFragment extends Fragment {
+
+    private FragmentCalendarBinding binding;
+    Activity activity;
+    private String uploadedImageUrl;
+    private List<Calendar> calenderByUser = new ArrayList<>();
+    TextView selectedDayTxt, selectedDayQuestionTxt;
+    private CalendarDay selectDay;
+    private Calendar selectCalendar;
+    private UserViewModel userViewModel;
+    private String actionSelect;
+    private String idUsuario;
+    List<CalendarDay> greenVisual;
+    List<CalendarDay> greenFromDb;
+    GreenBorderDecorator greenDecorator;
+    private BlackBackgroundDecorator blackBackgroundDecorator;
+    private Button btnAbscense, btnPresenceSelect;
+    List<CalendarDay> orange;
+    Long idGestor;
+    private static final String[] DIAS_ABREV = {"D", "S", "T", "Q", "Q", "S", "S"};
+
+    private final ActivityResultLauncher<Intent> imagePickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    if (imageUri != null) {
+                        uploadImageToCloudinary(imageUri);
+                    }
+                }
+            });
+
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+
+        binding = FragmentCalendarBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+        View view = inflater.inflate(R.layout.fragment_calendar, container, false);
+        activity = getActivity();
+        CloudinaryManager.init(requireContext());
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                if(user.getGestor() == null){
+                    idGestor = 0l;
+                }else{
+                    idGestor = user.getGestor().getId();
+
+                }
+            }
+        });
+
+        MaterialCalendarView calendarView = binding.calendarView;
+
+        calendarView.state().edit()
+                .setFirstDayOfWeek(DayOfWeek.SUNDAY)
+                .commit();
+
+        blackBackgroundDecorator = new BlackBackgroundDecorator(getContext());
+
+        calendarView.setWeekDayFormatter(dayOfWeek -> {
+            int index = dayOfWeek.getValue() % 7;
+            return DIAS_ABREV[index];
+        });
+
+        ImageView infoImage = binding.infoBorders;
+        infoImage.setOnClickListener(v -> {
+            View legendaView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_legenda, null);
+
+            AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                    .setView(legendaView)
+                    .create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+
+            dialog.show();
+
+            if (dialog.getWindow() != null) {
+                Window window = dialog.getWindow();
+
+                // Define a posição
+                window.setGravity(Gravity.TOP | Gravity.END);
+
+                // Define margens da borda superior e direita
+                WindowManager.LayoutParams params = window.getAttributes();
+                params.y = 100; // distância do topo
+                params.x = 50;  // distância da direita
+                window.setAttributes(params);
+
+                // 💡 Define o tamanho máximo da janela
+                // Usando  wrap_content para não ocupar a tela inteira
+                window.setLayout(
+                        (int) (getResources().getDisplayMetrics().widthPixels * 0.45),
+                        WindowManager.LayoutParams.WRAP_CONTENT
+                );
+            }
+        });
+
+        selectedDayQuestionTxt = binding.selectedDayQuestionTxt;
+        selectedDayTxt = binding.selectedDayTxt;
+        calendarView.setOnDateChangedListener((widget, date, selected) -> {
+            blackBackgroundDecorator.setSelectedDay(date);
+            widget.invalidateDecorators();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"));
+            String dataFormatada = date.getDate().format(formatter);
+
+            selectDay = date;
+
+            if (date.getDate().isEqual( LocalDate.now())){
+                selectedDayTxt.setText("Hoje");
+                selectedDayQuestionTxt.setText("Você estará presente?");
+
+
+            }else{
+                selectedDayTxt.setText("Dia: "+dataFormatada);
+                selectedDayQuestionTxt.setText("Você estará ausente?");
+            }
+
+
+
+            EditText editTextArea = root.findViewById(R.id.editTextArea);
+            editTextArea.setText("");
+
+            LocalDate localDate = LocalDate.of(date.getYear(), date.getMonth(), date.getDay());
+            String localDateStr = localDate.toString();
+
+            if (isWeekend(localDate)) {
+                if (isAdded())  ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Finais de semana não podem ser selecionados");
+
+                return;
+            }
+
+            Calendar calendarDay = null;
+            for (Calendar c : calenderByUser) {
+                String saveDate = c.getDay() != null && c.getDay().length() >= 10 ? c.getDay().substring(0, 10) : "";
+                if (saveDate.equals(localDateStr)) {
+                    calendarDay = c;
+                    if (c.getObservation() != null) {
+                        editTextArea.setText(c.getObservation());
+                    }
+                    break;
+                }
+            }
+
+            if (calendarDay != null && calendarDay.getAttest() != null && !calendarDay.getAttest().isEmpty()) {
+                binding.imageAtestado.setVisibility(View.VISIBLE);
+                Log.d("CALENDAR_DEBUG", "URL do atestado para " + localDateStr + ": " + calendarDay.getAttest());
+                String url = calendarDay.getAttest();
+                if (url != null && url.startsWith("http://")) {
+                    url = url.replace("http://", "https://");
+                }
+                Glide.with(requireContext())
+                        .load(url)
+                        .into(binding.imageAtestado);
+
+                uploadedImageUrl = calendarDay.getAttest();
+            } else {
+                binding.imageAtestado.setVisibility(View.GONE);
+                binding.imageAtestado.setImageDrawable(null);
+                uploadedImageUrl = null;
+            }
+
+
+
+
+        });
+
+        SharedPreferences prefs = getContext().getSharedPreferences("app", Context.MODE_PRIVATE);
+        idUsuario = prefs.getString("id", null);
+
+        calenderByUser(idUsuario);
+
+        btnAbscense = root.findViewById(R.id.absenceSelect);
+        btnPresenceSelect = root.findViewById(R.id.presenceSelect);
+        Button btnSend = root.findViewById(R.id.sendAbsenceButton);
+
+        btnAbscense.setOnClickListener(v -> {
+            if (selectDay == null) {
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você precisa selecionar um dia primeiro");
+                return;
+            }
+
+            LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+
+            if (isWeekend(selectedDay)) {
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você não pode marcar falta em finais de semana");
+                return;
+            }
+            LocalDate today = LocalDate.now();
+
+            if (selectedDay.isBefore(today)) {
+                if (isAdded())  ToastHelper.showFeedbackToast(activity,"info","Ação não permitida:","Você só pode marcar uma falta no dia atual ou agenda-la para dias futuros");
+                return;
+            }
+
+            selectCalendarDay("falta", root);
+            btnAbscense.setBackgroundResource(R.drawable.border_yellow);
+            btnPresenceSelect.setBackgroundResource(R.drawable.border_normal);
+        });
+        calendarView.setOnMonthChangedListener((widget, date) -> {
+            updateGreenDaysForMonth(date);
+        });
+
+        btnPresenceSelect.setOnClickListener(v -> {
+            if (selectDay == null) {
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você precisa selecionar um dia primeiro");
+                return;
+            }
+
+            LocalDate today = LocalDate.now();
+            LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+
+            if (!selectedDay.isEqual(today)) {
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você só pode registrar presença no dia atual");
+                return;
+            }
+
+            if (isWeekend(selectedDay)) {
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Você não pode marcar falta em finais de semana");
+                return;
+            }
+
+            selectCalendarDay("presente", root);
+            btnPresenceSelect.setBackgroundResource(R.drawable.border_yellow);
+            btnAbscense.setBackgroundResource(R.drawable.border_normal);
+        });
+
+        btnSend.setOnClickListener(v -> sendUpdate());
+        TextView txtAnexo = root.findViewById(R.id.txtAnexo);
+        txtAnexo.setOnClickListener(v -> abrirGaleria());
+
+        return root;
+    }
+
+    private void uploadImageToCloudinary(Uri imageUri) {
+        if (imageUri == null) return;
+
+        Toast.makeText(getContext(), "Enviando imagem...", Toast.LENGTH_SHORT).show();
+
+        try {
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+
+            if (originalBitmap == null) {
+                ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Não foi possível processar a imagem");
+                return;
+            }
+
+            // 🔹 1. Salva a imagem original em cache sem reduzir qualidade
+            File uploadFile = new File(requireContext().getCacheDir(), "upload_original.jpg");
+            try (FileOutputStream out = new FileOutputStream(uploadFile)) {
+                originalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // qualidade máxima
+            }
+
+            // 🔹 2. Faz upload unsigned para o Cloudinary
+            com.cloudinary.android.MediaManager.get()
+                    .upload(uploadFile.getAbsolutePath())
+                    .unsigned("kronos-upload") // nome exato do preset unsigned
+                    .callback(new com.cloudinary.android.callback.UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+                            Log.d("Cloudinary", "Upload iniciado: " + requestId);
+                        }
+
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                            double progress = (double) bytes / totalBytes * 100;
+                            Log.d("Cloudinary", "Progresso: " + String.format("%.2f", progress) + "%");
+                        }
+
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            String uploadedImageUrl = resultData.get("secure_url").toString();
+                            Log.d("Cloudinary", "Upload completo: " + uploadedImageUrl);
+                            ToastHelper.showFeedbackToast(activity, "success", "SUCESSO:", "Imagem enviada!");
+
+                            // Atualiza ImageView
+                            binding.imageAtestado.setVisibility(View.VISIBLE);
+                            binding.imageAtestado.setImageURI(imageUri);
+
+                            // Guarda a URL para envio com o calendário
+                            CalendarFragment.this.uploadedImageUrl = uploadedImageUrl;
+                        }
+
+                        @Override
+                        public void onError(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
+                            Log.e("Cloudinary", "Erro no upload: " + error.getDescription());
+                            ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao enviar imagem");
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
+                            Log.w("Cloudinary", "Upload reagendado: " + error.getDescription());
+                        }
+                    })
+                    .dispatch();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao processar imagem");
+        }
+    }
+
+
+
+    private void abrirGaleria() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(intent);
+    }
+    private void selectCalendarDay(String acao, View root) {
+        if (selectDay == null) {
+            if (isAdded()) ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos");
+            return;
+        }
+
+        LocalDate localDate = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+        String localDateStr = localDate.toString();
+
+        Calendar existCalendar = null;
+        for (Calendar c : calenderByUser) {
+            String saveDate = c.getDay() != null && c.getDay().length() >= 10 ? c.getDay().substring(0, 10) : "";
+            if (saveDate.equals(localDateStr)) {
+                existCalendar = c;
+                break;
+            }
+        }
+
+        if (existCalendar == null) {
+            existCalendar = new Calendar();
+            if (idUsuario != null) {
+                existCalendar.setUser(Long.parseLong(idUsuario));
+            }
+            existCalendar.setDay(localDateStr);
+        }
+
+        actionSelect = acao;
+        selectCalendar = existCalendar;
+    }
+
+    private boolean isWeekend(LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
+    }
+
+    private void sendUpdate() {
+        if (selectDay == null) {
+            if (isAdded())
+                ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
+            return;
+        }
+
+        LocalDate selectedDay = LocalDate.of(selectDay.getYear(), selectDay.getMonth(), selectDay.getDay());
+        if (isWeekend(selectedDay)) {
+            if (isAdded())
+                ToastHelper.showFeedbackToast(activity,"info","Selecione um dia válido:","Nenhuma ação é permitida nos finais de semana");
+            return;
+        }
+
+        if (selectCalendar != null) {
+            selectCalendar.setPresence("falta".equals(actionSelect) ? false : true);
+
+            EditText editTextArea = getView().findViewById(R.id.editTextArea);
+            String observation = editTextArea.getText().toString();
+            selectCalendar.setObservation(observation);
+
+            if (uploadedImageUrl != null && !uploadedImageUrl.isEmpty()) {
+                selectCalendar.setAttest(uploadedImageUrl);
+            }
+
+            if (selectCalendar.getId() == null) {
+                createCalender(selectCalendar);
+            } else {
+                updateCalender(selectCalendar.getId(), selectCalendar);
+            }
+        } else {
+            if (isAdded())
+                ToastHelper.showFeedbackToast(activity,"info","Preencha as informações:","Verifique se selecionou um dia e preencheu os campos corretamente");
+        }
+    }
+
+    private void calenderByUser(String userId) {
+        if (userId == null) return;
+
+        CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
+
+        calendarService.searchUser(userId).enqueue(new Callback<List<Calendar>>() {
+            @Override
+            public void onResponse(Call<List<Calendar>> call, Response<List<Calendar>> response) {
+                if (!isAdded()) {
+                    Log.e("CALENDAR_DEBUG", "Fragment fechado");
+                    return;
+                }
+
+                if (response.isSuccessful() && response.body() != null) {
+                    calenderByUser = response.body();
+
+                    greenFromDb = new ArrayList<>();
+                    orange = new ArrayList<>();
+                    greenVisual = new ArrayList<>();
+
+                    LocalDate today = LocalDate.now();
+
+                    for (Calendar event : calenderByUser) {
+                        String dateStr = event.getDay() != null && event.getDay().length() >= 10
+                                ? event.getDay().substring(0, 10)
+                                : null;
+
+                        if (dateStr == null) continue;
+
+                        try {
+                            LocalDate date = LocalDate.parse(dateStr);
+                            CalendarDay day = CalendarDay.from(date);
+                            Boolean presence = event.getPresence();
+
+                            if (Boolean.FALSE.equals(presence)) {
+                                orange.add(day);
+                            } else if (Boolean.TRUE.equals(presence)) {
+                                greenFromDb.add(day);
+                            }
+
+                        } catch (Exception e) {
+                            Log.e("CALENDAR_DEBUG", "Erro ao converter data: " + dateStr, e);
+                        }
+                    }
+
+                    LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+                    LocalDate cursor = firstDayOfMonth;
+                    while (cursor.isBefore(today)) {
+                        CalendarDay day = CalendarDay.from(cursor);
+                        if (!orange.contains(day) && !greenFromDb.contains(day)) {
+                            greenVisual.add(day);
+                        }
+                        cursor = cursor.plusDays(1);
+                    }
+
+                    List<CalendarDay> greenAll = new ArrayList<>();
+                    greenAll.addAll(greenFromDb);
+                    greenAll.addAll(greenVisual);
+
+                    binding.calendarView.removeDecorators();
+                    if (getContext() != null) {
+                        binding.calendarView.addDecorator(new GrayBorderDecorator(getContext()));
+                        binding.calendarView.addDecorator(new OrangeBorderDecorator(getContext(), orange));
+                        binding.calendarView.addDecorator(new GreenBorderDecorator(getContext(), greenAll));
+                        if (blackBackgroundDecorator != null) binding.calendarView.addDecorator(blackBackgroundDecorator);
+                    }
+
+                    binding.calendarView.invalidateDecorators();
+                    binding.calendarView.post(() -> {
+                        CalendarDay todayDay = CalendarDay.today();
+                        selectDay = todayDay;
+
+                        blackBackgroundDecorator.setSelectedDay(todayDay);
+                        binding.calendarView.setDateSelected(todayDay, true);
+                        binding.calendarView.invalidateDecorators();
+
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", new Locale("pt", "BR"));
+                        String dataFormatada = todayDay.getDate().format(formatter);
+                        selectedDayTxt.setText("Hoje");
+                        selectedDayQuestionTxt.setText("Você estará presente?");
+
+                        binding.calendarView.setCurrentDate(todayDay);
+                    });
+
+                } else {
+                    ToastHelper.showFeedbackToast(activity,"error","Erro inesperado:","Não foi possível concluir a ação");
+                    Log.e("CALENDAR_DEBUG", "Erro HTtP: " + response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Calendar>> call, Throwable t) {
+                Log.e("CALENDAR_DEBUG", "Falha na chamada da API", t);
+                if (isAdded() && getContext() != null) {
+                    ToastHelper.showFeedbackToast(activity,"error","Erro inesperado:","Não foi possível carregar os dias");
+                }
+            }
+        });
+    }
+
+    private void createCalender(Calendar calendar) {
+        calendar.setManager(idGestor);
+        calendar.setAccepted(false);
+        Log.d("CalendarDebug", calendar.toString());
+
+        CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
+
+        Log.e("CALENDARIO INSERT", calendar.getDay() +" "+ calendar.getUser());
+        calendarService.insertReport(calendar).enqueue(new Callback<Calendar>() {
+            @Override
+            public void onResponse(Call<Calendar> call, Response<Calendar> response) {
+                if (!isAdded()) return;
+                Log.e("CALENDARIO INSERT", ""+response.isSuccessful());
+                Log.e("CALENDARIO INSERT", ""+response.code());
+                Log.e("CALENDARIO INSERT", ""+response.message());
+
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Calendar created = response.body();
+                    calenderByUser.add(created);
+                    selectCalendar = created;
+                    if (isAdded())  ToastHelper.showFeedbackToast(activity,"success","Ação concluída!:","Sua falta ou presença foi salva");
+
+                    calenderByUser(idUsuario);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Calendar> call, Throwable t) {
+                t.printStackTrace();
+                if (isAdded())  ToastHelper.showFeedbackToast(activity,"error","Erro inesperado:","Não foi possível carregar os dias");
+            }
+        });
+    }
+
+    private void updateCalender(String idCalendario, Calendar calendar) {
+        CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
+
+        calendarService.updateReport(idCalendario, calendar).enqueue(new Callback<Calendar>() {
+            @Override
+            public void onResponse(Call<Calendar> call, Response<Calendar> response) {
+                if (!isAdded()) return;
+                if (response.isSuccessful() && response.body() != null) {
+                    if (isAdded()) Toast.makeText(requireContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+                    calenderByUser(idUsuario);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Calendar> call, Throwable t) {
+                t.printStackTrace();
+                if (isAdded()) Toast.makeText(requireContext(), "Erro na atualização: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+    private void updateGreenDaysForMonth(CalendarDay month) {
+        if (orange == null || greenFromDb == null) {
+            Log.w("CALENDAR_DEBUG", "Listas ainda não carregadas. Ignorando updateGreenDaysForMonth.");
+            return;
+        }
+        List<CalendarDay> greenVisual = new ArrayList<>();
+
+        LocalDate firstDayOfMonth = LocalDate.of(month.getYear(), month.getMonth(), 1);
+        LocalDate lastDayOfMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.lengthOfMonth());
+
+        LocalDate today = LocalDate.now();
+        LocalDate cursor = firstDayOfMonth;
+
+        while (!cursor.isAfter(lastDayOfMonth)) {
+            if (!cursor.isBefore(today)) {
+                cursor = cursor.plusDays(1);
+                continue;
+            }
+
+            DayOfWeek dayOfWeek = cursor.getDayOfWeek();
+            if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+                cursor = cursor.plusDays(1);
+                continue;
+            }
+
+            CalendarDay day = CalendarDay.from(cursor);
+
+            if (!orange.contains(day) && !greenFromDb.contains(day)) {
+                greenVisual.add(day);
+            }
+
+            cursor = cursor.plusDays(1);
+        }
+
+        if (greenDecorator != null) binding.calendarView.removeDecorator(greenDecorator);
+        greenDecorator = new GreenBorderDecorator(getContext(), greenVisual);
+        binding.calendarView.addDecorator(greenDecorator);
+        binding.calendarView.invalidateDecorators();
+    }
+
+}

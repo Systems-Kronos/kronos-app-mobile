@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/HomeFragment">
+
+    <!-- Home Fragment -->
+    <fragment
+        android:id="@+id/HomeFragment"
+        android:name="com.example.kronosprojeto.ui.Home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_HomeFragment_to_details"
+            app:destination="@id/details" />
+        <action
+            android:id="@+id/action_HomeFragment_to_CalendarioFragment"
+            app:destination="@id/CalendarioFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_RestrictLoginFragment"
+            app:destination="@id/RestrictLogin" />
+    </fragment>
+
+    <!-- Calendário Fragment -->
+    <fragment
+        android:id="@+id/CalendarioFragment"
+        android:name="com.example.kronosprojeto.ui.Calendar.CalendarFragment"
+        android:label="CalendarioFragment"
+        tools:layout="@layout/fragment_calendar" />
+
+    <!-- Chat Fragment -->
+    <fragment
+        android:id="@+id/ChatFragment"
+        android:name="com.example.kronosprojeto.ui.Chat.ChatFragment"
+        android:label="ChatFragment"
+        tools:layout="@layout/fragment_chat" />
+
+    <!-- Perfil Fragment -->
+    <fragment
+        android:id="@+id/PerfilFragment"
+        android:name="com.example.kronosprojeto.ui.Profile.ProfileFragment"
+        android:label="perfil"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_PerfilFragment_to_details"
+            app:destination="@id/details" />
+    </fragment>
+
+    <!-- Notificações Fragment -->
+    <fragment
+        android:id="@+id/NotificationsFragment"
+        android:name="com.example.kronosprojeto.ui.Notifications.NotificationsFragment"
+        android:label="Notificacoes"
+        tools:layout="@layout/fragment_notifications" >
+
+        <action
+            android:id="@+id/action_NotificationsFragment_to_RestrictLogin"
+            app:destination="@id/RestrictLogin" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/details"
+        android:name="com.example.kronosprojeto.ui.Details.DetailsFragment"
+        android:label="fragment_details"
+        tools:layout="@layout/fragment_details" >
+        <action
+            android:id="@+id/action_details_to_assignmentHistoryFragment"
+            app:destination="@id/assignmentHistoryFragment" />
+        <action
+            android:id="@+id/action_details_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/assignmentHistoryFragment"
+        android:name="com.example.kronosprojeto.ui.AssignmentHistory.AssignmentHistoryFragment"
+        android:label="fragment_assignment_history"
+        tools:layout="@layout/fragment_assignment_history" >
+        <action
+            android:id="@+id/action_assignmentHistoryFragment_to_details"
+            app:destination="@id/details" />
+    </fragment>
+
+    <!-- Restrict Area Login -->
+    <fragment
+        android:id="@+id/RestrictLogin"
+        android:name="com.example.kronosprojeto.ui.RestrictArea.RestrictLoginFragment"
+        android:label="RestrictLogin" >
+        <action
+            android:id="@+id/action_RestrictLogin_to_BI"
+            app:destination="@id/RestrictBIFragment" />
+    </fragment>
+
+    <!-- Restrict BI Fragment -->
+    <fragment
+        android:id="@+id/RestrictBIFragment"
+        android:name="com.example.kronosprojeto.ui.RestrictArea.RestrictBIFragment"
+        android:label="RestrictBI" />
+</navigation>

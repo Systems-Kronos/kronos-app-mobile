@@ -1,0 +1,14 @@
+<resources>
+
+    <style name="TransparentBottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/TransparentBottomSheetStyle</item>
+    </style>
+
+    <style name="TransparentBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@drawable/popup_border_radius</item>
+    </style>
+    <style name="NavDrawerItemText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textStyle">normal</item> <!-- Remove o bold -->
+        <item name="android:textColor">#000000</item> <!-- Cor desejada -->
+    </style>
+</resources>

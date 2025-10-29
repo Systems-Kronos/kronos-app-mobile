@@ -1,0 +1,160 @@
+<com.google.android.flexbox.FlexboxLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="12dp"
+    android:layout_marginStart="20dp"
+    android:background="@drawable/borda_tarefa"
+    app:alignItems="stretch">
+
+    <View
+        android:id="@+id/barra_decorativa"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/bordaverde_arredondada" />
+
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/cardTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
+        android:paddingTop="8dp"
+        android:paddingRight="20dp"
+        app:flexDirection="column">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/textAlign"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:justifyContent="space_between">
+
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/purple_700"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:breakStrategy="simple"
+                tools:text="TidsaatsdddTid" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/tag_box"
+                android:layout_width="110dp"
+                android:layout_height="20dp"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/borda_tag_roxa"
+                app:alignItems="center"
+                app:justifyContent="center">
+
+                <TextView
+                    android:id="@+id/txtTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    tools:text="Tag" />
+
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            app:flexDirection="column"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/textAlign"
+            >
+
+            <TextView
+                android:id="@+id/txtDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp"
+                tools:text="Dia: A partir das 00:00h" />
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                app:alignItems="center"
+                app:justifyContent="space_between"
+                app:alignContent="center"
+                android:textAlignment="center"
+                >
+                <ImageView
+                    android:id="@+id/gutLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/lower_priority"
+                    >
+
+                </ImageView>
+
+                <TextView
+                    android:id="@+id/priority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@color/purple_700"
+                    android:textSize="16sp"
+                    tools:text="0/5" />
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+
+            <TextView
+                android:id="@+id/dateTerm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/purple_700"
+                android:textSize="16sp"
+                tools:text="Data de Término: 20/08/2025" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:justifyContent="space_between">
+
+            <TextView
+                android:id="@+id/txtSector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Yelow"
+                android:layout_marginTop="10dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Setor:" />
+
+            <TextView
+                android:id="@+id/txtInformation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/Yelow"
+                android:textStyle="bold"
+                tools:text="Mais informações"
+
+                />
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+
+
+
+
+
+</com.google.android.flexbox.FlexboxLayout>
+

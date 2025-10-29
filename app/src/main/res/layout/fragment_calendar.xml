@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ui.Calendar.CalendarFragment">
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="351dp"
+            android:layout_marginTop="28dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mcv_dateTextAppearance="@style/TextAppearance.AppCompat.Small"
+            app:mcv_firstDayOfWeek="monday"
+            app:mcv_selectionColor="@color/purple_200"
+            app:mcv_showOtherDates="all"
+            app:mcv_tileHeight="50dp"
+            app:mcv_tileWidth="50dp"
+            app:mcv_weekDayTextAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/containerDay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/calendar_section_shape"
+            android:padding="40dp"
+            app:layout_constraintTop_toBottomOf="@+id/calendarView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:flexDirection="column"
+                app:justifyContent="space_between">
+
+                <TextView
+                    android:id="@+id/selectedDayTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hoje"
+                    android:textColor="#370963"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/selectedDayQuestionTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Você estará presente hoje?"
+                    android:textColor="#370963"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteY="34dp" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:justifyContent="space_between"
+                    app:flexWrap="wrap"
+                    app:alignItems="center">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/presenceSelect"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        app:layout_flexGrow="1"
+                        android:background="@drawable/border_normal"
+                        android:text="Estarei presente"
+                        android:textAllCaps="false"
+                        android:textColor="#25173A"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/absenceSelect"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        app:layout_flexGrow="1"
+                        android:background="@drawable/border_normal"
+                        android:text="Estarei ausente"
+                        android:textAllCaps="false"
+                        android:textColor="#25173A"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                </com.google.android.flexbox.FlexboxLayout>
+
+                <TextView
+                    android:id="@+id/txtComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Escreva uma breve justificativa:"
+                    android:textColor="#370963"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/editTextArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:background="@drawable/background_input"
+                    android:gravity="top|start"
+                    android:hint="Digite aqui..."
+                    android:inputType="textMultiLine"
+                    android:overScrollMode="always"
+                    android:padding="10dp"
+                    android:scrollbars="vertical" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/file_icon" />
+
+                    <TextView
+                        android:id="@+id/txtAnexo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Enviar arquivo"
+                        android:textColor="#25173A" />
+
+                </com.google.android.flexbox.FlexboxLayout>
+
+                <ImageView
+                    android:id="@+id/imageAtestado"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="12dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:justifyContent="flex_end">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/sendAbsenceButton"
+                        android:layout_width="147dp"
+                        android:layout_height="39dp"
+                        android:background="@drawable/button_shape"
+                        android:fontFamily="@font/anekodia"
+                        android:text="ENVIAR"
+                        android:textColor="#25173A"
+                        android:textStyle="bold" />
+
+
+
+                </com.google.android.flexbox.FlexboxLayout>
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <ImageView
+            android:id="@+id/info_borders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/infogray_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+

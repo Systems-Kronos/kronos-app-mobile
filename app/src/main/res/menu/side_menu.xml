@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/home_icon"
+            android:title="Página Inicial" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/profile_icon"
+            android:title="Meu Perfil" />
+        <item
+            android:id="@+id/nav_chat"
+            android:icon="@drawable/chat_icon"
+            android:title="Suporte Chatbot"/>
+        <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/calendar_icon"
+            android:title="Regristro de faltas e presenças" />
+        <item
+            android:id="@+id/nav_restrict"
+            android:icon="@drawable/padlock_icon"
+            android:title="Área Restrita" />
+    </group>
+    <item
+        android:id="@+id/spacer1"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer2"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer3"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer4"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer5"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer6"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer7"
+        android:title=""
+        android:enabled="false" />
+    <item
+        android:id="@+id/spacer8"
+        android:title=""
+        android:enabled="false" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/logout_icon"
+                android:title="Sair" />
+</menu>
