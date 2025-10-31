@@ -153,16 +153,16 @@ public class HomeFragment extends Fragment {
         String userIdStr = prefs.getString("id", "0");
         Long userId = Long.parseLong(userIdStr);
 
-        carregarTarefasUsuario(token,userId, "1", "4");
+        chargeUserTask(token,userId, "1", "4");
 
         buttonAll.setOnClickListener(v-> {
-            carregarTarefasUsuario(token,userId, "1", "4");
+            chargeUserTask(token,userId, "1", "4");
             buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
             buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
 
         });
         buttonRealocadas.setOnClickListener(v->{
-            carregarTarefasUsuario(token,userId, "2", "4");
+            chargeUserTask(token,userId, "2", "4");
             buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
             buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
         });
@@ -175,13 +175,7 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-    private void carregarTarefasUsuario(String token, Long userId, String taskType, String status) {
-        Log.d("DEBUG_TASKS", "Chamando getTasksByUserID com:");
-        Log.d("DEBUG_TASKS", "Token: " + token);
-        Log.d("DEBUG_TASKS", "usuarioId: " + userId);
-        Log.d("DEBUG_TASKS", "tipoTarefa: " + taskType);
-        Log.d("DEBUG_TASKS", "status: " + status);
-
+    private void chargeUserTask(String token, Long userId, String taskType, String status) {
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
         Call<List<Task>> call = service.getTasksByUserID(userId, "Bearer " + token, taskType, status);
         nestedScrollView.setVisibility(View.GONE);

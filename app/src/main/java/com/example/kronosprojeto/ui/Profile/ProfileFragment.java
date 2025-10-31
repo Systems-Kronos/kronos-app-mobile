@@ -76,7 +76,7 @@ public class ProfileFragment extends Fragment {
     private UserViewModel userViewModel;
     private ImageView pencilImage;
     private CloudinaryService cloudinaryService;
-    private UserService usuarioService;
+    private UserService userService;
     private View banner;
     RecyclerView recyclerView;
     TaskAdapter adapter;
@@ -128,7 +128,6 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
-        // Launcher para abrir a câmera
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -139,7 +138,7 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
-        pencilImage.setOnClickListener(v -> abrirEscolhaImagem());
+        pencilImage.setOnClickListener(v -> openChoseImage());
 
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
@@ -200,8 +199,7 @@ public class ProfileFragment extends Fragment {
         return root;
     }
 
-    // Escolher entre câmera ou galeria
-    private void abrirEscolhaImagem() {
+    private void openChoseImage() {
         String[] options = {"Escolher da Galeria", "Tirar Foto"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Selecionar Imagem")
@@ -228,14 +226,12 @@ public class ProfileFragment extends Fragment {
     private void processarImagemSelecionada(Uri imageUri) {
         ImageView profileImg = binding.profileImg;
 
-        // Mostra a imagem escolhida (sem rotação)
         Glide.with(this)
                 .load(imageUri)
                 .circleCrop()
                 .into(profileImg);
 
         try {
-            // Lê o bitmap
             InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
             Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
             inputStream.close();
@@ -245,22 +241,17 @@ public class ProfileFragment extends Fragment {
                 return;
             }
 
-            // 🧭 Corrige a rotação da imagem com base nos metadados EXIF
             Bitmap rotatedBitmap = corrigirRotacao(requireContext(), imageUri, originalBitmap);
-
-            // Calcula a cor predominante para o banner
             Palette.from(rotatedBitmap).generate(palette -> {
                 int corPredominante = palette.getDominantColor(Color.GRAY);
                 banner.setBackgroundColor(corPredominante);
             });
 
-            // Salva a imagem (sem reduzir qualidade)
             File finalFile = new File(requireContext().getCacheDir(), "upload_final.jpg");
             try (FileOutputStream out = new FileOutputStream(finalFile)) {
                 rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // qualidade total
             }
 
-            // Faz upload unsigned
             com.cloudinary.android.MediaManager.get()
                     .upload(finalFile.getAbsolutePath())
                     .unsigned("kronos-upload")
@@ -340,8 +331,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-
-
     private void atualizarFotoUsuario(String imageUrl) {
         UserResponseDto userResponseDto = userViewModel.getUser().getValue();
         if (userResponseDto == null) return;
@@ -364,9 +353,9 @@ public class ProfileFragment extends Fragment {
         Map<String, Object> updateFields = new HashMap<>();
         updateFields.put("foto", imageUrl);
 
-        usuarioService = RetrofitClientSQL.createService(UserService.class);
+        userService = RetrofitClientSQL.createService(UserService.class);
 
-        Call<String> callUpdate = usuarioService.updateUser(
+        Call<String> callUpdate = userService.updateUser(
                 "Bearer " + token,
                 updateFields,
                 String.valueOf(userResponseDto.getId())
