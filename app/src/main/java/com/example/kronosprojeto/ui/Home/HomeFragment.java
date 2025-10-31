@@ -212,7 +212,7 @@ public class HomeFragment extends Fragment {
                     for (Task tarefa : tasks) {
                         try {
                             Date prazo = sdf.parse(tarefa.getDataPrazo());
-                            if (prazo != null && prazo.after(oneMonthAgo)) {
+                            if ((prazo != null && prazo.after(oneMonthAgo)) ||"Pendente".equalsIgnoreCase(tarefa.getStatus()) || "Em Desenvolvimento".equalsIgnoreCase(tarefa.getStatus()) || "Em Andamento".equalsIgnoreCase(tarefa.getStatus()) ) {
                                 tasksLastMonth.add(tarefa);
                             }
                         } catch (ParseException e) {

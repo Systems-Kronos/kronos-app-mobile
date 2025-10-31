@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.Manifest;
 
@@ -195,6 +196,9 @@ public class MainActivity extends AppCompatActivity {
         String token = prefs.getString("jwt", null);
         Log.d("DEBUG_TOKEN", "Token carregado na MainActivity: " + token);
         String cpf = prefs.getString("cpf", null);
+
+
+
 
         if (token != null && cpf != null) {
             UserService userService = RetrofitClientSQL.createService(UserService.class);
