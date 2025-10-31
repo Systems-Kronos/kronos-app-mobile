@@ -25,21 +25,20 @@
         android:layout_width="144dp"
         android:layout_height="272dp"
         android:layout_marginStart="108dp"
-        android:layout_marginTop="41dp"
+        android:layout_marginTop="69dp"
         android:layout_marginEnd="2dp"
         android:src="@drawable/img_gear"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordInput"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
 
     <TextView
         android:id="@+id/txtTittleTarefa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="144dp"
         android:text="ÁREA RESTRITA"
         android:textColor="#1A1818"
         android:textSize="34sp"
@@ -92,41 +91,39 @@
         android:layout_marginStart="56dp"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="300dp"
-        android:layout_marginBottom="16dp"
         android:fontFamily="@font/anekodia"
         android:text="Senha"
         android:textColor="#070000"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/passwordInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
 
+
     <EditText
         android:id="@+id/passwordInput"
         android:layout_width="304dp"
-        android:layout_height="57dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/background_input"
         android:drawableStart="@drawable/padlock_icon"
         android:drawablePadding="12dp"
-        android:hint="Digite sua senha"
+        android:hint="Digite a senha"
         android:inputType="textPassword"
         android:paddingStart="18dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordLabel" />
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/loginButton"
         android:layout_width="210dp"
         android:layout_height="51dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="32dp"
         android:text="ENTRAR"
         android:textColor="#000000"
@@ -134,6 +131,7 @@
         app:backgroundTint="#E6B648"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
 

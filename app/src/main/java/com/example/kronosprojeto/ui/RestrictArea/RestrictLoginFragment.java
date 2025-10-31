@@ -81,7 +81,7 @@ public class RestrictLoginFragment extends Fragment {
                             .apply();
 
                     ToastHelper.showFeedbackToast(requireContext(), "success",
-                            "Login realizado", "Token salvo com sucesso.");
+                            "Login realizado", "Bem-vindo a área restrita");
 
                     NavController navController = Navigation.findNavController(requireView());
                     navController.navigate(R.id.action_RestrictLogin_to_BI);
