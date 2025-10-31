@@ -118,7 +118,6 @@ public class ProfileFragment extends Fragment {
         cloudinaryService = RetrofitClientCloudinary.createService(CloudinaryService.class);
         loadingOverlay = binding.loadingOverlay;
 
-        // Launcher para abrir a galeria
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -194,7 +193,7 @@ public class ProfileFragment extends Fragment {
 
         String usuarioIdStr = prefs.getString("id", "0");
         Long usuarioId = Long.parseLong(usuarioIdStr);
-        carregarTarefasUsuario(token, usuarioId, "1", "4");
+        chargeUserTasks(token, usuarioId, "1", "4");
 
         return root;
     }
@@ -274,14 +273,14 @@ public class ProfileFragment extends Fragment {
                             String imageUrl = resultData.get("secure_url").toString();
                             Log.d("Cloudinary", "✅ Upload completo: " + imageUrl);
                             ToastHelper.showFeedbackToast(activity, "success", "SUCESSO:", "Imagem enviada!");
-                            atualizarFotoUsuario(imageUrl);
+                            updateUserPhoto(imageUrl);
                         }
 
                         @Override
                         public void onError(String requestId, com.cloudinary.android.callback.ErrorInfo error) {
                             loadingOverlay.setVisibility(View.GONE);
                             ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao enviar imagem");
-                            Log.e("Cloudinary", "❌ Erro: " + error.getDescription());
+                            Log.e("Cloudinary", "Erro: " + error.getDescription());
                         }
 
                         @Override
@@ -331,7 +330,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void atualizarFotoUsuario(String imageUrl) {
+    private void updateUserPhoto(String imageUrl) {
         UserResponseDto userResponseDto = userViewModel.getUser().getValue();
         if (userResponseDto == null) return;
 
@@ -398,7 +397,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
+    private void chargeUserTasks(String token, Long usuarioId, String tipoTarefa, String status) {
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
         Call<List<Task>> call = service.getTasksByUserID(usuarioId, "Bearer " + token, tipoTarefa, status);
 
