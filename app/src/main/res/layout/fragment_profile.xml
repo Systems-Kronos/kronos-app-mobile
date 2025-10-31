@@ -49,7 +49,7 @@
                     android:layout_width="330dp"
                     android:layout_height="90dp"
                     android:layout_marginTop="16dp"
-                    android:background="@drawable/borda_amarela"
+                    android:background="@drawable/borda_yellow_button"
                     android:padding="14dp"
                     app:justifyContent="space_between"
                     app:layout_constraintEnd_toEndOf="parent"

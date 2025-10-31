@@ -16,16 +16,6 @@ public interface CalendarService {
 
     @GET("api/calendario/selecionar/usuario/{idUsuario}")
     Call<List<Calendar>> searchUser(@Path("idUsuario") String idUsuario);
-
-    @GET("api/calendario/selecionar")
-    Call<List<Calendar>> listAllCalendar();
-
-    @GET("api/calendario/selecionar/{id}")
-    Call<Calendar> searchById(@Path("id") String id);
-
-    @GET("api/calendario/selecionar/presenca/{presenca}")
-    Call<List<Calendar>> searchByPresent(@Path("presenca") Boolean presenca);
-
     @POST("api/calendario/adicionar")
     Call<Calendar> insertReport(@Body Calendar calendario);
 

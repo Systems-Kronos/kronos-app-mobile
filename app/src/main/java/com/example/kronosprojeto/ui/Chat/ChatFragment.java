@@ -2,6 +2,7 @@ package com.example.kronosprojeto.ui.Chat;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.example.kronosprojeto.databinding.FragmentChatBinding;
 import com.example.kronosprojeto.dto.ChatBotResponseDto;
 import com.example.kronosprojeto.model.ChatBotSession;
 import com.example.kronosprojeto.service.ChatBotService;
+import com.example.kronosprojeto.ui.Chat.ChatMessage;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
@@ -31,11 +33,7 @@ import retrofit2.Response;
 public class ChatFragment extends Fragment {
     private FragmentChatBinding binding;
     private ChatAdapter adapter;
-
-
     FrameLayout loadingOverlay;
-    NestedScrollView nestedScrollView;
-
     private ChatMessage loadingMessage = null;
     private List<ChatMessage> messages;
     private String sessionId;
@@ -84,7 +82,12 @@ public class ChatFragment extends Fragment {
         binding.btnSend.setEnabled(false);
 
         chatBotService = RetrofitClientChatBot.createService(ChatBotService.class);
-        Call<ChatBotSession> call = chatBotService.createNewSession();
+
+
+        SharedPreferences prefs = requireContext().getSharedPreferences("app", MODE_PRIVATE);
+        String idString = prefs.getString("id", null);
+
+        Call<ChatBotSession> call = chatBotService.createNewSession(idString);
         loadingOverlay.setVisibility(View.VISIBLE);
 
         call.enqueue(new Callback<ChatBotSession>() {
@@ -105,7 +108,6 @@ public class ChatFragment extends Fragment {
 
                     sessionReady = true;
                     binding.btnSend.setEnabled(true);
-
                     String welcomeMessage = "Olá, para tirar dúvidas sobre o aplicativo estou à sua disposição! 😉";
                     adapter.addMessage(new ChatMessage(welcomeMessage, false));
                     binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
@@ -118,6 +120,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onFailure(Call<ChatBotSession> call, Throwable t) {
                 t.printStackTrace();
+                Log.d("ERRO AQUI", "teste");
                 sessionReady = false;
             }
         });

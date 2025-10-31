@@ -39,9 +39,9 @@ public class AssignmentHistoryAdapter extends RecyclerView.Adapter<AssignmentHis
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AssignmentHistory item = historyList.get(position);
-        holder.title.setText(item.getTitulo());
-        holder.user.setText(item.getUsuario());
-        holder.description.setText(item.getDescricao());
+        holder.title.setText(item.getTitle());
+        holder.user.setText(item.getAssignedUserName());
+        holder.description.setText(item.getDescription());
     }
 
     @Override
