@@ -126,7 +126,6 @@ public class ChatFragment extends Fragment {
         });
     }
 
-
     private void sendMessage(String userMessage) {
         adapter.addMessage(new ChatMessage(userMessage, true));
         binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
