@@ -337,7 +337,7 @@ public class CalendarFragment extends Fragment {
 
             com.cloudinary.android.MediaManager.get()
                     .upload(uploadFile.getAbsolutePath())
-                    .unsigned("kronos-upload") // nome exato do preset unsigned
+                    .unsigned("kronos-upload")
                     .callback(new com.cloudinary.android.callback.UploadCallback() {
                         @Override
                         public void onStart(String requestId) {

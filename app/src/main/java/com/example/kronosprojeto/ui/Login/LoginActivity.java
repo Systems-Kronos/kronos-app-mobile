@@ -3,6 +3,7 @@ package com.example.kronosprojeto.ui.Login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
@@ -106,36 +107,39 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         passwordInput.setOnTouchListener((v, event) -> {
-            final int DRAWABLE_RIGHT = 2; // drawableEnd
+            final int DRAWABLE_RIGHT = 2;
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 if (event.getRawX() >= (passwordInput.getRight() -
                         passwordInput.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
 
-                    if ((passwordInput.getInputType() & android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-                            == android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
-                        passwordInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT |
-                                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        passwordInput.setCompoundDrawablesWithIntrinsicBounds(
-                                R.drawable.padlock_icon, 0,
-                                R.drawable.eye_icon_small_close, 0);
-                    } else {
-                        passwordInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT |
-                                android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    // alterna visibilidade da senha
+                    if (passwordInput.getInputType() ==
+                            (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+
+                        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                         passwordInput.setCompoundDrawablesWithIntrinsicBounds(
                                 R.drawable.padlock_icon, 0,
                                 R.drawable.eye_icon_small_open, 0);
+                    } else {
+                        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        passwordInput.setCompoundDrawablesWithIntrinsicBounds(
+                                R.drawable.padlock_icon, 0,
+                                R.drawable.eye_icon_small_close, 0);
                     }
 
-                    passwordInput.setSelection(passwordInput.getText().length());
-                    v.performClick();
-                    return true;
+                    // move o cursor para o fim de forma segura
+                    Editable currentText = passwordInput.getText();
+                    if (currentText != null) {
+                        passwordInput.setSelection(currentText.length());
+                    }
+
+                    return true; // indica que o evento foi consumido
                 }
             }
             return false;
         });
-
-        // ⚠️ Para remover aviso de Lint
-        passwordInput.setOnClickListener(View::performClick);
 
         String openFragment = getIntent().getStringExtra("open_fragment");
         if ("password_redefinition".equals(openFragment)) {
@@ -159,6 +163,15 @@ public class LoginActivity extends AppCompatActivity {
                     "info",
                     "Campos vazios",
                     "Preencha CPF e senha!");
+            loadingOverlay.setVisibility(View.GONE);
+            return;
+        }
+
+        if (unmask(cpf).length() < 11) {
+            ToastHelper.showFeedbackToast(getApplicationContext(),
+                    "info",
+                    "CPF inválido",
+                    "O CPF deve conter 11 dígitos!");
             loadingOverlay.setVisibility(View.GONE);
             return;
         }
