@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -29,9 +28,7 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.Visibility;
 
-import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentHomeBinding;
@@ -47,15 +44,12 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.flexbox.FlexboxLayout;
 
 import java.net.SocketTimeoutException;
-import java.nio.channels.FileLock;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -72,6 +66,7 @@ public class HomeFragment extends Fragment {
     FrameLayout loadingOverlay;
     NestedScrollView nestedScrollView;
     FlexboxLayout noContentFlex;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -84,10 +79,10 @@ public class HomeFragment extends Fragment {
         noContentFlex = binding.noContent;
         TextView presentTodayText = binding.presentTodayQuestion;
 
-        String texto = "Não estará presente no trabalho hoje? clique aqui!";
-        SpannableString spannable = new SpannableString(texto);
+        String CalendarText = "Não estará presente no trabalho hoje? clique aqui!";
+        SpannableString spannable = new SpannableString(CalendarText);
 
-        int start = texto.indexOf(" clique aqui!");
+        int start = CalendarText.indexOf(" clique aqui!");
         int end = start + " clique aqui!".length();
 
         presentTodayText.setOnClickListener(v -> {
@@ -127,8 +122,6 @@ public class HomeFragment extends Fragment {
 
         entries = new ArrayList<>();
 
-
-
         PieDataSet dataSet = new PieDataSet(entries, "");
 
         dataSet.setColors(Color.parseColor("#E6B648"), Color.parseColor("#FFFFFF"));
@@ -157,19 +150,19 @@ public class HomeFragment extends Fragment {
 
 
         String token = prefs.getString("jwt", null);
-        String usuarioIdStr = prefs.getString("id", "0");
-        Long usuarioId = Long.parseLong(usuarioIdStr);
+        String userIdStr = prefs.getString("id", "0");
+        Long userId = Long.parseLong(userIdStr);
 
-        carregarTarefasUsuario(token,usuarioId, "1", "4");
+        carregarTarefasUsuario(token,userId, "1", "4");
 
         buttonAll.setOnClickListener(v-> {
-            carregarTarefasUsuario(token,usuarioId, "1", "4");
+            carregarTarefasUsuario(token,userId, "1", "4");
             buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
             buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
 
         });
         buttonRealocadas.setOnClickListener(v->{
-            carregarTarefasUsuario(token,usuarioId, "2", "4");
+            carregarTarefasUsuario(token,userId, "2", "4");
             buttonRealocadas.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.YellowMessage));
             buttonAll.setBackgroundTintList(ContextCompat.getColorStateList(getContext(),R.color.PurpleLight));
         });
@@ -182,15 +175,15 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-    private void carregarTarefasUsuario(String token, Long usuarioId, String tipoTarefa, String status) {
+    private void carregarTarefasUsuario(String token, Long userId, String taskType, String status) {
         Log.d("DEBUG_TASKS", "Chamando getTasksByUserID com:");
         Log.d("DEBUG_TASKS", "Token: " + token);
-        Log.d("DEBUG_TASKS", "usuarioId: " + usuarioId);
-        Log.d("DEBUG_TASKS", "tipoTarefa: " + tipoTarefa);
+        Log.d("DEBUG_TASKS", "usuarioId: " + userId);
+        Log.d("DEBUG_TASKS", "tipoTarefa: " + taskType);
         Log.d("DEBUG_TASKS", "status: " + status);
 
         TaskService service = RetrofitClientSQL.createService(TaskService.class);
-        Call<List<Task>> call = service.getTasksByUserID(usuarioId, "Bearer " + token, tipoTarefa, status);
+        Call<List<Task>> call = service.getTasksByUserID(userId, "Bearer " + token, taskType, status);
         nestedScrollView.setVisibility(View.GONE);
         loadingOverlay.setVisibility(View.VISIBLE);
 
@@ -199,50 +192,48 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(Call<List<Task>> call, Response<List<Task>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Task> tarefas = response.body();
+                    List<Task> tasks = response.body();
                     loadingOverlay.setVisibility(View.GONE);
                     nestedScrollView.setVisibility(View.VISIBLE);
 
-                    // 🔹 Ordena pela prioridade (gravidade * urgencia * tendencia)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        tarefas.sort((t1, t2) -> {
-                            int prioridade1 = (t1.getGravidade() * t1.getUrgencia() * t1.getTendencia());
-                            int prioridade2 = (t2.getGravidade() * t2.getUrgencia() * t2.getTendencia());
-                            return Integer.compare(prioridade2, prioridade1); // maior prioridade primeiro
+                        tasks.sort((t1, t2) -> {
+                            int priority1 = (t1.getGravidade() * t1.getUrgencia() * t1.getTendencia());
+                            int prioriry2 = (t2.getGravidade() * t2.getUrgencia() * t2.getTendencia());
+                            return Integer.compare(prioriry2, priority1);
                         });
                     }
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // ajuste o formato conforme seu dataPrazo
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                     Calendar cal = Calendar.getInstance();
-                    cal.add(Calendar.MONTH, -1); // 1 mês atrás
-                    Date umMesAtras = cal.getTime();
+                    cal.add(Calendar.MONTH, -1);
+                    Date oneMonthAgo = cal.getTime();
 
-                    List<Task> tarefasUltimoMes = new ArrayList<>();
-                    for (Task tarefa : tarefas) {
+                    List<Task> tasksLastMonth = new ArrayList<>();
+                    for (Task tarefa : tasks) {
                         try {
                             Date prazo = sdf.parse(tarefa.getDataPrazo());
-                            if (prazo != null && prazo.after(umMesAtras)) {
-                                tarefasUltimoMes.add(tarefa);
+                            if (prazo != null && prazo.after(oneMonthAgo)) {
+                                tasksLastMonth.add(tarefa);
                             }
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
                     }
-                    int total = tarefasUltimoMes.size();
+                    int total = tasksLastMonth.size();
                     int concluidas = 0;
 
-                    for (Task tarefa : tarefasUltimoMes) {
-                        Log.d("DEBUG_TASKS", "Tarefa: " + tarefa.getNome()
-                                + ", Gravidade: " + tarefa.getGravidade()
-                                + ", Urgência: " + tarefa.getUrgencia()
-                                + ", Tendência: " + tarefa.getTendencia()
-                                + ", Status: " + tarefa.getStatus());
+                    for (Task task : tasksLastMonth) {
+                        Log.d("DEBUG_TASKS", "Tarefa: " + task.getNome()
+                                + ", Gravidade: " + task.getGravidade()
+                                + ", Urgência: " + task.getUrgencia()
+                                + ", Tendência: " + task.getTendencia()
+                                + ", Status: " + task.getStatus());
 
-                        Log.e("CONCLUIDO", tarefa.getStatus());
-                        if ("Concluída".equalsIgnoreCase(tarefa.getStatus()) || "Concluida".equalsIgnoreCase(tarefa.getStatus()) || "Concluido".equalsIgnoreCase(tarefa.getStatus()) || "Concluído".equalsIgnoreCase(tarefa.getStatus()) || "Cancelada".equalsIgnoreCase(tarefa.getStatus()) || "Cancelado".equalsIgnoreCase(tarefa.getStatus())) {
+                        Log.e("CONCLUIDO", task.getStatus());
+                        if ("Concluída".equalsIgnoreCase(task.getStatus()) || "Concluida".equalsIgnoreCase(task.getStatus()) || "Concluido".equalsIgnoreCase(task.getStatus()) || "Concluído".equalsIgnoreCase(task.getStatus()) || "Cancelada".equalsIgnoreCase(task.getStatus()) || "Cancelado".equalsIgnoreCase(task.getStatus())) {
                             concluidas++;
                         }
                     }
-
 
                     PieDataSet dataSet = new PieDataSet(entries, "");
                     dataSet.setColors(Color.parseColor("#E6B648"), Color.parseColor("#FFFFFF"));
@@ -252,10 +243,10 @@ public class HomeFragment extends Fragment {
                     pieChart.setData(data);
                     pieChart.invalidate();
 
-                    List<Task> tarefasPendentes = new ArrayList<>();
-                    for (Task tarefa : tarefas) {
-                        if ("Pendente".equalsIgnoreCase(tarefa.getStatus()) || "Em Desenvolvimento".equalsIgnoreCase(tarefa.getStatus()) || "Em Andamento".equalsIgnoreCase(tarefa.getStatus()) ) {
-                            tarefasPendentes.add(tarefa);
+                    List<Task> pendingTasks = new ArrayList<>();
+                    for (Task task : tasks) {
+                        if ("Pendente".equalsIgnoreCase(task.getStatus()) || "Em Desenvolvimento".equalsIgnoreCase(task.getStatus()) || "Em Andamento".equalsIgnoreCase(task.getStatus()) ) {
+                            pendingTasks.add(task);
                         }
                     }
 
@@ -273,8 +264,8 @@ public class HomeFragment extends Fragment {
                     entries.add(new PieEntry(porcentagemConcluidas, ""));
                     entries.add(new PieEntry(100 - porcentagemConcluidas, ""));
 
-                    adapter.updateList(tarefasPendentes);
-                    if (tarefasPendentes.isEmpty()){
+                    adapter.updateList(pendingTasks);
+                    if (pendingTasks.isEmpty()){
                         noContentFlex.setVisibility(View.VISIBLE);
                     }else {
                         noContentFlex.setVisibility(View.GONE);
@@ -284,7 +275,6 @@ public class HomeFragment extends Fragment {
                     Log.d("DEBUG_TASKS", "Resposta não foi bem sucedida. Código: " + response.code());
                 }
                 if (!isAdded()) {
-                    // O fragment já não está mais anexado — não faça nada
                     return;
                 }
 
@@ -293,12 +283,10 @@ public class HomeFragment extends Fragment {
                     if (context != null) {
                         Intent intent = new Intent(context, SplashScreen.class);
                         startActivity(intent);
-                        requireActivity().finish(); // opcional, pra fechar a tela atual
+                        requireActivity().finish();
                     }
                 }
-
                 Log.e("CALL",response.code() + "");
-
             }
 
             @Override
@@ -306,7 +294,6 @@ public class HomeFragment extends Fragment {
                 Log.e("DEBUG_TASKS", "Erro ao buscar tarefas", t);
 
                 if (!isAdded() || getContext() == null) {
-                    // Fragment não está mais anexado — não faz nada
                     return;
                 }
 
@@ -326,7 +313,6 @@ public class HomeFragment extends Fragment {
                     );
                 }
 
-                // Agora só abre a SplashScreen se o fragment ainda existir
                 requireActivity().runOnUiThread(() -> {
                     Intent intent = new Intent(requireActivity(), SplashScreen.class);
                     startActivity(intent);

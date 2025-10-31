@@ -30,7 +30,7 @@ public class GrayBorderDecorator implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
-        view.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.bg_dia_borda_cinza));
+        view.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.bg_day_border_grey));
     }
 }
 

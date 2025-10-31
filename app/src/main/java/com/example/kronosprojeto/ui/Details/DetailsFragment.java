@@ -51,8 +51,7 @@ public class DetailsFragment extends Fragment {
     private ConstraintLayout constraintLayout;
     private FlexboxLayout step1Layout;
     private FlexboxLayout step2Layout;
-
-    private long idTarefa = -1;
+    private long idTask = -1;
     private String problem;
     private String description;
     private String currentStatus;
@@ -63,7 +62,6 @@ public class DetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_details, container, false);
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -71,12 +69,12 @@ public class DetailsFragment extends Fragment {
         ImageView back = view.findViewById(R.id.imgBack);
 
         if (getArguments() != null) {
-            idTarefa = getArguments().getLong("idTarefa", -1);
-            Log.d(TAG, "Id da tarefa recebido: " + idTarefa);
+            idTask = getArguments().getLong("idTarefa", -1);
+            Log.d(TAG, "Id da tarefa recebido: " + idTask);
         }
 
         SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
-        prefs.edit().putLong("selectedTask", idTarefa).apply();
+        prefs.edit().putLong("selectedTask", idTask).apply();
 
 
         taskService = RetrofitClientSQL.createService(TaskService.class);
@@ -116,17 +114,16 @@ public class DetailsFragment extends Fragment {
         SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
 
-        if (idTarefa == -1 || token == null) {
-            Log.e(TAG, "idTarefa inválido ou token nulo: " + idTarefa + ", " + token);
+        if (idTask == -1 || token == null) {
+            Log.e(TAG, "idTarefa inválido ou token nulo: " + idTask + ", " + token);
             return;
         }
 
-        taskService.getTaskById(idTarefa, "Bearer " + token).enqueue(new Callback<TaskDetailsDto>() {
+        taskService.getTaskById(idTask, "Bearer " + token).enqueue(new Callback<TaskDetailsDto>() {
             @Override
             public void onResponse(Call<TaskDetailsDto> call, Response<TaskDetailsDto> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     TaskDetailsDto task = response.body();
-
                     txtTituloTarefa.setText(task.getNome());
                     txtDescription.setText(task.getDescricao() != null ? task.getDescricao() : "-");
                     txtInicialDate.setText(task.getDataAtribuicao() != null ? task.getDataAtribuicao() : "-");
@@ -146,9 +143,9 @@ public class DetailsFragment extends Fragment {
                     MaterialButton btnUpdate = requireView().findViewById(R.id.btnUpdate);
                     btnUpdate.setOnClickListener(v -> {
                         if ("Pendente".equalsIgnoreCase(currentStatus)) {
-                            showStartBottomSheet();
+                            showStartBottomSheet(txtSituation);
                         } else {
-                            showUpdateBottomSheet();
+                            showUpdateBottomSheet(txtSituation);
                         }
                     });
 
@@ -165,14 +162,14 @@ public class DetailsFragment extends Fragment {
     }
 
 
-    private void showStartBottomSheet() {
+    private void showStartBottomSheet(TextView txtSituation) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.TransparentBottomSheetDialog);
         View sheetStart = getLayoutInflater().inflate(R.layout.bottom_sheet_start, null);
         if (sheetStart == null) return;
 
         TextView txtStartTask = sheetStart.findViewById(R.id.txtStartTask);
         txtStartTask.setOnClickListener(v2 -> {
-            updateTaskStatus("Em Andamento");
+            updateTaskStatus("Em Andamento", txtSituation);
             currentStatus = "Em Andamento";
             bottomSheetDialog.dismiss();
         });
@@ -181,7 +178,7 @@ public class DetailsFragment extends Fragment {
         setBottomSheetBehavior(bottomSheetDialog);
     }
 
-    private void showUpdateBottomSheet() {
+    private void showUpdateBottomSheet(TextView txtSituation) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext(), R.style.TransparentBottomSheetDialog);
         View sheetViewChoice = getLayoutInflater().inflate(R.layout.bottom_sheet_choice, null);
         if (sheetViewChoice == null) return;
@@ -209,7 +206,7 @@ public class DetailsFragment extends Fragment {
                 String token = prefs.getString("jwt", null);
                 long idUsuario = Long.parseLong(prefs.getString("id", "0"));
 
-                if (token == null || idUsuario == 0 || idTarefa == -1) {
+                if (token == null || idUsuario == 0 || idTask == -1) {
                     ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Não foi possível obter os dados do usuário.");
                     return;
                 }
@@ -217,7 +214,7 @@ public class DetailsFragment extends Fragment {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String data2 = sdf.format(new Date());
 
-                LogAtribuicaoTarefaDto dto = new LogAtribuicaoTarefaDto(idTarefa, idUsuario, observacao, data2);
+                LogAtribuicaoTarefaDto dto = new LogAtribuicaoTarefaDto(idTask, idUsuario, observacao, data2);
                 Log.d(TAG, "JSON enviado para adicionarLog: " + new Gson().toJson(dto));
 
                 taskService.adicionarLog("Bearer " + token, dto).enqueue(new Callback<LogAtribuicaoTarefaDto>() {
@@ -246,7 +243,7 @@ public class DetailsFragment extends Fragment {
         });
 
         txtFinishTask.setOnClickListener(v -> {
-            updateTaskStatus("Concluído");
+            updateTaskStatus("Concluído", txtSituation);
             currentStatus = "Concluído";
             bottomSheetDialog.dismiss();
         });
@@ -280,7 +277,7 @@ public class DetailsFragment extends Fragment {
             description = descriptionInput.getText() != null ? descriptionInput.getText().toString().trim() : "";
 
             ReportService reportService = RetrofitClientSQL.createService(ReportService.class);
-            ReportRequestDto reportRequestDto = new ReportRequestDto(idTarefa, idUsuario, description, problem, "Pendente");
+            ReportRequestDto reportRequestDto = new ReportRequestDto(idTask, idUsuario, description, problem, "Pendente");
 
             reportService.insertReport("Bearer " + token, reportRequestDto).enqueue(new Callback<ReportRequestDto>() {
                 @Override
@@ -312,24 +309,30 @@ public class DetailsFragment extends Fragment {
         problemChose.setText("Problema escolhido: " + problem);
     }
 
-    private void updateTaskStatus(String newStatus) {
+    private void updateTaskStatus(String newStatus, TextView txtSituation) {
         SharedPreferences prefs = requireContext().getSharedPreferences("app", Context.MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
-        if (token == null || idTarefa == -1) return;
+        if (token == null || idTask == -1) return;
 
-        Log.d(TAG, "Atualizando tarefa id=" + idTarefa + " para status=" + newStatus);
+        Log.d(TAG, "Atualizando tarefa id=" + idTask + " para status=" + newStatus);
 
         TaskStatusDto statusDto = new TaskStatusDto(newStatus);
         Log.d(TAG, "JSON enviado: " + new Gson().toJson(statusDto));
 
-        taskService.updateStatus("Bearer " + token, idTarefa, statusDto)
+        taskService.updateStatus("Bearer " + token, idTask, statusDto)
                 .enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
                         if (response.isSuccessful()) {
-                            ToastHelper.showFeedbackToast(requireActivity(), "successo", "Tarefa atualizada", "Status atualizado para: " + newStatus);
+                            currentStatus = newStatus;
+                            txtSituation.setText(newStatus);
+
+                            ToastHelper.showFeedbackToast(requireActivity(),
+                                    "successo", "Tarefa atualizada",
+                                    "Status atualizado para: " + newStatus);
                         } else {
-                            ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro", "Falha ao atualizar: " + response.code());
+                            ToastHelper.showFeedbackToast(requireActivity(),
+                                    "error", "Erro", "Falha ao atualizar: " + response.code());
                             Log.e(TAG, "Erro resposta: " + response.message());
                         }
                     }
@@ -337,11 +340,11 @@ public class DetailsFragment extends Fragment {
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         Log.e(TAG, "Erro de conexão: " + t.getMessage(), t);
-                        ToastHelper.showFeedbackToast(requireActivity(), "error", "Erro de conexão", t.getMessage());
+                        ToastHelper.showFeedbackToast(requireActivity(),
+                                "error", "Erro de conexão", t.getMessage());
                     }
                 });
     }
-
 
     private void setBottomSheetBehavior(BottomSheetDialog dialog) {
         View container = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);

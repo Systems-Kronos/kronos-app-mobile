@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 app:alignContent="center"
-                android:background="@drawable/bordaroxa_arredondada_inferior">
+                android:background="@drawable/border_purple_shape">
                 <TextView
                     android:id="@+id/presentTodayQuestion"
                     android:layout_marginTop="15dp"
@@ -47,7 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="170dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/borda_retangulo_roxo" />
+                    android:background="@drawable/border_rectangle_purple" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -62,7 +62,7 @@
 
                     <TextView
                         android:id="@+id/textoDentroDoFrame"
-                        android:layout_width="212dp"
+                        android:layout_width="171dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/anekodia"
                         android:paddingStart="16dp"
@@ -197,7 +197,6 @@
         </RelativeLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- === OVERLAY DE LOADING === -->
     <FrameLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"

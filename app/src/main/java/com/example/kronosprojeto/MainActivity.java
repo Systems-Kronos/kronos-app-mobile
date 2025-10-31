@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private UserViewModel userViewModel;
     private NotificationViewModel notificationViewModel;
     private DrawerLayout drawerLayout;
-    TextView tvUsername;
     private static final String POST_NOTIF = Manifest.permission.POST_NOTIFICATIONS;
 
     private ActivityResultLauncher<String> requestNotificationPermission;
@@ -112,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        // Ícone de notificações
         ImageView notificationIcon = customView.findViewById(R.id.notification_logo);
         notificationIcon.setOnClickListener(v ->
                 navController.navigate(R.id.NotificationsFragment, null,
@@ -175,8 +173,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-
-        // ViewModels
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
@@ -197,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
+        Log.d("DEBUG_TOKEN", "Token carregado na MainActivity: " + token);
         String cpf = prefs.getString("cpf", null);
 
         if (token != null && cpf != null) {
@@ -247,10 +244,9 @@ public class MainActivity extends AppCompatActivity {
                     NotificationProcessor.processarNotificacoes(MainActivity.this, lista);
                 }
             }
-
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
-                ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi carregar as notificações");
+                ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi possível carregar as notificações");
             }
         });
 

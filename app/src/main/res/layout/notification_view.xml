@@ -3,7 +3,7 @@
     android:layout_width="300dp"
     android:layout_height="120dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/borda_tarefa"
+    android:background="@drawable/borda_task"
     android:padding="15dp"
     app:flexDirection="column"
     app:justifyContent="space_between"

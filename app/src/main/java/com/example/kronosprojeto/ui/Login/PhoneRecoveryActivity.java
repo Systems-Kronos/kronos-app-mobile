@@ -1,18 +1,12 @@
 package com.example.kronosprojeto.ui.Login;
-
 import android.Manifest;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -21,16 +15,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.dto.UserResponseDto;
 import com.example.kronosprojeto.service.UserService;
+import com.example.kronosprojeto.utils.SendSMS;
 import com.example.kronosprojeto.utils.ToastHelper;
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -112,13 +104,10 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
         } else {
             String cpf = cpfInput.getText().toString().trim();
 
-            if (cpf.isEmpty() || cpf.length() != 14) {
+            if (cpf.isEmpty()) {
                 ToastHelper.showFeedbackToast(getApplicationContext(),"info","CREDENCIAIS INVÁLIDAS","Digite um CPF válido");
                 return;
             }
-
-            String token = getSharedPreferences("app", MODE_PRIVATE).getString("jwt", null);
-
 
             try {
                 String cpfEncoded = URLEncoder.encode(cpf, StandardCharsets.UTF_8.toString());
@@ -131,31 +120,32 @@ public class PhoneRecoveryActivity extends AppCompatActivity {
                     public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             UserResponseDto userResponse = response.body();
-                            String telefone = userResponse.getTelefone();
+                            String phone = userResponse.getTelefone();
                             long userId = userResponse.getId();
 
                             getSharedPreferences("app", MODE_PRIVATE)
                                     .edit()
-                                    .putString("telefone", telefone)
+                                    .putString("phone", phone)
                                     .putLong("user_id", userId)
                                     .apply();
 
                             int codigo = (int) (Math.random() * 9000) + 1000;
-                            SendSMS.enviarSMS(PhoneRecoveryActivity.this, telefone, codigo);
+
+                            SendSMS.enviarSMS(PhoneRecoveryActivity.this, phone, codigo);
 
                             Intent intent = new Intent(PhoneRecoveryActivity.this, CodeRecoveryActivity.class);
-                            intent.putExtra("telefone", telefone);
+                            intent.putExtra("telefone", phone);
                             startActivity(intent);
                         } else {
                             ToastHelper.showFeedbackToast(getApplicationContext(),
-                                    "error", "ERRO", "Erro ao buscar telefone (" + response.code() + ")");
+                                    "error", "ERRO", "Usuário não encontrado");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<UserResponseDto> call, Throwable t) {
                         ToastHelper.showFeedbackToast(getApplicationContext(),
-                                "error", "ERRO DE CONEXÃO", t.getMessage());
+                                "error", "CREDENCIAIS INVÁLIDAS", "CPF não encontrado");
                     }
                 });
 

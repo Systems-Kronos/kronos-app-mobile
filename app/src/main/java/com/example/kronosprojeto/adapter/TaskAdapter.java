@@ -19,10 +19,7 @@ import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.model.Task;
 import com.google.android.flexbox.FlexboxLayout;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHolder> {
     Context context;
@@ -63,19 +60,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
         double gutEscala = (gut*10 / 125.0);
         Log.e("ESCALA GUT", String.valueOf(gutEscala));
         if (gutEscala > 8){
-            holder.getBorderView().setBackgroundResource(R.drawable.bordavermelha_arredondada);
+            holder.getBorderView().setBackgroundResource(R.drawable.border_red_shape);
             holder.getGutLevelIcon().setImageResource(R.drawable.higher_priority);
         } else if (gutEscala > 6 && gutEscala <= 8) {
-            holder.getBorderView().setBackgroundResource(R.drawable.bordalaranja_arredondada);
+            holder.getBorderView().setBackgroundResource(R.drawable.border_orange_shape);
             holder.getGutLevelIcon().setImageResource(R.drawable.high_priority);
         } else if (gutEscala > 4 && gutEscala <= 6) {
-            holder.getBorderView().setBackgroundResource(R.drawable.bordaamarela_arredondada);
+            holder.getBorderView().setBackgroundResource(R.drawable.border_yellow_shape);
             holder.getGutLevelIcon().setImageResource(R.drawable.medium_priority);
         }else if (gutEscala > 2 && gutEscala <= 4) {
-            holder.getBorderView().setBackgroundResource(R.drawable.bordaverde_arredondada);
+            holder.getBorderView().setBackgroundResource(R.drawable.border_green_shape);
             holder.getGutLevelIcon().setImageResource(R.drawable.low_priority);
         }else {
-            holder.getBorderView().setBackgroundResource(R.drawable.bordaazul_arredondada);
+            holder.getBorderView().setBackgroundResource(R.drawable.border_blue_shape);
             holder.getGutLevelIcon().setImageResource(R.drawable.lower_priority);
         }
 
