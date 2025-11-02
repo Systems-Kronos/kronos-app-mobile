@@ -2,6 +2,7 @@ package com.example.kronosprojeto.ui.Chat;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,13 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.adapter.ChatAdapter;
 import com.example.kronosprojeto.config.RetrofitClientChatBot;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentChatBinding;
 import com.example.kronosprojeto.dto.ChatBotResponseDto;
+import com.example.kronosprojeto.dto.LoginRequestDto;
 import com.example.kronosprojeto.model.ChatBotSession;
+import com.example.kronosprojeto.model.Task;
+import com.example.kronosprojeto.model.Token;
+import com.example.kronosprojeto.service.AuthService;
 import com.example.kronosprojeto.service.ChatBotService;
+import com.example.kronosprojeto.service.TaskService;
 import com.example.kronosprojeto.ui.Chat.ChatMessage;
+import com.example.kronosprojeto.ui.Login.LoginActivity;
+import com.example.kronosprojeto.ui.Login.PhoneRecoveryActivity;
+import com.example.kronosprojeto.utils.ToastHelper;
 
 import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
@@ -40,17 +51,20 @@ public class ChatFragment extends Fragment {
     private boolean sessionReady = false;
     private ChatBotService chatBotService;
 
+    private AuthService authService;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentChatBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        loadingOverlay= binding.loadingOverlay;
+        loadingOverlay = binding.loadingOverlay;
         messages = new ArrayList<>();
         adapter = new ChatAdapter(requireContext(), messages);
         binding.recyclerViewChat.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerViewChat.setAdapter(adapter);
+        authService = RetrofitClientSQL.createService(AuthService.class);
 
         if (getContext() != null) {
             sessionId = getContext().getSharedPreferences("app", MODE_PRIVATE)
@@ -67,6 +81,7 @@ public class ChatFragment extends Fragment {
         });
 
         startNewSession();
+        callSqlForDau();
 
         return root;
     }
@@ -162,4 +177,24 @@ public class ChatFragment extends Fragment {
             }
         });
     }
+
+
+    private void callSqlForDau() {
+
+        LoginRequestDto loginRequest = new LoginRequestDto("1", "2");
+        Call<Token> call = authService.login(loginRequest);
+
+        call.enqueue(new Callback<Token>() {
+            @Override
+            public void onResponse(Call<Token> call, Response<Token> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Token> call, Throwable t) {
+            }
+        });
+    }
+
+
 }

@@ -271,7 +271,7 @@ public class ProfileFragment extends Fragment {
                         public void onSuccess(String requestId, Map resultData) {
                             loadingOverlay.setVisibility(View.GONE);
                             String imageUrl = resultData.get("secure_url").toString();
-                            Log.d("Cloudinary", "✅ Upload completo: " + imageUrl);
+                            Log.d("Cloudinary", " Upload completo: " + imageUrl);
                             ToastHelper.showFeedbackToast(activity, "success", "SUCESSO:", "Imagem enviada!");
                             updateUserPhoto(imageUrl);
                         }
@@ -366,12 +366,10 @@ public class ProfileFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Log.d("ProfileFragment", "Foto atualizada com sucesso!");
 
-                    // Atualiza o SharedPreferences localmente
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("foto", imageUrl);
                     editor.apply();
 
-                    // Atualiza a imagem na interface
                     if (isAdded() && getView() != null) {
                         ImageView imageView = getView().findViewById(R.id.profile_img);
                         if (imageView != null) {
