@@ -5,6 +5,7 @@ import static android.content.Context.MODE_PRIVATE;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -141,14 +142,34 @@ public class ChatFragment extends Fragment {
         });
     }
 
+
+
     private void sendMessage(String userMessage) {
         adapter.addMessage(new ChatMessage(userMessage, true));
         binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
-        loadingMessage = new ChatMessage("Pensando na sua resposta...", false);
-        binding.btnSend.setEnabled(false);
 
+        loadingMessage = new ChatMessage("Carregando", false);
         adapter.addMessage(loadingMessage);
         binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
+
+        Handler handler = new Handler();
+        String baseText = "Carregando";
+        Runnable runnable = new Runnable() {
+            int dotCount = 0;
+            @Override
+            public void run() {
+                if (loadingMessage != null) {
+                    dotCount = (dotCount + 1) % 4;
+                    String dots = new String(new char[dotCount]).replace("\0", ".");
+                    loadingMessage.setText(baseText + dots);
+                    adapter.notifyItemChanged(adapter.getItemCount() - 1);
+                    handler.postDelayed(this, 500);
+                }
+            }
+        };
+        handler.post(runnable);
+
+        binding.btnSend.setEnabled(false);
 
         Call<ChatBotResponseDto> call = chatBotService.sendMessage(userMessage, sessionId);
         call.enqueue(new Callback<ChatBotResponseDto>() {
@@ -156,8 +177,10 @@ public class ChatFragment extends Fragment {
             public void onResponse(Call<ChatBotResponseDto> call, Response<ChatBotResponseDto> response) {
                 if (!isAdded() || binding == null) return;
 
+                handler.removeCallbacks(runnable);
                 adapter.removeMessage(loadingMessage);
                 loadingMessage = null;
+
                 binding.btnSend.setEnabled(true);
 
                 if (response.isSuccessful() && response.body() != null) {
@@ -173,6 +196,11 @@ public class ChatFragment extends Fragment {
             public void onFailure(Call<ChatBotResponseDto> call, Throwable t) {
                 t.printStackTrace();
                 if (!isAdded()) return;
+
+                handler.removeCallbacks(runnable);
+                adapter.removeMessage(loadingMessage);
+                loadingMessage = null;
+
                 adapter.addMessage(new ChatMessage("Erro ao se comunicar com o servidor.", false));
             }
         });
