@@ -35,13 +35,13 @@ Kronos é um aplicativo Android desenvolvido para que os funcionários possam vi
 
 ## ✨ Funcionalidades
 - Login e recuperação de senha via SMS
-- Controle de acesso restrito aos gestores
-- Gráfico de progresso de tarefas
+- Controle de acesso restrito aos administradores
+- Gráfico de progresso mensal de tarefas
 - Visualização das suas tarefas 
 - Controle de ausências/presença
 - Report de uma tarefa 
 - Notificações e mensagens de status aos usuários
-- Integração com APIs RESTful para dados dinâmicos
+- Comunicação com ChatBot para tirar dúvidas relacionadas ao aplicativo
 
 </br>
 
@@ -65,16 +65,16 @@ git clone https://github.com/Systems-Kronos/kronos-app-mobile
 ```
 com.exemplo.kronosprojeto
 ├── /adaptor                   # Adaptadores para RecyclerViews e outros componentes
-├── /config                    # Configurações (ex: RetrofitClientSQL)
+├── /config                    # Configurações com URL retrofit (ex: RetrofitClientSQL para busca da API SQL hospedada no render)
 ├── /decorador                 # Decoradores de UI
 ├── /dto                       # Objetos de transferência de dados (Requests/Responses)
   └── /error                   # Classes de tratamento de erros
 ├── /modelo                    # Modelos de dados
 ├── /service                   # Serviços para comunicação com APIs
-├── /ui                        # Atividades e Fragmentos (interfaces do usuário)
+├── /ui                        # Activity (Tela do aplicativo) e Fragmentos (interfaces do usuário)
 ├── /utils                     # Utilitários gerais (ex: ToastHelper)
 ├── /viewmodel                 # Modelos de visualização (MVVM)
-├── /trabalhadores             # Trabalhadores para tarefas em background
+├── /Workers                   # Workers para tarefas executadas em segundo plano (Como envio de notificações)
 └── MainActivity.java          # Classe principal da atividade e responsável por menu toolbar
 ```
 
