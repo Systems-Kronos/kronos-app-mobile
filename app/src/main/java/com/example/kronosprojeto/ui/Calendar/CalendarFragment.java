@@ -611,7 +611,7 @@ public class CalendarFragment extends Fragment {
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    if (isAdded()) Toast.makeText(requireContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) ToastHelper.showFeedbackToast(activity,"success","SUCESSO","Dia atualizado com sucesso!");
                     calenderByUser(idUsuario);
                 }
             }
@@ -619,7 +619,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(Call<Calendar> call, Throwable t) {
                 t.printStackTrace();
-                if (isAdded()) Toast.makeText(requireContext(), "Erro na atualização: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"erro","ERRO","Erro ao tentar atualizar o dia");
             }
         });
     }
