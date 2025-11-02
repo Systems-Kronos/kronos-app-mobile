@@ -9,32 +9,42 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
+
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:flexDirection="column">
+            app:alignItems="center"
+            app:flexDirection="column"
+            app:justifyContent="center">
 
-            <ImageView
-                android:id="@+id/imgBack"
-                android:layout_width="28dp"
-                android:layout_height="31dp"
-                android:layout_margin="16dp"
-                android:src="@drawable/baseline_arrow_back_ios_24"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="Voltar" />
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imgBack"
+                    android:layout_width="28dp"
+                    android:layout_height="31dp"
+                    android:layout_margin="16dp"
+                    android:clickable="true"
+                    android:contentDescription="Voltar"
+                    android:focusable="true"
+                    android:src="@drawable/baseline_arrow_back_ios_24" />
+            </com.google.android.flexbox.FlexboxLayout>
 
 
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/no_content_notifications"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
+                android:visibility="gone"
                 app:alignContent="center"
                 app:alignItems="center"
                 app:flexDirection="column"
@@ -47,8 +57,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nada por aqui"
-                    android:textSize="20dp"
                     android:textColor="#D9D9D9"
+                    android:textSize="20dp"
                     android:textStyle="bold">
 
                 </TextView>
@@ -63,7 +73,6 @@
                 android:id="@+id/recyclerviewNotifications"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:layout_marginTop="4dp"
                 tools:ignore="UnknownIdInLayout"
                 tools:listitem="@layout/notification_view" />
