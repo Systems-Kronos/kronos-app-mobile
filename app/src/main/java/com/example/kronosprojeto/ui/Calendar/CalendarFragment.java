@@ -45,13 +45,17 @@ import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.CloudinaryManager;
 import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.config.RetrofitClientNoSQL;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
 import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
+import com.example.kronosprojeto.dto.LoginRequestDto;
 import com.example.kronosprojeto.dto.UploadResultDto;
 import com.example.kronosprojeto.model.Calendar;
+import com.example.kronosprojeto.model.Token;
+import com.example.kronosprojeto.service.AuthService;
 import com.example.kronosprojeto.service.CalendarService;
 import com.example.kronosprojeto.service.CloudinaryService;
 import com.example.kronosprojeto.utils.ToastHelper;
@@ -90,6 +94,8 @@ public class CalendarFragment extends Fragment {
     private CalendarDay selectDay;
     private Calendar selectCalendar;
     private UserViewModel userViewModel;
+    private AuthService authService;
+
     FrameLayout loadingOverlay;
     private String actionSelect;
     private String idUsuario;
@@ -124,6 +130,8 @@ public class CalendarFragment extends Fragment {
         CloudinaryManager.init(requireContext());
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
+        authService = RetrofitClientSQL.createService(AuthService.class);
+
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
                 if(user.getGestor() == null){
@@ -134,6 +142,8 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
+
+        callSqlForDau();
 
         MaterialCalendarView calendarView = binding.calendarView;
 
@@ -657,6 +667,23 @@ public class CalendarFragment extends Fragment {
         greenDecorator = new GreenBorderDecorator(getContext(), greenVisual);
         binding.calendarView.addDecorator(greenDecorator);
         binding.calendarView.invalidateDecorators();
+    }
+
+    private void callSqlForDau() {
+
+        LoginRequestDto loginRequest = new LoginRequestDto("1", "2");
+        Call<Token> call = authService.login(loginRequest);
+
+        call.enqueue(new Callback<Token>() {
+            @Override
+            public void onResponse(Call<Token> call, Response<Token> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Token> call, Throwable t) {
+            }
+        });
     }
 
 }
