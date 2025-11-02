@@ -148,12 +148,12 @@ public class ChatFragment extends Fragment {
         adapter.addMessage(new ChatMessage(userMessage, true));
         binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
 
-        loadingMessage = new ChatMessage("Carregando", false);
+        loadingMessage = new ChatMessage("Pensando na sua resposta", false);
         adapter.addMessage(loadingMessage);
         binding.recyclerViewChat.scrollToPosition(adapter.getItemCount() - 1);
 
         Handler handler = new Handler();
-        String baseText = "Carregando";
+        String baseText = "Pensando na sua resposta";
         Runnable runnable = new Runnable() {
             int dotCount = 0;
             @Override
