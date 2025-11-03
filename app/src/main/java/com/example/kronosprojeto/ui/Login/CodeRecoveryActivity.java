@@ -1,5 +1,4 @@
 package com.example.kronosprojeto.ui.Login;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +21,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.kronosprojeto.R;
+import com.example.kronosprojeto.utils.SendSMS;
 import com.example.kronosprojeto.utils.ToastHelper;
 
 public class CodeRecoveryActivity extends AppCompatActivity {
@@ -54,18 +54,16 @@ public class CodeRecoveryActivity extends AppCompatActivity {
         et3 = findViewById(R.id.otp3);
         et4 = findViewById(R.id.otp4);
 
-        String telefone = getSharedPreferences("app", MODE_PRIVATE).getString("telefone", null);
-        if (telefone == null) {
-            Log.e("SMS_DEBUG", "Telefone nulo ao tentar reenviar SMS");
+        String phone = getSharedPreferences("app", MODE_PRIVATE).getString("phone", null);
+        if (phone == null) {
             return;
         }
-        if (telefone != null && telefone.length() >= 4 && txtSendTo != null) {
-            String ultimos4 = telefone.substring(telefone.length() - 4);
-            String maskedPhone = telefone.substring(0, telefone.length() - 4).replaceAll("\\d", "*");
+        if (phone != null && phone.length() >= 4 && txtSendTo != null) {
+            String ultimos4 = phone.substring(phone.length() - 4);
+            String maskedPhone = phone.substring(0, phone.length() - 4).replaceAll("\\d", "*");
             txtSendTo.setText("SMS enviado para o telefone: " + maskedPhone + ultimos4);
         }
 
-        // Setup EditTexts
         if (et1 != null && et2 != null && et3 != null && et4 != null) {
             et1.addTextChangedListener(new GenericTextWatcher(et1, et2));
             et2.addTextChangedListener(new GenericTextWatcher(et2, et3));
@@ -82,11 +80,9 @@ public class CodeRecoveryActivity extends AppCompatActivity {
             configurarBackspace();
         }
 
-        // Inicia contador para reenvio
         iniciarContador();
     }
 
-    // --- Permissões SMS ---
     private boolean hasSmsPermission() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 == PackageManager.PERMISSION_GRANTED;
@@ -110,7 +106,6 @@ public class CodeRecoveryActivity extends AppCompatActivity {
         }
     }
 
-    // --- Código e contador ---
     private void iniciarContador() {
         if (txtTimeReesend == null) return;
 
@@ -131,11 +126,9 @@ public class CodeRecoveryActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Gerar código aleatório
                     int novoCodigo = (int) (Math.random() * 9000) + 1000;
                     Log.d("SMS_DEBUG", "Código gerado: " + novoCodigo + " para telefone: " + telefone);
 
-                    // Verificar permissão de SMS
                     if (!hasSmsPermission()) {
                         Log.d("SMS_DEBUG", "Permissão de SMS negada, solicitando...");
                         requestSmsPermission();
@@ -149,14 +142,12 @@ public class CodeRecoveryActivity extends AppCompatActivity {
                         SendSMS.enviarSMS(CodeRecoveryActivity.this, telefone, novoCodigo);
                         Log.d("SMS_DEBUG", "SMS enviado via SendSMS");
 
-                        // Salvar código
                         getSharedPreferences("app", MODE_PRIVATE)
                                 .edit()
                                 .putInt("verification_code", novoCodigo)
                                 .apply();
                         Log.d("SMS_DEBUG", "Código salvo nas SharedPreferences");
 
-                        // Reiniciar contador
                         iniciarContador();
 
                     } catch (Exception e) {

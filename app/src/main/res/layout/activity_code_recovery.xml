@@ -145,23 +145,14 @@
         app:layout_constraintTop_toBottomOf="@+id/otpLayout" />
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="144dp"
-        android:layout_height="131dp"
-        android:layout_marginTop="660dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/kronoslogopurplelogin" />
-
-    <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="232dp"
-        android:layout_height="228dp"
-        android:layout_marginTop="508dp"
+        android:layout_width="202dp"
+        android:layout_height="313dp"
+        android:layout_marginTop="60dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/kronoslogoyellowlogin" />
+        app:layout_constraintTop_toBottomOf="@id/txtTimeReesend"
+        app:srcCompat="@drawable/img_login_gear" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,7 +3,9 @@ package com.example.kronosprojeto.ui.Login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -11,10 +13,10 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.kronosprojeto.MainActivity;
 import com.example.kronosprojeto.R;
@@ -47,23 +49,17 @@ public class LoginActivity extends AppCompatActivity {
     private void setupCpfMask(EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 if (isUpdating) {
                     isUpdating = false;
                     return;
                 }
-
                 String raw = unmask(s.toString());
                 StringBuilder masked = new StringBuilder();
-
                 int i = 0;
                 for (char m : mask.toCharArray()) {
                     if (m != '#') {
@@ -74,7 +70,6 @@ public class LoginActivity extends AppCompatActivity {
                         else break;
                     }
                 }
-
                 isUpdating = true;
                 int selection = masked.length();
                 editText.setText(masked.toString());
@@ -87,10 +82,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ⚠️ Essencial: define o layout antes de usar findViewById
         setContentView(R.layout.activity_login);
 
-        // EdgeToEdge
         EdgeToEdge.enable(this);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -98,7 +91,6 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Views
         loadingOverlay = findViewById(R.id.loadingOverlay);
         cpfInput = findViewById(R.id.cpfInput);
         passwordInput = findViewById(R.id.passwordInput);
@@ -112,6 +104,41 @@ public class LoginActivity extends AppCompatActivity {
         phoneRecoveryEntrypoint.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
             startActivity(intent);
+        });
+
+        passwordInput.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getRawX() >= (passwordInput.getRight() -
+                        passwordInput.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+
+                    // alterna visibilidade da senha
+                    if (passwordInput.getInputType() ==
+                            (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+
+                        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                        passwordInput.setCompoundDrawablesWithIntrinsicBounds(
+                                R.drawable.padlock_icon, 0,
+                                R.drawable.eye_icon_small_open, 0);
+                    } else {
+                        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT |
+                                InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        passwordInput.setCompoundDrawablesWithIntrinsicBounds(
+                                R.drawable.padlock_icon, 0,
+                                R.drawable.eye_icon_small_close, 0);
+                    }
+
+                    // move o cursor para o fim de forma segura
+                    Editable currentText = passwordInput.getText();
+                    if (currentText != null) {
+                        passwordInput.setSelection(currentText.length());
+                    }
+
+                    return true; // indica que o evento foi consumido
+                }
+            }
+            return false;
         });
 
         String openFragment = getIntent().getStringExtra("open_fragment");
@@ -136,6 +163,15 @@ public class LoginActivity extends AppCompatActivity {
                     "info",
                     "Campos vazios",
                     "Preencha CPF e senha!");
+            loadingOverlay.setVisibility(View.GONE);
+            return;
+        }
+
+        if (unmask(cpf).length() < 11) {
+            ToastHelper.showFeedbackToast(getApplicationContext(),
+                    "info",
+                    "CPF inválido",
+                    "O CPF deve conter 11 dígitos!");
             loadingOverlay.setVisibility(View.GONE);
             return;
         }

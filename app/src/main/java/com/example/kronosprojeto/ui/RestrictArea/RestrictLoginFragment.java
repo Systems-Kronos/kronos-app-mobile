@@ -2,6 +2,7 @@ package com.example.kronosprojeto.ui.RestrictArea;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,9 +66,11 @@ public class RestrictLoginFragment extends Fragment {
         }
 
 
-
         LoginAdmRequestDTO loginAdmRequest = new LoginAdmRequestDTO(email, password);
         Call<LoginAdmResponseDTO> call = admService.login(loginAdmRequest);
+        Log.e("LOGIN ADM", loginAdmRequest.getEmail());
+        Log.e("LOGIN ADM", loginAdmRequest.getSenha());
+
 
         call.enqueue(new Callback<LoginAdmResponseDTO>() {
             @Override
@@ -81,7 +84,7 @@ public class RestrictLoginFragment extends Fragment {
                             .apply();
 
                     ToastHelper.showFeedbackToast(requireContext(), "success",
-                            "Login realizado", "Token salvo com sucesso.");
+                            "Login realizado", "Bem-vindo a área restrita");
 
                     NavController navController = Navigation.findNavController(requireView());
                     navController.navigate(R.id.action_RestrictLogin_to_BI);

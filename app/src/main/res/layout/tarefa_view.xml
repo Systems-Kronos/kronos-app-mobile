@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="12dp"
     android:layout_marginStart="20dp"
-    android:background="@drawable/borda_tarefa"
+    android:background="@drawable/borda_task"
     app:alignItems="stretch">
 
     <View
@@ -13,7 +13,7 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:background="@drawable/bordaverde_arredondada" />
+        android:background="@drawable/border_green_shape" />
 
 
     <com.google.android.flexbox.FlexboxLayout
@@ -46,7 +46,7 @@
                 android:layout_width="110dp"
                 android:layout_height="20dp"
                 android:layout_alignParentStart="true"
-                android:background="@drawable/borda_tag_roxa"
+                android:background="@drawable/borda_tag_purple"
                 app:alignItems="center"
                 app:justifyContent="center">
 

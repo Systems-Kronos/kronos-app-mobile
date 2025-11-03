@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.palette.graphics.Palette;
@@ -38,17 +40,22 @@ import com.bumptech.glide.request.transition.Transition;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+
 import com.example.kronosprojeto.R;
 import com.example.kronosprojeto.config.CloudinaryManager;
 import com.example.kronosprojeto.config.RetrofitClientCloudinary;
 import com.example.kronosprojeto.config.RetrofitClientNoSQL;
+import com.example.kronosprojeto.config.RetrofitClientSQL;
 import com.example.kronosprojeto.databinding.FragmentCalendarBinding;
 import com.example.kronosprojeto.decorator.BlackBackgroundDecorator;
 import com.example.kronosprojeto.decorator.GrayBorderDecorator;
 import com.example.kronosprojeto.decorator.GreenBorderDecorator;
 import com.example.kronosprojeto.decorator.OrangeBorderDecorator;
+import com.example.kronosprojeto.dto.LoginRequestDto;
 import com.example.kronosprojeto.dto.UploadResultDto;
 import com.example.kronosprojeto.model.Calendar;
+import com.example.kronosprojeto.model.Token;
+import com.example.kronosprojeto.service.AuthService;
 import com.example.kronosprojeto.service.CalendarService;
 import com.example.kronosprojeto.service.CloudinaryService;
 import com.example.kronosprojeto.utils.ToastHelper;
@@ -87,6 +94,9 @@ public class CalendarFragment extends Fragment {
     private CalendarDay selectDay;
     private Calendar selectCalendar;
     private UserViewModel userViewModel;
+    private AuthService authService;
+
+    FrameLayout loadingOverlay;
     private String actionSelect;
     private String idUsuario;
     List<CalendarDay> greenVisual;
@@ -115,10 +125,12 @@ public class CalendarFragment extends Fragment {
 
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        View view = inflater.inflate(R.layout.fragment_calendar, container, false);
+        loadingOverlay= binding.loadingOverlay;
         activity = getActivity();
         CloudinaryManager.init(requireContext());
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+
+        authService = RetrofitClientSQL.createService(AuthService.class);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
@@ -130,6 +142,8 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
+
+        callSqlForDau();
 
         MaterialCalendarView calendarView = binding.calendarView;
 
@@ -161,17 +175,12 @@ public class CalendarFragment extends Fragment {
             if (dialog.getWindow() != null) {
                 Window window = dialog.getWindow();
 
-                // Define a posição
                 window.setGravity(Gravity.TOP | Gravity.END);
-
-                // Define margens da borda superior e direita
                 WindowManager.LayoutParams params = window.getAttributes();
-                params.y = 100; // distância do topo
-                params.x = 50;  // distância da direita
+                params.y = 100;
+                params.x = 50;
                 window.setAttributes(params);
 
-                // 💡 Define o tamanho máximo da janela
-                // Usando  wrap_content para não ocupar a tela inteira
                 window.setLayout(
                         (int) (getResources().getDisplayMetrics().widthPixels * 0.45),
                         WindowManager.LayoutParams.WRAP_CONTENT
@@ -331,16 +340,14 @@ public class CalendarFragment extends Fragment {
                 return;
             }
 
-            // 🔹 1. Salva a imagem original em cache sem reduzir qualidade
             File uploadFile = new File(requireContext().getCacheDir(), "upload_original.jpg");
             try (FileOutputStream out = new FileOutputStream(uploadFile)) {
                 originalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // qualidade máxima
             }
 
-            // 🔹 2. Faz upload unsigned para o Cloudinary
             com.cloudinary.android.MediaManager.get()
                     .upload(uploadFile.getAbsolutePath())
-                    .unsigned("kronos-upload") // nome exato do preset unsigned
+                    .unsigned("kronos-upload")
                     .callback(new com.cloudinary.android.callback.UploadCallback() {
                         @Override
                         public void onStart(String requestId) {
@@ -357,13 +364,8 @@ public class CalendarFragment extends Fragment {
                         public void onSuccess(String requestId, Map resultData) {
                             String uploadedImageUrl = resultData.get("secure_url").toString();
                             Log.d("Cloudinary", "Upload completo: " + uploadedImageUrl);
-                            ToastHelper.showFeedbackToast(activity, "success", "SUCESSO:", "Imagem enviada!");
-
-                            // Atualiza ImageView
                             binding.imageAtestado.setVisibility(View.VISIBLE);
                             binding.imageAtestado.setImageURI(imageUri);
-
-                            // Guarda a URL para envio com o calendário
                             CalendarFragment.this.uploadedImageUrl = uploadedImageUrl;
                         }
 
@@ -385,8 +387,6 @@ public class CalendarFragment extends Fragment {
             ToastHelper.showFeedbackToast(activity, "error", "ERRO:", "Falha ao processar imagem");
         }
     }
-
-
 
     private void abrirGaleria() {
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -468,6 +468,7 @@ public class CalendarFragment extends Fragment {
         if (userId == null) return;
 
         CalendarService calendarService = RetrofitClientNoSQL.createService(CalendarService.class);
+        loadingOverlay.setVisibility(View.VISIBLE);
 
         calendarService.searchUser(userId).enqueue(new Callback<List<Calendar>>() {
             @Override
@@ -476,6 +477,9 @@ public class CalendarFragment extends Fragment {
                     Log.e("CALENDAR_DEBUG", "Fragment fechado");
                     return;
                 }
+
+
+                loadingOverlay.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     calenderByUser = response.body();
@@ -607,7 +611,7 @@ public class CalendarFragment extends Fragment {
             public void onResponse(Call<Calendar> call, Response<Calendar> response) {
                 if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    if (isAdded()) Toast.makeText(requireContext(), "Dia atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) ToastHelper.showFeedbackToast(activity,"success","SUCESSO","Dia atualizado com sucesso!");
                     calenderByUser(idUsuario);
                 }
             }
@@ -615,7 +619,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onFailure(Call<Calendar> call, Throwable t) {
                 t.printStackTrace();
-                if (isAdded()) Toast.makeText(requireContext(), "Erro na atualização: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded()) ToastHelper.showFeedbackToast(activity,"erro","ERRO","Erro ao tentar atualizar o dia");
             }
         });
     }
@@ -663,6 +667,23 @@ public class CalendarFragment extends Fragment {
         greenDecorator = new GreenBorderDecorator(getContext(), greenVisual);
         binding.calendarView.addDecorator(greenDecorator);
         binding.calendarView.invalidateDecorators();
+    }
+
+    private void callSqlForDau() {
+
+        LoginRequestDto loginRequest = new LoginRequestDto("1", "2");
+        Call<Token> call = authService.login(loginRequest);
+
+        call.enqueue(new Callback<Token>() {
+            @Override
+            public void onResponse(Call<Token> call, Response<Token> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Token> call, Throwable t) {
+            }
+        });
     }
 
 }

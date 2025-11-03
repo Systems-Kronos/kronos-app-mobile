@@ -8,7 +8,10 @@ import retrofit2.http.Query;
 public interface ChatBotService {
 
     @GET("new_session")
-    Call<ChatBotSession> createNewSession();
+    Call<ChatBotSession> createNewSession(
+            @Query("user_id") String usuarioId
+    );
+
     @GET("chat")
     Call<ChatBotResponseDto> sendMessage(
             @Query("query") String query,

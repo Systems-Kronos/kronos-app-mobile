@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.Manifest;
 
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     private UserViewModel userViewModel;
     private NotificationViewModel notificationViewModel;
     private DrawerLayout drawerLayout;
-    TextView tvUsername;
     private static final String POST_NOTIF = Manifest.permission.POST_NOTIFICATIONS;
 
     private ActivityResultLauncher<String> requestNotificationPermission;
@@ -194,7 +194,11 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
+        Log.d("DEBUG_TOKEN", "Token carregado na MainActivity: " + token);
         String cpf = prefs.getString("cpf", null);
+
+
+
 
         if (token != null && cpf != null) {
             UserService userService = RetrofitClientSQL.createService(UserService.class);
@@ -244,11 +248,9 @@ public class MainActivity extends AppCompatActivity {
                     NotificationProcessor.processarNotificacoes(MainActivity.this, lista);
                 }
             }
-
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
-                ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi carregar as notificações");
-                startActivity(new Intent(MainActivity.this, SplashScreen.class));
+                ToastHelper.showFeedbackToast(getApplicationContext(), "error", "ERRO:", "Não foi possível carregar as notificações");
             }
         });
 

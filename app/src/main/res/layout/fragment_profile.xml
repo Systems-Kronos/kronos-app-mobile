@@ -49,7 +49,7 @@
                     android:layout_width="330dp"
                     android:layout_height="90dp"
                     android:layout_marginTop="16dp"
-                    android:background="@drawable/borda_amarela"
+                    android:background="@drawable/borda_yellow_button"
                     android:padding="14dp"
                     app:justifyContent="space_between"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -211,8 +211,8 @@ realocadas"
                 </com.google.android.flexbox.FlexboxLayout>
 
 
-                <Button
-                    android:id="@+id/btnTarefaSemanal"
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnHistory"
                     android:layout_width="330dp"
                     android:layout_height="58dp"
                     android:layout_marginTop="12dp"
@@ -237,7 +237,7 @@ realocadas"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btnTarefaSemanal"
+                    app:layout_constraintTop_toBottomOf="@+id/btnHistory"
                     tools:listitem="@layout/tarefa_view" />
 
                 <ImageView
