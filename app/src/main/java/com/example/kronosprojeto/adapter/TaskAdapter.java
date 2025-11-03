@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -102,14 +103,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TarefaViewHold
                 Bundle bundle = new Bundle();
                 bundle.putLong("idTarefa", tarefas.get(position).getId());
 
-                if(comeFrom.equals("home")){
-                    navController.navigate(R.id.action_HomeFragment_to_details,bundle);
-                }else{
-                    navController.navigate(R.id.action_PerfilFragment_to_details,bundle);
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setLaunchSingleTop(true) // evita múltiplas instâncias
+                        .setPopUpTo(R.id.HomeFragment, false)
+                        .build();
 
+                if (comeFrom.equals("home")) {
+                    navController.navigate(R.id.action_HomeFragment_to_details, bundle, navOptions);
+                } else {
+                    navController.navigate(R.id.action_PerfilFragment_to_details, bundle, navOptions);
                 }
             }
         });
+
         holder.getTagView().setText(tarefas.get(position).getOrigemTarefa()); // precisa ter no model
         holder.getDetailsView().setText("Mais informações");
     }
