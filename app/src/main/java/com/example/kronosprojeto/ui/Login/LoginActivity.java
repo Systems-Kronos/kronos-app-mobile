@@ -193,7 +193,7 @@ public class LoginActivity extends AppCompatActivity {
                             .putString("cpf", cpf)
                             .apply();
 
-                    if (password.equals("senha123")) {
+                    if (password.equals("Senha@123")) {
                         Intent intent = new Intent(LoginActivity.this, PhoneRecoveryActivity.class);
                         startActivity(intent);
                         return;
